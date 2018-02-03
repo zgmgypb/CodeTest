@@ -11,4 +11,5 @@ int main(void)
 	printf("%s %d\n", __func__, g);
 	add_g();
 	printf("%s %d\n", __func__, g);
+	sizeof g;
 }
