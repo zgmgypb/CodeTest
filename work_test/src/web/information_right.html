@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+
+    <script type="text/javascript" src="/js/language.js"></script>
+
+    <script type="text/javascript" src="/js/common_process.js"></script>
+
+    <script type="text/javascript" src="/js/device_information.js"></script>
+    
+
+    <script type="text/javascript">
+        JS_LANInitiate();//初始化语言脚本组件
+        JS_InfoInitiate();
+        function OnLoad() 
+        {
+
+       }
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="650px" border="0" align="center" cellpadding="0" cellspacing="0" id="Table2">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_650.gif">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div style="height: 300px; overflow: auto; padding: 10px;">
+                    <img src="/graphics/intro.jpg" width="600" height="300">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="/graphics/boxbottom_650.gif">
+            </td>
+        </tr>
+    </table>
+    <div style="height:10px; overflow:hidden;">
+    </div>
+    <table width="650px" border="0" align="center" cellpadding="0" cellspacing="0" >
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_650.gif">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("auth_info")</script></span>
+            </td>
+        </tr>
+        <tr>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+				<div style="height: 134px; overflow: auto; padding: 10px;">
+					<table width="100%" height="" border="1" align="center" cellpadding="10" cellspacing="2" id="Table1" style="table-layout: fixed">
+						<tr>
+							<td height="22" width="130" align="left" bgcolor="#E4EFF8">
+								&nbsp<span><script type="text/javascript">								           	document.write(JS_LAN("license_status"))</script></span>
+							</td>
+							<td align="center" bgcolor="#F5F9FE">
+								<span>
+									<script type="text/javascript">
+										if (JS_InfoLicenseValid() > 0)
+										{
+											document.write("<img src=\"/graphics/green_hook.gif\" style=\"height: 20px; width: 20px; display: inline\" />")
+
+										}
+									</script>
+								</span>
+							</td>
+							<td height="22" align="left" bgcolor="#E4EFF8">
+								&nbsp<span><script type="text/javascript">								           	document.write(JS_LAN("license_mode"))</script></span>
+							</td>
+							<td align="center" bgcolor="#F5F9FE">
+								<span>
+
+									<script type="text/javascript">										document.write(JS_InfoGetAuthMode())</script>
+
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td height="22" align="left" bgcolor="#E4EFF8">
+								&nbsp<span><script type="text/javascript">								           	document.write(JS_LAN("license_time"))</script></span>
+							</td>
+							<td align="center" bgcolor="#F5F9FE" >
+								<span>
+
+									<script type="text/javascript">										document.write(JS_InfoGetAuthorizationTime())</script>
+
+								</span>
+							</td>
+							<td height="22" width="130" align="left" bgcolor="#E4EFF8">
+								&nbsp<span><script type="text/javascript">								           	document.write(JS_LAN("trail_remain_time"))</script></span>
+							</td>
+							<td align="center" bgcolor="#F5F9FE">
+								<span>
+
+									<script type="text/javascript">										document.write(JS_InfoGetLeftTrailTime())</script>
+
+								</span>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13" background="/graphics/boxbottom_650.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

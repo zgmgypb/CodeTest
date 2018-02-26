@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/system_parameter.js"></script>
+    <script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem;
+		var s_MaxTsNum = 0; //限制最大文件数量
+		var s_TotalMaxBps = 0; //限制总发送码率
+		var s_TotalMaxSize = 0; //限制总文件大小
+		var s_MaxINSNameByteSize = 31; //名称最大字节数
+		var s_PIDMapIDsArray = new Array();
+
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnLoad()
+		{
+			var i;
+			var lItemArray;
+			var lItemInfo;
+			var lCurSumBps, lCurSumSize
+
+			JS_ParamInitate();
+			lItemInfo = JS_ParamGetInserterInfo();
+			s_MaxTsNum = lItemInfo.m_MaxItemNum;
+			s_TotalMaxBps = lItemInfo.m_MaxTotalBitrate;
+			s_TotalMaxSize = lItemInfo.m_MaxTotalSize;
+			s_MaxINSNameByteSize = lItemInfo.m_MaxNameBytes;
+
+			s_BitrateListItem = new MyListControl("s_BitrateListItem", 820, 440, "list_target", true);
+			s_BitrateListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_BitrateListItem.SetColProperty(1, 200, JS_LAN("description"), "center", "center");
+			s_BitrateListItem.SetColProperty(2, 140, JS_LAN("size"), "center", "center");
+			s_BitrateListItem.SetColProperty(3, 100, JS_LAN("out_ts"), "center", "center");
+			s_BitrateListItem.SetColProperty(4, 120, JS_LAN("bitrate"), "center", "center");
+			s_BitrateListItem.SetColProperty(5, 80, JS_LAN("mark"), "center", "center");
+			s_BitrateListItem.SetColProperty(6, 80, "", "center", "center");
+			s_BitrateListItem.UpdateListFrame();
+
+			lCurSumBps = 0;
+			lCurSumSize = 0;
+			lItemArray = JS_ParamGetInserterArray();
+			for (i = 0; i < lItemArray.length; i++)
+			{
+				lItemInfo = JS_ParamGetInserterItem(lItemArray[i]);
+				s_PIDMapIDsArray[s_PIDMapIDsArray.length] = lItemInfo.m_IDs;
+				lCurSumBps += lItemInfo.m_Bitrate;
+				lCurSumSize += lItemInfo.m_Size;
+				OnAddInserterRow(lItemInfo.m_IDs, lItemInfo.m_Name, lItemInfo.m_Size, lItemInfo.m_OutTsIndex, lItemInfo.m_Bitrate, lItemInfo.m_Active);
+			}
+
+			$("sum_size").value = (lCurSumSize / 1024).toFixed(3) + "/" + (s_TotalMaxSize / 1024).toFixed(3);
+			$("sum_bps").value = (lCurSumBps / 1000).toFixed(3) + "/" + (s_TotalMaxBps / 1000).toFixed(3);
+
+
+			if (JS_ParamGetRemuxSystemInfo().m_DisableRemuxMark == "ON")
+			{
+			    $("submit_edit").disabled = true;
+			}
+			else
+			{
+			    $("submit_edit").disabled = false;
+			}
+
+		}
+
+
+		function OnSelectRemove()
+		{
+			s_BitrateListItem.RemoveSelectedRow();
+		}
+
+
+		function OnAddInserterRow(IDs, Name, Size, OutTsIndex, Bitrate, Active, bShow)
+		{
+			var lHolderNode;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "170px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Name;
+			lHolderNode.defaultValue = lHolderNode.value;
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "100px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Size;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			s_BitrateListItem.SetColValue(2, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "70px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = OutTsIndex + 1;
+			lHolderNode.defaultValue = lHolderNode.value;
+			JS_RestrctInputInt(lHolderNode);
+			s_BitrateListItem.SetColValue(3, lHolderNode);
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "100px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = (Bitrate / 1000).toFixed(3);
+			lHolderNode.defaultValue = lHolderNode.value;
+			JS_RestrctInputFloat(lHolderNode);
+			s_BitrateListItem.SetColValue(4, lHolderNode);
+			
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Active, true);
+			lHolderNode.style.height = "18px";
+			s_BitrateListItem.SetColValue(5, lHolderNode);
+
+
+			s_BitrateListItem.AddRowToDom(false, IDs, bShow);
+		}
+		
+		function OnSubmit(Item)
+		{
+			var lTmpVar;
+        	var i, k, lRowNum;
+        	var lName, lBitrate, lOutTsNum, lTotalBps;
+        	var lOutTsIndex, lMark, lIDs;
+
+        	var lHolderNode, lInforNode;
+
+        	lOutTsNum = JS_ParamGetTsNum(false);
+
+        	var lXMLDom = JS_XMLCreateDomFromFile(null);
+        	lRowNum = s_BitrateListItem.GetRowNumber();
+
+        	lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "manual_ts_inserter", "");
+
+        	for (i = 0; i < lRowNum; i++)
+        	{
+        		lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+        		JS_UISetErrorIndicator(lTmpVar, true, false);
+        		lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 3);
+        		JS_UISetErrorIndicator(lTmpVar, true, false);
+        		lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 4);
+        		JS_UISetErrorIndicator(lTmpVar, true, false);
+        	}
+
+        	lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "add_modify_items");
+        	lTotalBps = 0;
+        	for (i = 0; i < lRowNum; i++)
+        	{
+        		lIDs = s_BitrateListItem.GetRowData(i);
+        		for (k = 0; k < s_PIDMapIDsArray.length; k++)
+        		{
+        			if (s_PIDMapIDsArray[k] == lIDs)
+        			{
+        				s_PIDMapIDsArray.splice(k, 1);
+        				break;
+        			}
+        		}
+
+        		lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+        		lName = lTmpVar.value;
+        		if (JS_HTMLStringByteLength(lName) > s_MaxINSNameByteSize)
+        		{
+        			JS_UISetErrorIndicator(lTmpVar, false, true);
+        			return false;
+        		}
+
+
+        		lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 3);
+        		lOutTsIndex = parseInt(lTmpVar.value, 10) - 1;
+        		if (lOutTsIndex < 0 || lOutTsIndex >= lOutTsNum)
+        		{
+        			JS_UISetErrorIndicator(lTmpVar, false, true);
+        			return;
+        		}
+
+        		lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 4);
+        		lBitrate = parseFloat(lTmpVar.value) * 1000;
+        		lTotalBps += lBitrate;
+        		if (lTotalBps > s_TotalMaxBps)
+        		{
+        			JS_UISetErrorIndicator(lTmpVar, false, true);
+        			return;
+        		}
+
+        		lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 5);
+        		lMark = JS_UISelectGetCurValue(lTmpVar);
+
+        		lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "item");
+        		JS_XMLAddTextChild(lXMLDom, lInforNode, "ids", lIDs);
+        		JS_XMLAddTextChild(lXMLDom, lInforNode, "name", lName);
+        		JS_XMLAddTextChild(lXMLDom, lInforNode, "bitrate", lBitrate);
+        		JS_XMLAddTextChild(lXMLDom, lInforNode, "out_ts_index", lOutTsIndex);
+        		JS_XMLAddTextChild(lXMLDom, lInforNode, "active_mark", lMark);
+        	}
+
+
+        	lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "remove_items");
+        	for (k = 0; k < s_PIDMapIDsArray.length; k++)
+        	{
+        		lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "item");
+        		JS_XMLAddTextChild(lXMLDom, lInforNode, "ids", s_PIDMapIDsArray[k]);
+        	}
+
+        	JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+
+        	window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+
+        }
+
+        function OnTsFileUpload()
+        {
+        	return true;
+        }
+
+    </script>
+</head>
+<body onload="OnLoad()">
+    <table width="850px" border="0" align="center" cellpadding="0" cellspacing="0" >
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="list_target" style="height: 442px;width:820px; overflow: auto; padding:5px 10px 0px 10px;">
+                </div>
+				<div id="head" style="height: 28px; width: 800px; overflow: hidden; padding: 5px 20px 5px 20px;">
+					<table width="100%">
+						<tr>
+							<td height="25px" bgcolor="#E4EFF8" width="25%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+								<span><script type="text/javascript">JS_INLAN("space")</script></span>
+							</td>
+							<td height="25px" bgcolor="#E4EFF8" width="25%" align="left" style="color: #069; font-size: 12pt;">
+								<input id="sum_size" type="text" style="width:120px; text-align:center" readOnly />
+							</td>
+							<td height="25px" bgcolor="#F5F9FE" width="25%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+								<span><script type="text/javascript">JS_INLAN("total_bitrate")</script></span>
+							</td>
+							<td height="25px" bgcolor="#F5F9FE" width="25%" align="left" style="color: #069; font-size: 12pt;" >
+								<input id="sum_bps" type="text" style="width:120px; text-align:center" readOnly />
+							</td>
+						</tr>
+					</table>
+				</div>
+           </td>
+        </tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+				<div style="height: 30px;width:800px; overflow: auto;padding: 5px 20px 5px 20px; text-align:right">
+                    <form target="_self" method="post" enctype="multipart/form-data" action="cgi-bin/upload.cgi" id="ts_upload"  onsubmit ="return(OnTsFileUpload())">
+                    <input type="hidden" name="type" value="ts" />
+                    <input type="hidden" name="file_limit" value="1048576" />
+                    <input type="hidden" name="redirect" value="/upload_right_cgi.html" />
+                    <input type="hidden" name="back" value="/mux_right_inserter.html" />
+                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                    	<tr>
+                    		<td align="left">
+								<input type="file" name="file" style="width:300px; height: 25px" />
+								<button type="submit" style="width: 60px; height: 25px" id="uploade_small_ts_file"><script type="text/javascript">JS_INCMNLAN("upload")</script></button>
+                    		</td>
+                     		<td align="right">
+								<button type="button" onclick='OnSelectRemove();' style="width:80px; height:25px" ><script type="text/javascript">JS_INCMNLAN("remove")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='OnSubmit(this)' style="width: 80px; height:25px" id="submit_edit"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width:80px; height:25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                     		</td>
+                   		</tr>
+                    </table>
+                    </form>
+                </div>
+           </td>
+        </tr>
+        <tr>
+            <td height="13px"  background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/js/monitor_setting.js"></script>
+    <script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+	<script type="text/javascript" src="/card/card_language.js"></script>
+	<script type="text/javascript" src="/card/card_system.js"></script>
+    <script type="text/javascript">
+    	var s_ModuleInd;
+    	var s_ModuleTag;
+    	var s_List;
+    	
+    	JS_CLANInitiate();
+    	JS_LANInitiate();
+    	JS_CardParamInitiate();
+
+    	function OnXMLCBProgressInfo(XMLDom)
+    	{
+    	    if (JS_ISValidObject(XMLDom)) 
+    	    {
+    	        var lInfoArray, lInfoNode;
+    	        var lState, lProgress, lAvgBand, lCurBand, lDurationTotal, lDurationLeft, lCheckOK;
+
+    	        lInfoArray = JS_XMLGetTagNameArray(XMLDom, "progress_chip_info");
+
+    	        for (i = 0; i < lInfoArray.length; i++)
+    	        {
+    	            lInfoNode = lInfoArray[i];
+    	            lState = JS_XMLGetTagValueINT(lInfoNode, "state");
+    	            if (lState != 0)
+    	            {
+    	                lProgress = JS_XMLGetTagValueFloat(lInfoNode, "progress");
+    	                lAvgBand = JS_XMLGetTagValueFloat(lInfoNode, "avg_bandwidth");
+    	                lCurBand = JS_XMLGetTagValueFloat(lInfoNode, "cur_bandwidth");
+    	                lDurationTotal = JS_XMLGetTagValueFloat(lInfoNode, "duration");
+    	                lDurationLeft = JS_XMLGetTagValueFloat(lInfoNode, "left_duration");
+    	                lCheckOK = JS_XMLGetTagValueINT(lInfoNode, "check_ok");
+
+
+    	                $("progress_width" + "_" + i).style.width = (lProgress * 100).toFixed(1) + "%";
+    	                $("progress_text" + "_" + i).innerText = (lProgress * 100).toFixed(1) + "%";
+
+
+    	                $("avg_bandwidth" + "_" + i).value = (lAvgBand / 1024 / 1024).toFixed(3);
+    	                $("cur_bandwidth" + "_" + i).value = (lCurBand / 1024 / 1024).toFixed(3);
+    	                $("duration" + "_" + i).value = lDurationTotal.toFixed(1);
+    	                $("left_duration" + "_" + i).value = lDurationLeft.toFixed(1);
+
+    	                if (lState == 3)
+    	                {
+    	                    if (lCheckOK > 0)
+    	                    {
+    	                        $("check_ok" + "_" + i).src = "/graphics/green.gif"
+    	                    }
+    	                    else
+    	                    {
+    	                        $("check_ok" + "_" + i).src = "/graphics/red.gif"
+    	                    }
+    	                }
+
+
+    	            }
+
+    	            if (lState == 0)
+    	            {
+    	                $("state_" + i).value = JS_CLAN("idle");
+    	            }
+    	            else if (lState == 1)
+    	            {
+    	                $("state_" + i).value = JS_CLAN("programing");
+    	            }
+    	            else if (lState == 2)
+    	            {
+    	                $("state_" + i).value = JS_CLAN("checking");
+    	            }
+    	            else
+    	            {
+    	                $("state_" + i).value = JS_CLAN("complete");
+    	            }
+    	        }
+
+    	        setTimeout(OnTimeoutDelayGetProgressInfo, 3000);
+    	    }
+    	}
+
+    	function OnTimeoutDelayGetProgressInfo()
+    	{
+    	    lXMLDom = JS_XMLCreateDomFromFile(null);
+    	    lBodyHolder = JS_XMLParamSetSubModuleHead(lXMLDom, s_ModuleInd, "progress_info");
+    	    JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnXMLCBProgressInfo, false);
+    	}
+
+    	function AddRow(SubInd)
+    	{
+    	    var lRowInd;
+    	    var lHolderNode, lContainer;
+
+    	    lRowInd = 1;
+    	    lHolderNode = document.createElement("input");
+    	    lHolderNode.type = "text";
+    	    lHolderNode.style.width = "90px";
+    	    lHolderNode.style.textAlign = "center";
+    	    lHolderNode.value = "";
+    	    lHolderNode.id = "state" + "_" + SubInd;
+    	    s_List.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+
+    	    {
+    	        var lProgressBar;
+    	        var lInnerBar;
+    	        
+    	        lProgressBar = document.createElement("div");
+    	        lProgressBar.style.width = 180;
+    	        lProgressBar.style.height = "23px";
+    	        lProgressBar.style.border = "2px";
+    	        lProgressBar.style.borderColor = "black";
+    	        lProgressBar.style.position = "relative";
+    	        lProgressBar.style.margin = "0px";
+
+    	        lInnerBar = document.createElement("div");
+    	        lInnerBar.style.width = "0%";
+    	        lInnerBar.style.height = "80%";
+    	        lInnerBar.style.backgroundColor = "#C0D0F0";
+    	        lInnerBar.id = "progress_width" + "_" + SubInd;
+
+
+    	        lTextNode = document.createElement("span");
+    	        lTextNode.style.position = "absolute";
+    	        lTextNode.style.width = 180;
+    	        lTextNode.innerText = "0%";
+    	        lTextNode.id = "progress_text" + "_" + SubInd;
+
+    	        lInnerBar.appendChild(lTextNode);
+    	        
+    	        lProgressBar.appendChild(lInnerBar);
+
+    	        lHolderNode = lProgressBar;
+    	    }
+    	    s_List.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+    	    lHolderNode = document.createElement("input");
+    	    lHolderNode.type = "text";
+    	    lHolderNode.style.width = "60px";
+    	    lHolderNode.style.textAlign = "center";
+    	    lHolderNode.id = "avg_bandwidth" + "_" + SubInd;
+    	    lHolderNode.value = "";
+    	    s_List.SetColValue(lRowInd, lHolderNode); lRowInd++;
+    	    
+    	    lHolderNode = document.createElement("input");
+    	    lHolderNode.type = "text";
+    	    lHolderNode.style.width = "60px";
+    	    lHolderNode.style.textAlign = "center";
+    	    lHolderNode.id = "cur_bandwidth" + "_" + SubInd;
+    	    lHolderNode.value = "";
+    	    s_List.SetColValue(lRowInd, lHolderNode); lRowInd++;
+    	    
+    	    lHolderNode = document.createElement("input");
+    	    lHolderNode.type = "text";
+    	    lHolderNode.style.width = "60px";
+    	    lHolderNode.style.textAlign = "center";
+    	    lHolderNode.id = "duration" + "_" + SubInd;
+    	    lHolderNode.value = "";
+    	    s_List.SetColValue(lRowInd, lHolderNode); lRowInd++;
+    	    
+    	    lHolderNode = document.createElement("input");
+    	    lHolderNode.type = "text";
+    	    lHolderNode.style.width = "60px";
+    	    lHolderNode.style.textAlign = "center";
+    	    lHolderNode.id = "left_duration" + "_" + SubInd;
+    	    lHolderNode.value = "";
+    	    s_List.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+    	    lHolderNode = document.createElement("img");
+    	    lHolderNode.id = "check_ok" + "_" + SubInd;
+    	    lHolderNode.src = "/graphics/grey.gif"
+    	    s_List.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+    	    s_List.AddRowToDom(false);
+    	}
+    	
+    	function OnXMLCBBurnerInfo(XMLDom)
+    	{
+    	    if (JS_ISValidObject(XMLDom))
+    	    {
+    	        lModuleType = JS_XMLGetTagValueINT(XMLDom, "module_type", 10);
+    	        lSubChipNum = JS_XMLGetTagValueINT(XMLDom, "sub_chip_num", 10);
+    	        lFlashSize = JS_XMLGetTagValueINT(XMLDom, "flash_file_size", 10);
+    	        lFlashCRC32 = JS_XMLGetTagValue(XMLDom, "flash_file_crc32");
+
+    	        $("burner_info").value = JS_StrLeftPading(lModuleType, 4);
+    	        $("flash_info").value = lFlashSize + " Byte (" + (lFlashSize) / 1024 / 1024 + " MByte) / CRC32 0x" + lFlashCRC32;
+
+
+    	        for (i = 0; i < lSubChipNum; i++)
+    	        {
+    	            AddRow(i);
+    	        }
+
+    	        OnTimeoutDelayGetProgressInfo();
+    	    }
+    	}
+
+    	function OnTimeoutDelayGetBurnerInfo()
+    	{
+    	    lXMLDom = JS_XMLCreateDomFromFile(null);
+    	    lBodyHolder = JS_XMLParamSetSubModuleHead(lXMLDom, s_ModuleInd, "burner_info");
+    	    JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnXMLCBBurnerInfo, false);
+    	}
+
+
+    	function OnLoad()
+    	{
+    		var i, lTmpVar;
+    		var lAlarmSystem, lAlarmArray, lAlarmObj;
+
+    		JS_MONInitiate();
+    		JS_CLANInitiate();
+    		
+    		lTmpVar = JS_ArgGetArgs();
+    		
+    		s_ModuleInd = parseInt(JS_ArgGetValueByName(lTmpVar, "module"), 10);
+    		s_ModuleTag = JS_ArgGetValueByName(lTmpVar, "module_tag");
+
+    		$("cur_name").innerHTML = JS_LANCMN("module") + "-" + JS_StrLeftPading(s_ModuleInd + 1, 2);
+
+
+    		s_List = new MyListControl("s_List", 830, 407, "progress_div", false);
+
+    		i = 0;
+    		s_List.SetColProperty(i, 40, JS_LANCMN("index"), "center", "center"); i++;
+    		s_List.SetColProperty(i, 110, JS_CLAN("state"), "center", "center"); i++;
+    		s_List.SetColProperty(i, 180, JS_CLAN("progress"), "center", "center"); i++;
+    		s_List.SetColProperty(i, 100, JS_CLAN("avg_bandwidth"), "center", "center"); i++;
+    		s_List.SetColProperty(i, 100, JS_CLAN("cur_bandwidth"), "center", "center"); i++;
+    		s_List.SetColProperty(i, 90, JS_CLAN("duraion"), "center", "center"); i++;
+    		s_List.SetColProperty(i, 90, JS_CLAN("left_duration"), "center", "center"); i++;
+    		s_List.SetColProperty(i, 50, JS_CLAN("ok_mark"), "center", "center"); i++;
+    		s_List.UpdateListFrame();
+
+
+    		setTimeout(OnTimeoutDelayGetBurnerInfo, 1);
+        }
+
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="30px" colspan="3" align="center" background="/graphics/boxmenu_850.gif">
+                 <table border="0" cellspacing="0" cellpadding="0" width="100%" style="padding-left:20px;padding-right:20px;">
+					<tr>
+						<td width="250px" align="right">
+						</td>
+						<td align="center">
+							<span style="font-weight: bold"><script type="text/javascript" >JS_CINLAN("title")</script></span>
+						</td>
+						<td width="220px" align="right">
+						    <span id="cur_name" ></span>
+						</td>
+						<td width="30px" align="right">
+						</td>
+					</tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="head" style="height: 30px; width: 800px; overflow: auto; padding: 10px 20px 0px 10px;">
+                    <table width="100%">
+                        <tr>
+                            <td height="22px" bgcolor="#E4EFF8" width="20%" align="left" style="padding-left: 13px;
+                                color: #069; font-size: 10pt;">
+                                <span>
+                                    <script type="text/javascript">JS_CINLAN("burner_info")</script>
+                                </span>
+                            </td>
+                            <td height="20px" bgcolor="#F5F9FE" width="80%" align="left" style="padding-left: 13px;color: #069; font-size: 10pt;">
+                                <input id="burner_info" type="text" style="width:80px; text-align: center" /> - 
+                                <input id="flash_info" type="text" style="width:480px; text-align: center" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="progress_div" style="height: 429px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" bgcolor="#F5F9FE" align="center" >
+				<div style="height:1px; width:800px;overflow:hidden; background:#666;"></div>
+           </td>
+        </tr>
+		<tr>
+			<td colspan="3" bgcolor="#F5F9FE">
+				<div style="height: 30px; overflow: auto; padding: 5px 25px 7px 25px; text-align: right">
+				    <table width="100%" align="center" cellpadding="0" cellspacing="0">
+						<tr>
+							<td width="50%" align="left">
+							</td>
+							<td width="50%" align="right">
+								<button type="button" onclick='OnSubmitSetting(this);' style="width:80px; height:25px"id="submit" disabled><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+							</td>
+						</tr>
+					</table>
+
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="3" height="13"  background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

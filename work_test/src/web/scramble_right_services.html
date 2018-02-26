@@ -1,0 +1,394 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem = null;
+		var s_TsIndex;
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		function OnLoad()
+		{
+			var lTmpVar, i;
+			var lTsObj, lSCSArray, lSCSObj, lSCSInfo, lServArray, lServObj, lServInfo, lServCAArray, lSCSIDs;
+			var lACColSample;
+			var lRouteInfo, lRouteMark;
+
+			lTmpVar = JS_ArgGetArgs();
+			s_TsIndex = parseInt(JS_ArgGetValueByName(lTmpVar, "ts_index"), 10);
+			if (s_TsIndex == null)
+			{
+				s_TsIndex = 0;
+			}
+
+			JS_ParamInitate();
+
+
+			document.getElementById("ts_index").value = JS_StrLeftPading(s_TsIndex + 1, 3);
+			s_BitrateListItem = new MyListControl("s_BitrateListItem", 820, 400, "list_target", false);
+			s_BitrateListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_BitrateListItem.SetColProperty(1, 80, JS_LANCMN("service_id"), "center", "center");
+			s_BitrateListItem.SetColProperty(2, 140, JS_LANCMN("service_name"), "center", "center");
+			s_BitrateListItem.SetColProperty(3, 450, JS_LAN("ac_sel"), "center", "center");
+			s_BitrateListItem.SetColProperty(4, 60, JS_LAN("scramble"), "center", "center");
+			s_BitrateListItem.UpdateListFrame();
+
+			lTsObj = JS_ParamGetTsObject(s_TsIndex, false);
+			lRouteInfo = JS_ParamGetTsRouteInfo(lTsObj);
+			if (lRouteInfo.m_RouteMark == "ON")
+			{
+				lRouteMark = true;
+			}
+			else
+			{
+				lRouteMark = false;
+			}
+			
+			lSCSArray = JS_ParamGetSCSArray();
+			lACColSample = OnCreateACSelectUI(lSCSArray);
+
+			
+			
+			lServArray = JS_ParamGetServArrayByTsIndex(s_TsIndex, false);
+			for (i = 0; i < lServArray.length; i++)
+			{
+				lServObj = lServArray[i];
+				lItemInfo = JS_ParamGetServiceInfo(lServObj, false);
+				lServCAArray = JS_ParamGetServCAArray(lServObj, false);
+				if (lServCAArray.length == lSCSArray.length)
+				{
+					OnAddServiceRow(lItemInfo.m_IDs, lItemInfo.m_ServID, lItemInfo.m_ServName, lItemInfo.m_ScrambleMark, lServCAArray, lACColSample, lRouteMark);
+				}
+				else
+				{
+					alert("error");
+				}
+			}
+			
+			$("batch_ac").appendChild(lACColSample.cloneNode(true));
+			$("batch_start").value = lServArray.length?1:0;
+			$("batch_end").value = lServArray.length;
+			
+		}
+
+
+		function OnAddServiceRow(ServIDs, ServID, ServName, bScramble, LocalCAArray, ACColSample, DisableMark)
+		{
+			var lHolderNode, lACNodeArray, lCAInfo;
+			var i;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.readOnly = true;
+			lHolderNode.value = ServID;
+			lHolderNode.defaultValue = lHolderNode.value;
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "130";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = ServName;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			s_BitrateListItem.SetColValue(2, lHolderNode);
+
+
+			lHolderNode = ACColSample.cloneNode(true);
+			lACNodeArray = lHolderNode.getElementsByTagName("select");
+			for (i = 0; i < LocalCAArray.length; i++)
+			{
+				lCAInfo = JS_ParamGetSCSCAInfo(LocalCAArray[i]);
+				JS_UISelectSetCurIndexByValue(lACNodeArray[i], lCAInfo.m_ACIDs)
+			}
+			s_BitrateListItem.SetColValue(3, lHolderNode);
+			
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, bScramble, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.disabled = DisableMark;
+			s_BitrateListItem.SetColValue(4, lHolderNode);
+
+
+			s_BitrateListItem.AddRowToDom(false, ServIDs, false);
+		}
+
+		function OnCreateACSelectUI(SCSArray)
+		{
+			var i, k;
+			var lHolderNode, lContainer;  
+			var lSCSInfo, lACArray, lACInfo;
+			
+			lContainer = document.createElement("span");
+			for (i = 0; i < SCSArray.length; i++)
+			{
+				lSCSInfo = JS_ParamGetSCSInfo(SCSArray[i]);
+				lHolderNode = JS_UISelectCreate();
+				lHolderNode.style.height = "18px";
+				lHolderNode.name = "scs_" + i;
+				lACArray = JS_ParamGetSCSACArray(SCSArray[i]);
+				JS_UISelectAddOption(lHolderNode, 0, "        ");
+				lHolderNode.style.width = "110px";
+				if (lACArray.length == 0)
+				{
+					lHolderNode.disabled = true;
+				}
+				else
+				{
+					for (k = 0; k < lACArray.length; k++)
+					{
+						lACInfo = JS_ParamGetACInfo(lACArray[k]);
+
+						lACInfo.m_Name = JS_StrLeftPading((k + 1), 3) + "-" + lACInfo.m_Name;
+
+						JS_UISelectAddOption(lHolderNode, lACInfo.m_IDs, lACInfo.m_Name);
+					}
+				}
+
+				lContainer.appendChild(lHolderNode);
+			}
+			return lContainer;
+		}
+		
+		function OnValidation() 
+		{
+			var i, k, lRowNum;
+			var lACContainer, lACSelect, lACIDs, lScrambleContainer, lScrambleMark;
+			var lSCSArray, lSCSObj, lSCSInfo;
+
+			lSCSArray = JS_ParamGetSCSArray();
+
+			lRowNum = s_BitrateListItem.GetRowNumber();
+			for (i = 0; i < lRowNum; i++)
+			{
+				lScrambleContainer = s_BitrateListItem.GetColNodeByIndex(i, 4);
+				
+				lACContainer = s_BitrateListItem.GetColNodeByIndex(i, 3);
+				for (k = 0; k < lSCSArray.length; k++)
+				{
+					lSCSObj = lSCSArray[k];
+					lSCSInfo = JS_ParamGetSCSInfo(lSCSObj);
+					lACSelect = JS_HTMLFindElementByName(lACContainer, "select", "scs_" + k);
+					JS_UISetErrorIndicator(lACSelect, true, false);
+					JS_UISetErrorIndicator(lScrambleContainer, true, false);
+				}
+			}
+
+
+			for (i = 0; i < lRowNum; i++)
+			{
+				lScrambleContainer = s_BitrateListItem.GetColNodeByIndex(i, 4);
+				lScrambleMark = JS_HTMLGetValue(lScrambleContainer);
+				
+				lACContainer = s_BitrateListItem.GetColNodeByIndex(i, 3);
+				for (k = 0; k < lSCSArray.length; k++)
+				{
+					lSCSObj = lSCSArray[k];
+					lSCSInfo = JS_ParamGetSCSInfo(lSCSObj);
+					lACSelect = JS_HTMLFindElementByName(lACContainer, "select", "scs_" + k);
+					lACIDs = JS_HTMLGetValue(lACSelect);
+					if (lSCSInfo.m_Active == "ON" && lScrambleMark == "ON")
+					{
+						if (lACIDs == 0) 
+						{
+							JS_UISetErrorIndicator(lACSelect, false, false);
+							JS_UISetErrorIndicator(lScrambleContainer, false, true);
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
+		
+		function OnSubmit(Item)
+		{
+			var i, k, lRowNum;
+			var lXMLDom, lHolderNode, lSCSIDs, lServIDs, lACIDs;
+			var lContainer, lACSelect;
+			var lSCSArray, lSCSObj, lSCSInfo, lServObj;
+			
+// 			if (OnValidation() == false) 
+// 			{
+// 				return false;
+// 			}
+
+			lSCSArray = JS_ParamGetSCSArray();
+
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "scramble", "services", "");
+
+			
+			lRowNum = s_BitrateListItem.GetRowNumber();
+			for (i = 0; i < lRowNum; i++)
+			{
+				lServIDs = s_BitrateListItem.GetRowData(i);
+				lServObj = JS_ParamGetServByIDs(lServIDs);
+				if (lServObj != null) 
+				{
+					lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "service");
+					JS_XMLAddTextChild(lXMLDom, lHolderNode, "serv_ids", lServIDs);
+					lContainer = s_BitrateListItem.GetColNodeByIndex(i, 4);
+					JS_XMLAddTextChild(lXMLDom, lHolderNode, "scramble_mark", JS_HTMLGetValue(lContainer));
+
+					
+					lSCSIDs = JS_ParamGetServSCSCAIDs(lServObj);
+					lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "scs");
+					JS_XMLAddTextChild(lXMLDom, lHolderNode, "scs_ids", lSCSIDs);
+					
+					lContainer = s_BitrateListItem.GetColNodeByIndex(i, 3);
+					for (k = 0; k < lSCSArray.length; k++)
+					{
+						lSCSObj = lSCSArray[k];
+						lSCSInfo = JS_ParamGetSCSInfo(lSCSObj);
+						lACSelect = JS_HTMLFindElementByName(lContainer, "select", "scs_" + k);
+						lACIDs = JS_HTMLGetValue(lACSelect);
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "scs_acids_" + k, lACIDs);
+					}
+				}
+			}
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+
+		function OnBatchApply(Item)
+		{
+			var i;
+			var lTmpValue, lContainer;
+			var lIndS, lIndE;
+		
+			
+			JS_UISetErrorIndicatorByID("batch_start", true, false);
+			JS_UISetErrorIndicatorByID("batch_end", true, false);
+
+
+			lIndS = parseInt($("batch_start").value, 10) - 1;
+			lIndE = parseInt($("batch_end").value, 10) - 1;
+
+			if (lIndS > lIndE)
+			{
+				JS_UISetErrorIndicatorByID("batch_start", false, false);
+				JS_UISetErrorIndicatorByID("batch_end", false, false);
+				return;
+			}
+
+			if (lIndS >= s_BitrateListItem.GetRowNumber() || lIndS < 0)
+			{
+				JS_UISetErrorIndicatorByID("batch_start", false, false);
+				return;
+			}
+
+			if (lIndE >= s_BitrateListItem.GetRowNumber() || lIndE < 0)
+			{
+				JS_UISetErrorIndicatorByID("batch_end", false, false);
+				return;
+			}
+			
+			if (Item.id == "apply_ac")
+			{
+				var lSCSArray, lACSelect;
+				var lBatchACIDs;
+				
+				lBatchACIDs = new Array();
+
+				lSCSArray = JS_ParamGetSCSArray();
+
+
+				lContainer = $("batch_ac");
+				for (k = 0; k < lSCSArray.length; k++)
+				{
+					lACSelect = JS_HTMLFindElementByName(lContainer, "select", "scs_" + k);
+					lBatchACIDs[k] = JS_HTMLGetValue(lACSelect);
+				}
+
+				for (i = lIndS; i < lIndE + 1; i++)
+				{
+					lContainer = s_BitrateListItem.GetColNodeByIndex(i, 3);
+					for (k = 0; k < lSCSArray.length; k++)
+					{
+						lACSelect = JS_HTMLFindElementByName(lContainer, "select", "scs_" + k);
+						JS_UISelectSetCurIndexByValue(lACSelect, lBatchACIDs[k], false);
+					}
+				}
+				
+				lTmpValue = JS_UISelectGetCurValue($("batch_mak"));
+				for (i = lIndS; i < lIndE + 1; i++)
+				{
+					lContainer = s_BitrateListItem.GetColNodeByIndex(i, 4);
+					JS_UISelectSetCurIndexByValue(lContainer, lTmpValue, false);
+				}
+
+				lBatchACIDs = null;
+			}
+		}
+
+	</script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+				<div style="height: 31px; width: 820px; overflow: auto; padding-left: 20px; padding-top: 10px; text-align: left; border: solid 0px #00FF00;">
+					<span><script type="text/javascript">JS_INCMNLAN("ts");</script></span>&nbsp;&nbsp;<input type="text" style="width: 60px; text-align: center;" id="ts_index" />
+				</div>
+				<div id="list_target" style="height: 403px; width: 820px; overflow: auto; padding: 1px 10px 0px 10px; border: solid 0px #FF0000;">
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+			<td valign="top" align="left" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+                    <input type="text" id="batch_start" style="width:40px; padding-left:5px; text-align:center"/>-<input type="text" id="batch_end" style="width:40px; padding-left:5px; text-align:center"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span id="batch_ac"></span>&nbsp;&nbsp;
+                    <select id="batch_mak"><option value="OFF">OFF</option><option value="ON">ON</option></select>&nbsp;&nbsp;
+                    <button type="button" onclick="OnBatchApply(this);" style="width: 100px; height: 25px" id="apply_ac" ><script type="text/javascript">JS_INLAN("apply_ac")</script></button>&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

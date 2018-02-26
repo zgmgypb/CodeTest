@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript">
+
+		JS_LANInitiate(); 
+
+		function OnLoad()
+		{
+			var i, lTmpVar, lItemInfo, lTmpStr, lTmpValue, lCharSetArray, lCharSetInfo;
+
+			lTmpVar = JS_ArgGetArgs();
+
+			JS_RestrctInputInt($("servl_pid"));
+			JS_RestrctInputHEX($("servl_table_id"));
+			JS_RestrctInputHEX($("servl_desc_tag"));
+			JS_RestrctInputInt($("servl_bps"));
+			JS_RestrctInputHEX($("local_id"));
+
+			JS_ParamInitate();
+
+
+			lTmpVar = JS_ParamGetSERVL();
+
+			JS_UISelectSetCurIndexByValue($("serv_active_mark"), JS_XMLGetTagValue(lTmpVar, "serv_active_mark"));
+			JS_UISelectSetCurIndexByValue($("serv_encrypt_mark"), JS_XMLGetTagValue(lTmpVar, "serv_encrypt_mark"));
+			$("servl_pid").value = parseInt(JS_XMLGetTagValue(lTmpVar, "servl_pid"), 10);
+			$("servl_table_id").value = parseInt(JS_XMLGetTagValue(lTmpVar, "servl_table_id"), 10).toString(16).toUpperCase();
+			$("servl_desc_tag").value = parseInt(JS_XMLGetTagValue(lTmpVar, "servl_desc_tag"), 10).toString(16).toUpperCase();
+			$("servl_bps").value = parseInt(JS_XMLGetTagValue(lTmpVar, "servl_bps"), 10) / 1000;
+			$("local_id").value = JS_XMLGetTagValue(lTmpVar, "local_id");
+			$("servl_desc_content").value = JS_XMLGetTagValue(lTmpVar, "servl_desc_content");
+			
+		}
+       
+		function OnSubmit(Item)
+		{
+			var lTmpValue;
+			var lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			JS_UISetErrorIndicatorByID("servl_pid", true, false);
+			JS_UISetErrorIndicatorByID("servl_table_id", true, false);
+			JS_UISetErrorIndicatorByID("servl_desc_tag", true, false);
+			JS_UISetErrorIndicatorByID("servl_bps", true, false);
+			JS_UISetErrorIndicatorByID("local_id", true, false);
+
+			lTmpValue = parseInt($("servl_pid").value, 10);
+			if (lTmpValue < 47 || lTmpValue > 8190)
+			{
+				JS_UISetErrorIndicatorByID("servl_pid", false, true);
+				return;
+			}
+
+			lTmpValue = parseInt($("servl_table_id").value, 16);
+			if (lTmpValue < 0 || lTmpValue > 255)
+			{
+				JS_UISetErrorIndicatorByID("servl_table_id", false, true);
+				return;
+			}
+			
+			lTmpValue = parseInt($("servl_desc_tag").value, 16);
+			if (lTmpValue < 0 || lTmpValue > 255)
+			{
+				JS_UISetErrorIndicatorByID("servl_desc_tag", false, true);
+				return;
+			}
+
+			lTmpValue = parseInt($("servl_bps").value, 10);
+			if (lTmpValue < 1 || lTmpValue > 1000000)
+			{
+				JS_UISetErrorIndicatorByID("servl_bps", false, true);
+				return;
+			}
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "servl_setting", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "serv_active_mark", JS_UISelectGetCurValue($("serv_active_mark")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "serv_encrypt_mark", JS_UISelectGetCurValue($("serv_encrypt_mark")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "servl_pid", $("servl_pid").value);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "servl_table_id", parseInt($("servl_table_id").value, 16));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "servl_desc_tag", parseInt($("servl_desc_tag").value, 16));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "servl_bps", parseInt($("servl_bps").value, 10) * 1000);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "local_id", $("local_id").value);
+
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(5, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+	</script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                	<tr>
+                		<td width="150px" align="right"></td>
+                		<td><script type="text/javascript">JS_INLAN("title")</script></td>
+                		<td width="150px" align="right"></td>
+                	</tr>
+                </table>
+			</td>
+		</tr>
+		<tr>
+			<td  bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("servl_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("serv_active_mark")</script></span>&nbsp;&nbsp;&nbsp;<select id="serv_active_mark"><option value="OFF">OFF</option><option value="ON">ON</option></select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("serv_encrypt_mark")</script></span>&nbsp;&nbsp;&nbsp;<select id="serv_encrypt_mark"><option value="OFF">OFF</option><option value="ON">ON</option></select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 25%">
+										</td>
+										<td style="text-align: left; width: 25%">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("servl_pid")</script></span>&nbsp;&nbsp;&nbsp;<input id="servl_pid" type="text" style="text-align: center; width: 40px" value="47" />&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("servl_table_id")</script></span>&nbsp;&nbsp;&nbsp;<input id="servl_table_id" type="text" style="text-align: center; width: 40px" value="47" />&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("servl_desc_tag")</script></span>&nbsp;&nbsp;&nbsp;<input id="servl_desc_tag" type="text" style="text-align: center; width: 40px" value="47" />&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("servl_bps")</script></span>&nbsp;&nbsp;&nbsp;<input id="servl_bps" type="text" style="text-align: center; width: 40px" value="47" />&nbsp;&nbsp;&nbsp;
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 100%">
+											<span><script type="text/javascript">											      	JS_INLAN("servl_desc_content")</script></span>&nbsp;&nbsp;&nbsp;<input id="servl_desc_content" type="text" style="text-align: center; width: 400px" value="" readonly/>&nbsp;&nbsp;&nbsp;
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("local_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 35%">
+											<span><script type="text/javascript">JS_INLAN("local_id")</script></span>&nbsp;&nbsp;&nbsp;<input id="local_id" type="text" style="text-align: center; width: 70px" value="00000000" />&nbsp;&nbsp;&nbsp;
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+            <td colspan="3" height="30px" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

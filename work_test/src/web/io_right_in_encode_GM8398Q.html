@@ -1,0 +1,1525 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="js/common_process.js"></script>
+	<script type="text/javascript" src="js/language.js"></script>
+	<script type="text/javascript" src="js/system_parameter.js"></script>
+	<script type="text/javascript" src="components/my_list_control/my_list_control.js"></script>
+	<script type="text/javascript">
+
+    //Global paramters
+    var s_Direction = "input";
+    var s_ChannelIndex = null;
+    var s_ChannelType = null;
+    var s_ChannelSubType = null;
+    var s_SubChannelNum = null;
+
+    JS_LANInitiate(); //初始化语言脚本组件
+
+    //联动函数
+    function OnVideoFormatDataChange(Obj, Index) 
+    {
+        var i, lTmpValue, lTmpNode;
+        lTmpValue = JS_UISelectGetCurValue(Obj);
+        for (i = 0; i < 4; ++i) 
+        {
+            JS_UISelectSetCurIndexByValue($("video_format_" + i), lTmpValue, true);
+            lTmpNode = $("resolution_" + i);
+            lTmpNode.length = 0;	
+                
+            //NTSC    
+            if ((lTmpValue == "NTSC(M/J)") || (lTmpValue == "PAL(M)") || (lTmpValue == "NTSC4.43")) 
+            {
+                JS_UISelectAddOption(lTmpNode, "720*480", "720*480");
+                JS_UISelectAddOption(lTmpNode, "704*480", "704*480");
+                JS_UISelectAddOption(lTmpNode, "640*480", "640*480");
+                JS_UISelectAddOption(lTmpNode, "544*480", "544*480");
+                JS_UISelectAddOption(lTmpNode, "352*480", "352*480");
+                JS_UISelectSetCurIndexByValue(lTmpNode, "720*480", true);
+                //JS_UISelectSetCurIndexByValue($("frame_rate_" + i), "29.97", true);
+            }
+            else 
+            {
+            //PAL
+            
+                JS_UISelectAddOption(lTmpNode, "720*576", "720*576");
+                JS_UISelectAddOption(lTmpNode, "704*576", "704*576");
+                JS_UISelectAddOption(lTmpNode, "640*576", "640*576");
+                JS_UISelectAddOption(lTmpNode, "544*576", "544*576");
+                JS_UISelectAddOption(lTmpNode, "352*576", "352*576");
+                JS_UISelectSetCurIndexByValue(lTmpNode, "720*576", true);
+                //JS_UISelectSetCurIndexByValue($("frame_rate_" + i), "25", true);
+            }
+        }
+    }
+
+    function OnAudioEncodeModeDataChange(Obj, Index) {
+        var i, lTmpValue, lTmpNode;
+        lTmpValue = JS_UISelectGetCurValue(Obj);
+        for (i = 0; i < 4; ++i) {
+            JS_UISelectSetCurIndexByValue($("audio_encode_mode_" + i), lTmpValue, true);
+            lTmpNode = $("audio_bit_rate_" + i);
+            lTmpNode.length = 0;
+            if (lTmpValue == "MPEG-1 L2") {
+                JS_UISelectAddOption(lTmpNode, "192", "192");
+                JS_UISelectAddOption(lTmpNode, "224", "224");
+                JS_UISelectAddOption(lTmpNode, "256", "256");
+                JS_UISelectAddOption(lTmpNode, "320", "320");
+                JS_UISelectAddOption(lTmpNode, "384", "384");
+                JS_UISelectSetCurIndexByValue(lTmpNode, "192", true);
+            }
+            else if (lTmpValue == "HE-AAC V1") {
+                JS_UISelectAddOption(lTmpNode, "96", "96");
+                JS_UISelectAddOption(lTmpNode, "112", "112");
+                JS_UISelectAddOption(lTmpNode, "128", "128");
+                JS_UISelectAddOption(lTmpNode, "160", "160");
+                JS_UISelectAddOption(lTmpNode, "192", "192");
+                JS_UISelectSetCurIndexByValue(lTmpNode, "96", true);
+            }
+            else if (lTmpValue == "HE-AAC V2") {
+                JS_UISelectAddOption(lTmpNode, "96", "96");
+                JS_UISelectSetCurIndexByValue(lTmpNode, "96", true);
+            }
+            else {
+                JS_UISelectAddOption(lTmpNode, "96", "96");
+                JS_UISelectAddOption(lTmpNode, "112", "112");
+                JS_UISelectAddOption(lTmpNode, "128", "128");
+                JS_UISelectAddOption(lTmpNode, "160", "160");
+                JS_UISelectAddOption(lTmpNode, "192", "192");
+                JS_UISelectAddOption(lTmpNode, "224", "224");
+                JS_UISelectAddOption(lTmpNode, "256", "256");
+                JS_UISelectAddOption(lTmpNode, "320", "320");
+                JS_UISelectSetCurIndexByValue(lTmpNode, "96", true);
+            }
+        }
+    }
+
+    function OnLoad() {
+    
+    //Xml Var
+    
+    var lUrlParaFromLeftHtlm;
+    var lChnObj;
+    var lSubChnObj;
+    var lSubEntryEntryObj;
+    var lChnInfo;
+    var lSubInfo;
+
+    var lVidoeFrmatSelect;
+    var lVideoResolutionSelect;
+    var lOutBitRateModeSelect;
+    var lVideoAspectSelect;
+    var lAudioSampleRateSelect;
+    var lAudioBitRateSelect;
+    var lAudioEncodeModeSelect;
+    var lFrameRateSelect;
+    var lVideoProfileSelect;
+    var lWorkModeSelcet;
+    var lAudioEncodeModeSelect;
+    var lVideoEncodeModeSelect;
+    var lPidEqualSwitch;
+
+    var lTmpValue;
+    var lTmpParaInput;
+    var i, k;
+    var lActive;
+
+    lUrlParaFromLeftHtlm = JS_ArgGetArgs();
+    s_Direction = JS_ArgGetValueByName(lUrlParaFromLeftHtlm, "direction");
+    s_ChannelIndex = parseInt(JS_ArgGetValueByName(lUrlParaFromLeftHtlm, "chn_ind"), 10);
+
+    JS_ParamInitate(); //初始化系统参数处理脚本组件
+    if (s_Direction == "input") {
+        lChnObj = JS_ParamGetInChannelObject(s_ChannelIndex);
+    }
+    else {
+        lChnObj = JS_ParamGetOutChannelObjct(s_ChannelIndex);
+    }
+
+    s_ChannelType = JS_ParamGetChannelType(lChnObj); //ENCODER_CVBS_DXT8243
+    s_ChannelSubType = JS_ParamGetChannelSubType(lChnObj); //编码子板类型 ASI输入 或者 CVBS输入
+    s_SubChannelNum = JS_ParamGetSubChannelNum(lChnObj); //编码子板输入通道数 ：4
+    //s_SubChannelNum = 4;         
+    //s_ChannelSubType = "CVBS";    
+    //s_ChannelIndex = 3;
+
+    $("submit").value = JS_LAN("submit");
+    for (i = 0; i < 4; ++i) 
+    {
+        k = s_ChannelIndex * 4 + i + 1; 
+        $("label_ch"+i).innerHTML = JS_LAN("channel")+k;
+    }
+
+    lSubChnObj = JS_ParamGetSubChnObj(lChnObj, 0);
+    
+    for (i = 0; i < 4; ++i) //1.2.3.4
+    {
+        
+        lSubEntryEntryObj = JS_ParamGetSubEncoderEntryObj(lSubChnObj,i)
+
+        lSubInfo = JS_ParamGetSubChannelInfoENCODER(lSubEntryEntryObj);
+
+        if (lSubInfo.m_Dxt8243Active == "0")
+            lActive = false;
+        else
+            lActive = true;
+
+        /////////////////////////////////////////////////////NO.1 Wroking Mode
+        lWorkModeSelcet = $("work_mod_" + i);
+	    JS_UISelectAddOption(lWorkModeSelcet, "Encode", JS_LAN("work_mode_encode"));
+	    JS_UISelectAddOption(lWorkModeSelcet, "Free", JS_LAN("work_mode_free"));
+	    JS_UISelectSetCurIndexByValue(lWorkModeSelcet, lSubInfo.m_WorkMod, true);
+	    lWorkModeSelcet.disabled = lActive;
+        
+        /////////////////////////////////////////////////////NO.2 Video Format
+        var lAudioEmbedSelect = $("audio_emb_channel_" + i); //音频嵌入联动
+        lVidoeFrmatSelect = $("video_format_" + i);
+        lVidoeFrmatSelect.length = 0;
+        if (s_ChannelSubType == "CVBS")  //HWL //0 defined as cvbs ; 1 as sdi; 2 none
+        {
+            lAudioEmbedSelect.disabled = true; ////音频嵌入联动
+
+            JS_UISelectAddOption(lVidoeFrmatSelect, "NTSC(M/J)", "NTSC(M/J)");
+            JS_UISelectAddOption(lVidoeFrmatSelect, "PAL(D/K/B/G/H/I/N)", "PAL(D/K/B/G/H/I/N)");
+            JS_UISelectAddOption(lVidoeFrmatSelect, "PAL(M)", "PAL(M)");
+            JS_UISelectAddOption(lVidoeFrmatSelect, "PAL(COMBINATION-N)", "PAL(COMBINATION-N)");
+            JS_UISelectAddOption(lVidoeFrmatSelect, "NTSC4.43", "NTSC4.43");
+            JS_UISelectAddOption(lVidoeFrmatSelect, "SECAM", "SECAM");
+            JS_UISelectAddOption(lVidoeFrmatSelect, "PAL60", "PAL60");
+            JS_UISelectSetCurIndexByValue(lVidoeFrmatSelect, lSubInfo.m_VideoFormat, true);
+            lVidoeFrmatSelect.onchange = function()
+            {
+                OnVideoFormatDataChange(this, i);
+            }
+        }
+        else if (s_ChannelSubType == SDI) {
+            JS_UISelectAddOption(lVidoeFrmatSelect, "NTSC", "NTSC");
+            JS_UISelectAddOption(lVidoeFrmatSelect, "PAL", "PAL");
+            /*dis_联动 缺省*/
+        }
+        else {
+
+        }
+        lVidoeFrmatSelect.disabled = lActive;
+
+        /////////////////////////////////////////////////////NO.3 Video Resolution
+        lVideoResolutionSelect = $("resolution_" + i);
+        lVideoResolutionSelect.length = 0;	
+        lTmpValue = JS_UISelectGetCurValue(lVidoeFrmatSelect);
+        if ((lTmpValue == "NTSC(M/J)") || (lTmpValue == "PAL(M)") || (lTmpValue == "NTSC4.43"))
+        {
+            JS_UISelectAddOption(lVideoResolutionSelect, "720*480", "720*480");
+            JS_UISelectAddOption(lVideoResolutionSelect, "704*480", "704*480");
+            JS_UISelectAddOption(lVideoResolutionSelect, "640*480", "640*480");
+            JS_UISelectAddOption(lVideoResolutionSelect, "544*480", "544*480");
+            JS_UISelectAddOption(lVideoResolutionSelect, "352*480", "352*480");            
+        }
+        else
+        {
+            JS_UISelectAddOption(lVideoResolutionSelect, "720*576", "720*576");
+            JS_UISelectAddOption(lVideoResolutionSelect, "704*576", "704*576");
+            JS_UISelectAddOption(lVideoResolutionSelect, "640*576", "640*576");
+            JS_UISelectAddOption(lVideoResolutionSelect, "544*576", "544*576");
+            JS_UISelectAddOption(lVideoResolutionSelect, "352*576", "352*576");
+        }
+        JS_UISelectSetCurIndexByValue(lVideoResolutionSelect, lSubInfo.m_Resolution, true);
+        lVideoResolutionSelect.disabled = lActive;
+
+        /////////////////////////////////////////////////////NO.4 Video Output Frame(fps) 
+/*        
+        //"NTSC(M/J)", "PAL(M)", "NTSC4.43", 29.97
+        //"SECAM", "PAL(COMBINATION-N)","PAL(D/K/B/G/H/I/N)","PAL60", 25
+        lFrameRateSelect = $("frame_rate_" + i);
+        lFrameRateSelect.length = 0;
+        JS_UISelectAddOption(lFrameRateSelect, "29.97", "29.97");
+        JS_UISelectAddOption(lFrameRateSelect, "25", "25");
+        lFrameRateSelect.disabled = true;
+        if ((lVidoeFrmatSelect.value == "NTSC(M/J)") || (lVidoeFrmatSelect.value == "PAL(M)") || (lVidoeFrmatSelect.value == "NTSC4.43"))
+            JS_UISelectSetCurIndexByValue(lFrameRateSelect, "29.97", true);
+        else
+            JS_UISelectSetCurIndexByValue(lFrameRateSelect, "25", true);
+        lFrameRateSelect.disabled = lActive;
+*/
+
+
+        /////////////////////////////////////////////////////NO.5 Video Bitrate Mode	
+        lOutBitRateModeSelect = $("out_bit_rate_mode_" + i);
+        lOutBitRateModeSelect.length = 0;
+        JS_UISelectAddOption(lOutBitRateModeSelect, "VBR", "VBR");
+        JS_UISelectAddOption(lOutBitRateModeSelect, "CBR", "CBR");
+        JS_UISelectSetCurIndexByValue(lOutBitRateModeSelect, lSubInfo.m_OutBitRate, true);
+        lOutBitRateModeSelect.disabled = lActive;
+        
+        /////////////////////////////////////////////////////NO.6 Video Encode Mode
+        lVideoEncodeModeSelect = $("video_encode_mode_"+i);
+	    lVideoEncodeModeSelect.options.length = 0;
+	    JS_UISelectAddOption(lVideoEncodeModeSelect, "H.264", "H.264");
+	    JS_UISelectAddOption(lVideoEncodeModeSelect, "MPEG-2", "MPEG-2");
+	    JS_UISelectSetCurIndexByValue(lVideoEncodeModeSelect, lSubInfo.m_VideoEncodeMode, true);
+	    lVideoEncodeModeSelect.disabled = lActive;
+        
+        /////////////////////////////////////////////////////NO.7 Profile Mode
+        lVideoProfileSelect = $("video_profile_"+i);
+	    lVideoProfileSelect.options.length=0;	
+	    //lVideoAspectSelect = $("video_aspect_"+i)
+	    //if (tmp_sys_cfg == 2) //1838
+	    //{
+	        //lVideoAspectSelect.options[0].selected = true;
+	        //lVideoAspectSelect.disabled = true;
+	    //}		
+
+	    //if ((tmp_sys_cfg == 0) || (tmp_sys_cfg == 1)) //1886b or 1898
+	    //{
+		    //select.options[0] = new Option("高端类型","0");
+		    //select.options[1] = new Option("主要类型","1");
+	    JS_UISelectAddOption(lVideoProfileSelect, "High Profile", JS_LAN("video_high_profile"));
+	    JS_UISelectAddOption(lVideoProfileSelect, "Main Profile", JS_LAN("video_main_profile"));
+	    JS_UISelectSetCurIndexByValue(lVideoProfileSelect, lSubInfo.m_VideoProfile, true);
+	    lVideoProfileSelect.disabled = lActive;
+         
+        /////////////////////////////////////////////////////NO.8 Video Aspect Rate	            
+        lVideoAspectSelect = $("video_aspect_" + i);
+        lVideoAspectSelect.length = 0;
+        JS_UISelectAddOption(lVideoAspectSelect, "16:9", "16:9");
+        JS_UISelectAddOption(lVideoAspectSelect, "1:1", "1:1");
+        JS_UISelectAddOption(lVideoAspectSelect, "4:3", "4:3");
+        JS_UISelectSetCurIndexByValue(lVideoAspectSelect, lSubInfo.m_VideoAspect, true);
+        lVideoAspectSelect.disabled = lActive;
+        
+        /////////////////////////////////////////////////////NO.9 Video Bitrate(Kbps)
+        lTmpParaInput = $("video_bit_rate_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_VideoBitRate);
+	    //lTmpParaInput.value = 2500;
+        lTmpParaInput.disabled = lActive;
+        
+        /////////////////////////////////////////////////////NO.10 Image Horizontal Offset
+	    lTmpParaInput = $("image_horizontal_offset_" + i);
+	    lTmpParaInput.value = parseInt(lSubInfo.m_ImageHorizontalOffset);
+	    //lTmpParaInput.value = 20;
+	    lTmpParaInput.disabled = lActive;
+        
+        /////////////////////////////////////////////////////NO.11 Brightness
+        lTmpParaInput = $("brightness_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_Brightness);
+        //lTmpParaInput.value = 50;
+        lTmpParaInput.disabled = lActive;
+
+        /////////////////////////////////////////////////////NO.12 Contrast	
+        lTmpParaInput = $("contrast_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_Contrast);
+        //lTmpParaInput.value = 50;
+        lTmpParaInput.disabled = lActive;
+
+        /////////////////////////////////////////////////////NO.13 Saturation
+        lTmpParaInput = $("saturation_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_Saturation);
+        //lTmpParaInput.value = 50;
+        lTmpParaInput.disabled = lActive;
+
+        /////////////////////////////////////////////////////NO.14 Hue
+        lTmpParaInput = $("hue_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_Hue);
+        //lTmpParaInput.value = 50;
+        lTmpParaInput.disabled = lActive;
+        
+        /////////////////////////////////////////////////////NO.15 Audio Encode Mode	
+        lAudioEncodeModeSelect = $("audio_encode_mode_" + i);
+        lAudioEncodeModeSelect.length = 0;
+
+        JS_UISelectAddOption(lAudioEncodeModeSelect, "MPEG-1 L2", "MPEG-1 L2");
+        JS_UISelectAddOption(lAudioEncodeModeSelect, "LC-AAC", "LC-AAC");
+        JS_UISelectAddOption(lAudioEncodeModeSelect, "HE-AAC V1", "HE-AAC V1");
+        JS_UISelectAddOption(lAudioEncodeModeSelect, "HE-AAC V2", "HE-AAC V2");
+        
+        JS_UISelectSetCurIndexByValue(lAudioEncodeModeSelect, lSubInfo.m_AudioEncodeMode, true);
+        lAudioEncodeModeSelect.onchange = function() 
+        {
+            OnAudioEncodeModeDataChange(this, i);
+        }
+        lAudioEncodeModeSelect.disabled = lActive;
+
+        /////////////////////////////////////////////////////NO.16 Audio Bitrate(Kbps)
+        lAudioBitRateSelect = $("audio_bit_rate_" + i);
+        lAudioBitRateSelect.length = 0;
+
+        if (lAudioEncodeModeSelect.vlaue == "MPEG-1 L2")
+        {
+            JS_UISelectAddOption(lAudioBitRateSelect, "192", "192");
+            JS_UISelectAddOption(lAudioBitRateSelect, "224", "224");
+            JS_UISelectAddOption(lAudioBitRateSelect, "256", "256");
+            JS_UISelectAddOption(lAudioBitRateSelect, "320", "320");
+            JS_UISelectAddOption(lAudioBitRateSelect, "384", "384");
+        }
+        else if (lAudioEncodeModeSelect.vlaue == "HE-ACC V1") 
+        {
+            JS_UISelectAddOption(lAudioBitRateSelect, "96", "96");
+            JS_UISelectAddOption(lAudioBitRateSelect, "112", "112");
+            JS_UISelectAddOption(lAudioBitRateSelect, "128", "128");
+            JS_UISelectAddOption(lAudioBitRateSelect, "160", "160");
+            JS_UISelectAddOption(lAudioBitRateSelect, "192", "192");
+        }
+        else if (lAudioEncodeModeSelect.vlaue == "HE-ACC V2") 
+        {
+            JS_UISelectAddOption(lAudioBitRateSelect, "96", "96");
+        }
+        else
+        {
+            //LC-ACC
+            JS_UISelectAddOption(lAudioBitRateSelect, "96", "96");
+            JS_UISelectAddOption(lAudioBitRateSelect, "112", "112");
+            JS_UISelectAddOption(lAudioBitRateSelect, "128", "128");
+            JS_UISelectAddOption(lAudioBitRateSelect, "160", "160");
+            JS_UISelectAddOption(lAudioBitRateSelect, "192", "192");
+            JS_UISelectAddOption(lAudioBitRateSelect, "224", "224");
+            JS_UISelectAddOption(lAudioBitRateSelect, "256", "256");
+            JS_UISelectAddOption(lAudioBitRateSelect, "320", "320");
+        }
+        JS_UISelectSetCurIndexByValue(lAudioBitRateSelect, lSubInfo.m_AudioBitRate, true);
+        lAudioBitRateSelect.disabled = lActive;
+
+        /////////////////////////////////////////////////////NO.17 Audio Embed
+        //CVBS disable is true
+        JS_UISelectAddOption(lAudioEmbedSelect, "Channel 1", JS_LAN("channel1"));
+
+        /////////////////////////////////////////////////////NO.18 Volume (dB)	  
+        lTmpParaInput = $("volume_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_Volume);
+	    //lTmpParaInput.value = 0;
+        lTmpParaInput.disabled = lActive;
+
+        /////////////////////////////////////////////////////NO.19 Audio Sample Frequency(KHz)
+        lAudioSampleRateSelect = $("audio_sample_rate_" + 1);
+        lAudioSampleRateSelect.length = 0;
+        JS_UISelectAddOption(lAudioSampleRateSelect, "32", "32");
+        JS_UISelectAddOption(lAudioSampleRateSelect, "44.1", "44.1");
+        JS_UISelectAddOption(lAudioSampleRateSelect, "48", "48");
+        JS_UISelectSetCurIndexByValue(lAudioSampleRateSelect, lSubInfo.m_AudioSampleRate, true);
+        lAudioSampleRateSelect.disabled = lActive;
+
+        /////////////////////////////////////////////////////NO.20 Video PID	
+        lTmpParaInput = $("video_pid_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_VideoPid);
+        //lTmpParaInput.value = 128;
+        //lTmpParaInput.disabled = lActive;
+        lTmpParaInput.disabled = true;
+
+        /////////////////////////////////////////////////////NO.21 Audio PID
+        lTmpParaInput = $("audio_pid_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_AudioPid);
+        //lTmpParaInput.value = 144;
+        //lTmpParaInput.disabled = lActive;
+        lTmpParaInput.disabled = true;
+
+        /////////////////////////////////////////////////////NO.22 PCR PID
+        lTmpParaInput = $("pcr_pid_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_PcrPid);
+        //lTmpParaInput.value = 160;
+        //lTmpParaInput.disabled = lActive;
+        lTmpParaInput.disabled = true;
+
+        /////////////////////////////////////////////////////NO.23 PMT PID
+        lTmpParaInput = $("pmt_pid_" + i);
+        lTmpParaInput.value = parseInt(lSubInfo.m_PmtPid);
+        //lTmpParaInput.value = 176;
+        //lTmpParaInput.disabled = lActive;
+        lTmpParaInput.disabled = true;
+
+        /////////////////////////////////////////////////////NO.24 Pid Equal Switch
+        lPidEqualSwitch = $("pid_equal_switch");
+        lPidEqualSwitch.length = 0;
+        JS_UISelectAddOption(lPidEqualSwitch, "On", "On");
+        JS_UISelectAddOption(lPidEqualSwitch, "Off", "Off");
+        JS_UISelectSetCurIndexByValue(lPidEqualSwitch, lSubInfo.m_PidEqualSwitch, true);
+        //JS_UISelectSetCurIndexByValue(lPidEqualSwitch, "On", true);
+        lPidEqualSwitch.disabled = lActive;
+	     
+    }
+
+    //此处检测编码子板（PS：不是CVBS子板）个数
+    //var XmlDom = JS_XMLCreateDomFromFile("xml/how_many_subboards.xml");//需修改为读取新的xml文件
+    var i =0, tmpID//临时变量
+    if (0) //2nd subboard doesn't exist
+    {
+        //修改音频采样显示宽度
+        $("audio_sample_rate_1").style.width = "310px";
+           
+        //隐藏通道3,4所有Object   
+        for (i = 1; i < 24; i++)   // total 24 rows
+        {
+            tmpID = "ch3_td_" + i;
+            $(tmpID).style.display = "none";
+            
+            tmpID = "ch4_td_" + i;
+            $(tmpID).style.display = "none";
+        }
+    }
+    //获取输入焦点
+    //$("video_bit_rate_1").focus();  
+    }
+
+    function isValidVideoBitRate() 
+    {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+        
+        var min;
+        var max; 
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) 
+        {
+            if (s_ChannelSubType == "CVBS") 
+            {
+                lTmpNode = $("video_bit_rate_" + i);
+                lTmpNode.style.color = "";
+
+                lVideoEncodeModeNode = $("video_encode_mode_" + i);
+                max = 5500;
+                if(lVideoEncodeModeNode.value == "H.264") 
+                {
+                    min = 250;
+                }
+                else 
+                {
+                    min = 500;
+                }
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) 
+                {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }                  
+            }
+        }
+        return true;
+    }
+
+    function isValidVideoPid() 
+    {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = 32;
+        var max = 8190;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("video_pid_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function isValidAudioPid()
+    {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = 32;
+        var max = 8190;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("audio_pid_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;    
+    }
+
+    function isValidPcrPid() 
+    {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = 32;
+        var max = 8190;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("pcr_pid_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;      
+    }
+    
+    function isValidPmtPid() 
+    {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = 32;
+        var max = 8190;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("pmt_pid_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;     
+    }
+
+    function isValidVolume() 
+    {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = -63;
+        var max = 20;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("volume_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function isValidImageShift() 
+    {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = 0;
+        var max = 40;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("image_horizontal_offset_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function isValidBrightness()
+    {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = 0;
+        var max = 100;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("brightness_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function isValidContrast() {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = 0;
+        var max = 100;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("contrast_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function isValidSaturation() {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = 0;
+        var max = 100;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+        
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("saturation_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function isValidHue() {
+        var i;
+        var lTmpValue;
+        var lTmpNode;
+
+        var min = 0;
+        var max = 100;
+        var num;
+
+        var lVideoEncodeModeNode = null;
+
+        for (i = 0; i < 4; i++) {
+            if (s_ChannelSubType == "CVBS") {
+                lTmpNode = $("hue_" + i);
+                lTmpNode.style.color = "";
+
+                num = parseInt(lTmpNode.value)
+                if (num > max || num < min) {
+                    lTmpNode.style.borderColor = "#FF0000";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function OnValidationEncoder() 
+    {
+        if (isValidVideoBitRate() == false)
+            return false;
+        if (isValidVideoPid() == false)
+            return false;
+        if (isValidAudioPid() == false)
+            return false;
+        if (isValidPcrPid() == false)
+            return false;
+        if (isValidPmtPid() == false)
+            return false;
+        if (isValidVolume() == false)
+            return false;
+        if (isValidImageShift() == false)
+            return false;
+        if (isValidBrightness() == false)
+            return false;
+        if (isValidContrast() == false)
+            return false;
+        if (isValidSaturation() == false)
+            return false;
+        if (isValidHue() == false)
+            return false;            
+        return true;        
+    }
+
+    function OnSubmit(Item) {
+        var i,j;
+        var lBodyNode, lHolderNode, lEncoderHolderNode;
+        var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+        lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "parameters", "");
+        JS_XMLAddTextChild(lXMLDom, lBodyNode, "chn_ind", s_ChannelIndex);
+        if (s_Direction == "input") {
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "direction", "IN");
+            if (s_ChannelType = "ENCODER_CVBS_DXT8243") {
+                //if (s_ChannelType == "ENCODER_CVBS_DXT8243") {
+                JS_XMLAddTextChild(lXMLDom, lBodyNode, "type", s_ChannelType); //ENCODER_CVBS_DXT8243
+                JS_XMLAddTextChild(lXMLDom, lBodyNode, "sub_type", s_ChannelSubType); //CVBS and SDI
+                for (i = 0; i < s_SubChannelNum; i++)
+                {
+                    lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "sub_channel");
+                    JS_XMLAddTextChild(lXMLDom, lHolderNode, "sub_ind", i);
+
+                    for (j = 0; j < 4; j++) 
+                    {
+                        lEncoderHolderNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "encoder_info_entry");
+                        
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "work_mod", JS_HTMLGetValueByID("work_mod_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "video_format", JS_HTMLGetValueByID("video_format_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "frame_rate", JS_HTMLGetValueByID("frame_rate_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "resolution", JS_HTMLGetValueByID("resolution_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "out_bit_rate_mode", JS_HTMLGetValueByID("out_bit_rate_mode_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "video_encode_mode", JS_HTMLGetValueByID("video_encode_mode_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "video_profile", JS_HTMLGetValueByID("video_profile_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "video_aspect", JS_HTMLGetValueByID("video_aspect_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "video_bit_rate", parseFloat(JS_HTMLGetValueByID("video_bit_rate_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "audio_encode_mode", JS_HTMLGetValueByID("audio_encode_mode_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "audio_bit_rate", JS_HTMLGetValueByID("audio_bit_rate_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "image_horizontal_offset", parseFloat(JS_HTMLGetValueByID("image_horizontal_offset_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "video_pid", parseFloat(JS_HTMLGetValueByID("video_pid_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "audio_pid", parseFloat(JS_HTMLGetValueByID("audio_pid_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "pcr_pid_", parseFloat(JS_HTMLGetValueByID("pcr_pid_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "pmt_pid_", parseFloat(JS_HTMLGetValueByID("pmt_pid_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "brightness", parseFloat(JS_HTMLGetValueByID("brightness_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "contrast", parseFloat(JS_HTMLGetValueByID("contrast_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "saturation", parseFloat(JS_HTMLGetValueByID("saturation_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "hue", parseFloat(JS_HTMLGetValueByID("hue_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "volume", parseFloat(JS_HTMLGetValueByID("volume_" + j)));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "audio_emb_channel", JS_HTMLGetValueByID("audio_emb_channel_" + j));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "audio_sample_rate", JS_HTMLGetValueByID("audio_sample_rate_" + 1));
+                        JS_XMLAddTextChild(lXMLDom, lEncoderHolderNode, "pid_equal_switch", JS_HTMLGetValueByID("pid_equal_switch"));
+                    }
+
+                }
+                if (OnValidationEncoder()) 
+                {
+                    JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+                    window.top.document.frames["BottomFrame"].OnShowLoadingWindow(3, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+                }
+            }
+        }
+    }
+    
+    </script>
+</head>
+
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+            <td height="30"  align="center" background="graphics/boxmenu_850.gif" id="setting_title">
+                    <script type="text/javascript">
+                        JS_INLAN("encoder_web_title")
+                    </script>
+            </td>   
+		</tr>
+		<tr>
+			<td  bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+   <table width="100%">
+                <tr>	
+                    <td class="td_1" bgcolor="#E4EFF8"></td>				
+                    <td align="center" bgcolor="#E4EFF8"><label class="para_label" id="label_ch0"></label></td><!--通道1-->					
+                    <td align="center"  bgcolor="#E4EFF8"><label class="para_label" id="label_ch1"></label></td>
+                    <td id="ch3_td_1" align="center"  bgcolor="#E4EFF8"><label class="para_label" id="label_ch2"></label></td>
+                    <td id="ch4_td_1" align="center"  bgcolor="#E4EFF8"><label class="para_label" id="label_ch3"></label></td>
+                 </tr>
+                 
+                <tr>
+                    <td class="td_1" align="left" bgcolor="#F5F9FE">
+                        <label id="work_mod_txt" class="para_label_1">
+                            <script type="text/javascript">                                JS_INLAN("work_mod")</script><!--工作模式-->	
+                        </label>
+                    </td> 	
+                    							
+                    <td  align="left" bgcolor="#F5F9FE"> 
+                        <select style="width:160px;" style="width:160px;" id="work_mod_0" name="work_mod_1"> 						
+	                    </select>
+                    </td>
+            					
+                    <td align="left" bgcolor="#F5F9FE"> 
+                        <select style="width:160px;" style="width:160px;" id="work_mod_1" name="work_mod_2"> 							
+                        </select>
+                    </td>
+            				
+                    <td id="ch3_td_2" align="left" bgcolor="#F5F9FE"> 
+                        <select style="width:160px;" style="width:160px;" id="work_mod_2" name="work_mod_3"> 		
+                        </select>
+                    </td>
+                    
+                    <td id="ch4_td_2" align="left" bgcolor="#F5F9FE"> 
+                        <select style="width:160px;" style="width:160px;" id="work_mod_3" name="work_mod_4"> 						
+                        </select>
+                    </td>		
+                    								
+                </tr>		
+                	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>
+                			
+                <tr>
+                    <td class="td_1" align="left" bgcolor="#F5F9FE">
+                        <label id="video_format_txt" class="para_label_1">
+                            <script type="text/javascript">                                JS_INLAN("video_format")</script><!--输入视频制式-->
+                        </label>
+                    </td> 	
+                    								
+                    <td align="left" bgcolor="#F5F9FE">
+                        <select style="width:160px;" style="width:160px;" id="video_format_0" name="format_select"></select>
+                    </td>
+                    
+                    <td align="left" bgcolor="#F5F9FE">
+                        <select style="width:160px;" style="width:160px;" id="video_format_1" name="format_select"></select>
+                    </td>
+                    
+                    <td id="ch3_td_3" align="left" bgcolor="#F5F9FE">
+                        <select style="width:160px;" style="width:160px;" id="video_format_2" name="format_select"></select>
+                    </td>
+                    
+                    <td id="ch4_td_3" align="left" bgcolor="#F5F9FE">
+                        <select style="width:160px;" style="width:160px;" id="video_format_3" name="format_select"></select>
+                    </td>
+                    
+                </tr>
+
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>
+            	    
+	            <tr>
+		            <td class="td_1" align="left" bgcolor="#F5F9FE"s>
+		                <label id="video_resolution_txt" class="para_label_1">
+		                <script type="text/javascript">		                    JS_INLAN("video_resolution")</script><!--视频解像度-->	
+		                </label>
+		            </td> 
+            						
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" style="width:160px;" id="resolution_0"></select>
+		            </td>
+            		
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" style="width:160px;" id="resolution_1"></select>
+		            </td>
+            		
+		            <td id="ch3_td_4" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" style="width:160px;" id="resolution_2"></select>
+		            </td>
+            		
+		            <td id="ch4_td_4" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" style="width:160px;" id="resolution_3"></select>
+		            </td>
+	            </tr>
+
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>
+            		
+            		
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>
+            				
+	            <tr>
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="out_bit_rate_mode" class="para_label_1">
+		                <script type="text/javascript">		                    JS_INLAN("out_bit_rate_mode")</script><!--视频码流输出模式CBR/VBR-->	
+		                </label>
+		            </td>
+            		 				
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;"  id="out_bit_rate_mode_0">
+			            </select>
+		            </td>
+            		
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;"  id="out_bit_rate_mode_1">
+			            </select>
+		            </td>
+            		
+		            <td id="ch3_td_6" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;"  id="out_bit_rate_mode_2">
+			            </select>
+		            </td>
+            		
+		            <td id="ch4_td_6" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;"  id="out_bit_rate_mode_3">
+			            </select>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="video_encode_mode" class="para_label_1">
+		                    <script type="text/javascript">		                        JS_INLAN("video_encode_mode")</script><!--视频编码模式-->		
+		                </label>
+		            </td> 
+            					
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_encode_mode_0" > <!--0:h.264, 1mpeg2 3:notuserd--></select>
+		            </td>
+            		
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_encode_mode_1" ></select>
+		            </td>
+            		
+		            <td id="ch3_td_7" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_encode_mode_2"></select>
+		            </td>
+            		
+		            <td id="ch4_td_7" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_encode_mode_3"></select>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr >					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="video_profile" class="para_label_1">
+		                    <script type="text/javascript">		                        JS_INLAN("video_profile")</script><!--视频类型-->
+		                </label>
+		            </td> 
+            												
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_profile_0"></select>
+		            </td>
+            		
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_profile_1"></select>
+		            </td>
+            		
+		            <td id="ch3_td_8" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_profile_2"></select>
+		            </td>
+            		
+		            <td id="ch4_td_8" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_profile_3"></select>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr >					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="video_aspect" class="para_label_1">
+		                    <script type="text/javascript">		                        JS_INLAN("video_aspect")</script><!--视频宽高比-->	
+		                </label>
+		            </td> 
+            											
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_aspect_0">
+			            </select>
+		            </td>
+            		
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_aspect_1">
+			            </select>
+		            </td>
+            		
+		            <td id="ch3_td_9" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_aspect_2">
+			            </select>
+		            </td>
+            		
+		            <td id="ch4_td_9" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="video_aspect_3">
+			            </select>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="video_bit_rate_txt" class="para_label_1">
+		                    <script type="text/javascript">JS_INLAN("video_bit_rate")</script><!--视频输出码率-->
+		                </label>
+		            </td> 					
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="video_bit_rate_0"></input>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="video_bit_rate_1"></input>
+		            </td>
+		            <td id="ch3_td_10" align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="video_bit_rate_2"></input>
+		            </td>
+		            <td id="ch4_td_10" align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="video_bit_rate_3"></input>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="video_h_positon_txt" class="para_label_1">
+			                <script type="text/javascript">			                    JS_INLAN("image_horizontal_offset")</script><!--图像水平位置-->
+		                </label>
+		            </td> 					
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_1" type="text" id="image_horizontal_offset_0"></input>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_2" type="text" id="image_horizontal_offset_1"></input>
+		            </td>
+		            <td id="ch3_td_11" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_3" type="text" id="image_horizontal_offset_2"></input>
+		            </td>
+		            <td id="ch4_td_11" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_4" type="text" id="image_horizontal_offset_3"></input>
+		            </td>
+	            </tr>	
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="brightness_txt" class="para_label_1">
+			                <script type="text/javascript">			                    JS_INLAN("brightness")</script><!--亮度（0-100）-->
+			            </label>  
+		            </td>	
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_1" type="text" id="brightness_0"></input>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_2" type="text" id="brightness_1"></input>
+		            </td>
+		            <td id="ch3_td_12" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_3" type="text" id="brightness_2"></input>
+		            </td>
+		            <td id="ch4_td_12" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_4" type="text" id="brightness_3"></input>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="contrast_txt" class="para_label_1">
+			                <script type="text/javascript">			                    JS_INLAN("contrast")</script><!--对比度（0-100）-->
+			            </label>  
+		            </td>	
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_1" type="text" id="contrast_0"></input>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_2" type="text" id="contrast_1"></input>
+		            </td>
+		            <td id="ch3_td_13" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_3" type="text" id="contrast_2"></input>
+		            </td>
+		            <td id="ch4_td_13" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_4" type="text" id="contrast_3"></input>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="saturation_txt" class="para_label_1">
+			                <script type="text/javascript">			                    JS_INLAN("saturation")</script><!--饱和度（0-100）-->
+			            </label>  
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_1" type="text" id="saturation_0" ></input>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_2" type="text" id="saturation_1" ></input>
+		            </td>
+		            <td id="ch3_td_14" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_3" type="text" id="saturation_2" ></input>
+		            </td>
+		            <td id="ch4_td_14" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_4" type="text" id="saturation_3" ></input>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="hue_txt" class="para_label_1">
+			                <script type="text/javascript">			                    JS_INLAN("hue")</script><!--色调（0-100）-->
+			            </label>  
+		            </td>	
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_1" type="text" id="hue_0" ></input>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_2" type="text" id="hue_1" ></input>
+		            </td>
+		            <td id="ch3_td_15" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_3" type="text" id="hue_2" ></input>
+		            </td>
+		            <td id="ch4_td_15" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_4" type="text" id="hue_3" ></input>
+		            </td>					
+	            </tr>	
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="audio_encode_mode_txt" class="para_label_1">
+		                    <script type="text/javascript">		                        JS_INLAN("audio_encode_mode")</script><!--音频编码模式-->
+		                </label>
+		            </td> 												
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_encode_mode_0">
+				            <!--<option value="2" >HE-AAC V1</option>-->
+				            <!--<option value="3" >HE-AAC V1</option>-->
+			            </select>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_encode_mode_1">
+				            <!--<option value="2" >HE-AAC V1</option>-->
+				            <!--<option value="3" >HE-AAC V2</option>-->
+			            </select>
+		            </td>
+		            <td id="ch3_td_16" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_encode_mode_2">
+				            <!--<option value="2" >HE-AAC V1</option>-->
+				            <!--<option value="3" >HE-AAC V2</option>-->
+			            </select>
+		            </td>
+		            <td id="ch4_td_16" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_encode_mode_3">
+				            <!--<option value="2" >HE-AAC V1</option>-->
+				            <!--<option value="3" >HE-AAC V2</option>-->
+			            </select>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="audio_rate_txt" class="para_label_1">
+		                    <script type="text/javascript">		                        JS_INLAN("audio_rate")</script><!--音频码率-->
+		                </label>
+		            </td> 										
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_bit_rate_0">
+				            <option value="9" ></option >
+				            <option value="10" ></option>
+				            <option value="11" ></option>
+				            <option value="12" ></option>
+				            <option value="13" ></option>
+			            </select>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_bit_rate_1">
+				            <option value="9" ></option >
+				            <option value="10" ></option>
+				            <option value="11" ></option>
+				            <option value="12" ></option>
+				            <option value="13" ></option>
+			            </select>
+		            </td>
+		            <td id="ch3_td_17" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_bit_rate_2">
+				            <option value="9" ></option >
+				            <option value="10" ></option>
+				            <option value="11" ></option>
+				            <option value="12" ></option>
+				            <option value="13" ></option>
+			            </select>
+		            </td>
+		            <td id="ch4_td_17" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_bit_rate_3">
+				            <option value="9" ></option >
+				            <option value="10" ></option>
+				            <option value="11" ></option>
+				            <option value="12" ></option>
+				            <option value="13" ></option>
+			            </select>
+		            </td>
+	            </tr>
+            	
+	            <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>
+            	
+	            <tr>
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="audio_embed_txt" class="para_label_1">
+		                    <script type="text/javascript">		                        JS_INLAN("audio_embed")</script><!--音频嵌入-->
+		                </label>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_emb_channel_0"></select>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_emb_channel_1"></select>
+		            </td>
+		            <td id="ch3_td_18" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_emb_channel_2"></select>
+		            </td>
+		            <td id="ch4_td_18" align="left" bgcolor="#F5F9FE">
+			            <select style="width:160px;" id="audio_emb_channel_3"></select>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+		                <label id="volume_txt" class="para_label_1">
+		                    <script type="text/javascript">		                        JS_INLAN("volume")</script><!--音量控制-->
+		                </label>
+		            </td> 										
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_1" type="text" id="volume_0" ></input>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input class="dis_2" type="text" id="volume_1" ></input>
+		            </td>
+		            <td id="ch3_td_19" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_3" type="text" id="volume_2" ></input>
+		            </td>
+		            <td id="ch4_td_19" align="left" bgcolor="#F5F9FE">
+			            <input class="dis_4" type="text" id="volume_3" ></input>
+		            </td>	
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="audio_sample_txt" class="para_label_1" >
+			                <script type="text/javascript">			                    JS_INLAN("audio_sample")</script><!--通道1-4共同的音频采样率-->
+			            </label>  
+		            </td>	
+		            <td colspan="4" align="left" bgcolor="#F5F9FE">
+			            <select style="width:629px;"  style="width:629px" id="audio_sample_rate_1" >						
+			            </select>
+		            </td>
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>
+            	
+	            <tr>					
+		            <td  class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="video_pid_txt" class="para_label_1">
+			                <script type="text/javascript">			                    JS_INLAN("video_pid")</script><!--视频PID-->  
+			            </label>  					
+		            </td>	
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="video_pid_0"></input>
+		            </td>	
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="video_pid_1"></input>
+		            </td>	
+		            <td id="ch3_td_20" align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="video_pid_2"></input>
+		            </td>	
+		            <td id="ch4_td_20" align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="video_pid_3"></input>
+		            </td>						
+	            </tr>	
+            		
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>
+            				
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="audio_pid_txt" class="para_label_1">
+			                <script type="text/javascript">			                    JS_INLAN("audio_pid")</script><!--音频PID-->
+			            </label>  
+		            </td>		
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="audio_pid_0"></input>
+		            </td>	
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="audio_pid_1"></input>
+		            </td>	
+		            <td id="ch3_td_21" align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="audio_pid_2"></input>
+		            </td>	
+		            <td id="ch4_td_21" align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="audio_pid_3"></input>
+		            </td>	
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="PCR_pid_txt" class="para_label_1">
+			                <script type="text/javascript">			                    JS_INLAN("pcr_pid")</script><!--PCR PID-->
+			            </label>  
+		            </td>	
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="pcr_pid_0"></input>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="pcr_pid_1"></input>
+		            </td>
+		            <td id="ch3_td_22" align="left" bgcolor="#F5F9FE" >
+			            <input type="text" id="pcr_pid_2"></input>
+		            </td>
+		            <td id="ch4_td_22" align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="pcr_pid_3"></input>
+		            </td>					
+	            </tr>
+            	
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>	
+            	
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="PMT_pid_txt" class="para_label_1">
+			                <script type="text/javascript">			                    JS_INLAN("pmt_pid")</script><!--PMT PID-->
+			            </label>  
+		            </td>	
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="pmt_pid_0"></input>
+		            </td>
+		            <td align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="pmt_pid_1"></input>
+		            </td>	
+		            <td id="ch3_td_23" align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="pmt_pid_2"></input>
+		            </td>	
+		            <td id="ch4_td_23" align="left" bgcolor="#F5F9FE">
+			            <input type="text" id="pmt_pid_3"></input>
+		            </td>	
+	            </tr>
+
+
+	            <tr>					
+		            <td class="td_1" align="left" bgcolor="#F5F9FE">
+			            <label id="PID_equal_switch_txt" class="para_label_1" >
+			                <script type="text/javascript">			                    JS_INLAN("pid_equal_switch")</script><!--通道VIDEO 、PCR PID 相同开关-->
+			            </label>  
+		            </td>	
+		            <td colspan="4" align="left" bgcolor="#F5F9FE">
+			            <select style="width:629px;"  style="width:629px" id="pid_equal_switch" >						
+			            </select>
+		            </td>
+	            </tr>
+
+                <tr>
+		            <td style="height:3px", colspan="5" bgcolor="#F5F9FE"></td>
+	            </tr>
+	           </table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+            <td colspan="3" height="30px" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">					                                                                                                   JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">					                                                                                         JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13px" background="graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>

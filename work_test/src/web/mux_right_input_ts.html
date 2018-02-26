@@ -1,0 +1,737 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<link rel="StyleSheet" href="/components/my_tree_control/my_tree_control.css" type="text/css">
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+	<script type="text/javascript" src="/js/common_process.js"></script>
+	<script type="text/javascript" src="/js/language.js"></script>
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+	<script type="text/javascript" src="/components/my_tree_control/my_tree_control.js"></script>
+	<script type="text/javascript">
+	    var s_ServiceTreeItem;
+	    var s_Chn, s_Sub;
+	    var s_TsInd = 0;
+	    /*限制信息*/
+	    var s_OutServiceLimit = 64;
+
+	    JS_LANInitiate();
+
+	    function OnLoad()
+	    {
+	        var i, k, m, n, ca, des, group;
+	        var lTmpValue, lTmpStr;
+	        var lRootID, lChnID, lTsID, lCAID, lSubCAID, lServArrayID, lServID, lEsID, lDescID, lOpenID, lGroupID;
+	        var lCHNArray, lChnObj, lSUBArray, lSubObj, lChnInfo, lSubInfo, lChnNum, lSubNum, lTsIndex, lTsObj, lTsInfo, lServArray, lServInfo, lEsArray, lEsObj, lEsInfo, lPCRESMatchIndex;
+	        var lCAArray, lCAInfo, lCAGroup, lGroupNum;
+	        var lDescArray, lDescInfo;
+	        var lOutTsArray, lServOutTsSelectUI, lTsRouteSelectUI, lServIO, lRouteInfo, lRouteMark;
+	        var lMarkSelectUI;
+	        var lTmpArray, lTmpInfo, lTmpVar;
+	        
+	        //JS_TIMETestSeed();
+
+	        lTmpVar = JS_ArgGetArgs();
+	        s_Chn = parseInt(JS_ArgGetValueByName(lTmpVar, "chn_ind"), 10);
+	        s_Sub = parseInt(JS_ArgGetValueByName(lTmpVar, "sub_ind"), 10);
+
+	        if (isNaN(s_Chn))
+	        {
+	            s_Chn = 0;
+	        }
+
+	        if (isNaN(s_Sub))
+	        {
+	            s_Sub = 0;
+	        }
+
+	        s_TsInd = 0;
+
+	        JS_ParamInitate();
+	        lTmpArray = JS_ParamGetCharSetArray();
+	        for (i = 0; i < lTmpArray.length; i++)
+	        {
+	            lTmpInfo = JS_ParamGetCharSetInfo(lTmpArray[i]);
+	            JS_UISelectAddOption($("charset"), lTmpInfo.m_Value, lTmpInfo.m_Txt);
+	        }
+
+	        lTmpValue = JS_ParamGetRemuxSystemInfo();
+	        JS_UISelectSetCurIndexByValue($("charset"), lTmpValue.m_DefaultInCharset);
+
+	        lTmpArray = JS_ParamGetAutoMapArray();
+	        if (lTmpArray.length <= 0)
+	        {
+	            JS_UISelectAddOption($("auto_map"), 0, "OFF");
+	            JS_UISelectSetCurIndexByValue($("auto_map"), 0, true);
+	            $("auto_map").disabled = true;
+	        }
+	        else
+	        {
+	            for (i = 0; i < lTmpArray.length; i++)
+	            {
+	                lTmpInfo = JS_ParamGetAutoMapInfo(lTmpArray[i]);
+	                JS_UISelectAddOption($("auto_map"), lTmpInfo.m_Value, JS_LANCMN(lTmpInfo.m_Txt));
+	            }
+	            JS_UISelectSetCurIndexByValue($("auto_map"), JS_ParamGetCurrentAutoMapMode(), true);
+	        }
+
+
+	        s_ServiceTreeItem = new MyTreeControl("s_ServiceTreeItem");
+
+
+	        lTmpStr = JS_LAN("ts_setting");
+	        lRootID = s_ServiceTreeItem.AddNewNode(0, lTmpStr);
+
+	        lCHNArray = JS_ParamGetChannelArray(true);
+	        if (lCHNArray.length > s_Chn)
+	        {
+	            lChnObj = lCHNArray[s_Chn];
+	            lSUBArray = JS_ParamGetSubChannelArray(lChnObj);
+	            if (lSUBArray.length > s_Sub)
+	            {
+	                lSubObj = lSUBArray[s_Sub];
+	                {
+	                    lOutTsArray = JS_ParamGetTsArray(false);
+	                    /*批量选择节目到输出TS功能*/
+
+	                    /*创建开关用Select控件*/
+	                    lMarkSelectUI = JS_UISelectCreate();
+	                    lMarkSelectUI.style.height = "18px";
+	                    JS_UISelectAddOption(lMarkSelectUI, "OFF", "OFF");
+	                    JS_UISelectAddOption(lMarkSelectUI, "ON", "ON");
+
+	                    /*创建输出TS控件 */
+	                    lServOutTsSelectUI = OnCreateOutputTSSelectUI2(lOutTsArray, false);
+	                    OnCreateOutputTSSelectUI2(lOutTsArray, true);
+
+//	                    lServOutTsSelectUI = OnCreateOutputTSSelectUI(lOutTsArray, true, false);
+//	                    OnCreateOutputTSSelectUI(lOutTsArray, true, true);
+
+	                    lSubInfo = JS_ParamGetSubChannelInfo(lSubObj);
+	                    s_TsInd = lSubInfo.m_TsIndex;
+
+	                    if (lSubInfo.m_Active == "ON")
+	                    {
+	                        lTsObj = JS_ParamGetTsObject(s_TsInd, true);
+	                        lTsInfo = JS_ParamGetTsInfo(lTsObj, true);
+	                        lRouteInfo = JS_ParamGetTsRouteInfo(lTsObj);
+
+	                        if (lRouteInfo.m_RouteMark == "ON")
+	                        {
+	                            lRouteMark = "disabled";
+	                            $("batch_out_ts").disabled = true; //将全选按钮也无效化
+	                            $("submit_service_remux").disabled = true; //将提交按钮也无效化，已经没有可以提交的东西了
+	                        }
+	                        else
+	                        {
+	                            lRouteMark = "";
+	                        }
+
+	                        lServArray = JS_ParamGetServArrayByTsIndex(lSubInfo.m_TsIndex, true);
+
+	                        lTmpStr = "<b>" + JS_LANCMN("chan") + " " + JS_StrLeftPading(s_Chn + 1, 2) + "-" + JS_StrLeftPading(s_Sub + 1, 3) + " - " + " ("+ JS_LANCMN("ts") + " " + JS_StrLeftPading(s_TsInd + 1, 3) + ")</b> - <b>" + JS_LANCMN("serv_num") + " " + lServArray.length + "</b>";
+	                        if (lRouteInfo.m_RouteMark == "ON")
+	                        {
+	                            lTmpStr += " -- " + JS_LANCMN("route_to") + " " + JS_LANCMN("out_ts") + " -  <input type='text' value='" + JS_StrLeftPading(lRouteInfo.m_TsIndex + 1, 3) + "' readOnly style='width:60px;text-align:center;' />";
+	                        }
+
+	                        lTsID = s_ServiceTreeItem.AddNewNode(lRootID, lTmpStr);
+
+
+
+	                        lTmpStr = "TS ID" + " -  <input type='text' value='" + lTsInfo.m_TSID + "' readOnly style='width:30px;text-align:center;' /> --";
+	                        lTmpStr += "ON ID" + " -  <input type='text' value='" + lTsInfo.m_ONID + "' readOnly style='width:30px;text-align:center;' />";
+	                        s_ServiceTreeItem.AddNewNode(lTsID, lTmpStr);
+
+	                        lTmpStr = "PAT " + JS_LANCMN("version") + " -  <input type='text' value='" + lTsInfo.m_PATV + "' readOnly style='width:30px;text-align:center;' /> -- ";
+	                        lTmpStr += "CRC32" + " -  <input type='text' value='" + lTsInfo.m_PATCRC32 + "' readOnly style='width:70px;text-align:center;' />";
+	                        s_ServiceTreeItem.AddNewNode(lTsID, lTmpStr);
+
+	                        lDescArray = JS_ParamGetTsDescrArray(lTsObj);
+	                        lTmpStr = "CAT " + JS_LANCMN("version") + " -  <input type='text' value='" + lTsInfo.m_CATV + "' readOnly style='width:30px;text-align:center;' /> -- ";
+	                        lTmpStr += JS_LANCMN("descriptor") + " -  <input type='text' value='" + lDescArray.length + "' readOnly style='width:40px;text-align:center;' />";
+	                        lDescID = s_ServiceTreeItem.AddNewNode(lTsID, lTmpStr);
+	                        for (des = 0; des < lDescArray.length; des++)
+	                        {
+	                            lDescInfo = JS_ParamGetDescriptorInfo(lDescArray[des]);
+	                            lTmpStr = JS_LANCMN("desc_content") + " -  <input type='text' value='" + lDescInfo.m_Data + "' readOnly style='width:220px;text-align:left;' />";
+	                            s_ServiceTreeItem.AddNewNode(lDescID, lTmpStr);
+	                            lDescInfo = null;
+	                        }
+
+
+	                        lTmpStr = "SDT " + JS_LANCMN("version") + " -  <input type='text' value='" + lTsInfo.m_SDTV + "' readOnly style='width:30px;text-align:center;' />";
+	                        s_ServiceTreeItem.AddNewNode(lTsID, lTmpStr);
+
+	                        /*TS 复用 CA 信息*/
+	                        lCAGroup = JS_ParamGetInTsRemuxCAGroup(lTsObj);
+	                        lTmpStr = JS_LANCMN("ca") + " (EMM)" + " -  <input type='text' value='" + lCAGroup.length + "' readOnly style='width:40px;text-align:center;' />";
+	                        lCAID = s_ServiceTreeItem.AddNewNode(lTsID, lTmpStr);
+	                        for (group = 0; group < lCAGroup.length; group++)
+	                        {
+	                            lCAInfo = lCAGroup[group].m_InfoArray[0];
+
+	                            lTmpStr = "CA System ID" + " -  <input type='text' value='" + lCAInfo.m_CASID + "' readOnly style='width:60px;text-align:center;' /> -- ";
+	                            lTmpStr += "CA PID (EMM)" + " -  <input type='text' value='" + lCAInfo.m_CAPID + "' readOnly style='width:40px;text-align:center;' />";
+	                            lGroupID = s_ServiceTreeItem.AddNewNode(lCAID, lTmpStr);
+
+	                            for (ca = 0; ca < lCAGroup[group].m_InfoArray.length; ca++)
+	                            {
+	                                lCAInfo = lCAGroup[group].m_InfoArray[ca];
+	                                lTmpStr = JS_LANCMN("out_ts") + " -  <input type='text' value='" + JS_StrLeftPading(lCAInfo.m_OutTsIndex + 1, 3) + "' readOnly style='width:40px;text-align:center;' /> - ";
+	                                JS_UISelectSetCurIndexByValue(lMarkSelectUI, lCAInfo.m_OutMark, true);
+	                                lTmpStr += "<select id='mux_ca_ids_" + lCAInfo.m_IDs + "' " + lRouteMark + " >" + lMarkSelectUI.innerHTML + "</select>";
+	                                lSubCAID = s_ServiceTreeItem.AddNewNode(lGroupID, lTmpStr);
+
+	                                if (JS_ISValidObject(lCAInfo.m_PrivateData))
+	                                {
+	                                    if (lCAInfo.m_PrivateData.length > 0) {
+	                                        /*CA私有数据*/
+	                                        lTmpStr = "CA PRIVATE DATA" + " - <input type='text' value='" + lCAInfo.m_PrivateData + "' style='width:400px;text-align:left;' readOnly />";
+	                                        s_ServiceTreeItem.AddNewNode(lSubCAID, lTmpStr);
+	                                    }
+	                                
+	                                }
+
+
+
+	                                lCAInfo = null;
+	                            }
+	                        }
+	                        lCAGroup = null;
+
+	                        //lServArray.sort(OnSortByServiceID);
+	                        for (m = 0; m < lServArray.length; m++)
+	                        {
+	                            lServObj = lServArray[m];
+	                            lServInfo = JS_ParamGetServiceInfo(lServObj, true);
+	                            lServIO = JS_ParamGetServiceIO(lServObj);
+	                            JS_UISelectSetCurIndexByValue(lServOutTsSelectUI, lServIO.m_OutTsIndex, true);
+
+	                            lServInfo.m_ServName = lServInfo.m_ServName.replace(/(["])/g, '&#34;');
+	                            lServInfo.m_ServName = lServInfo.m_ServName.replace(/(['])/g, '&#39;');
+
+	                            lTmpStr = "<input type='text' value='" + lServInfo.m_ServName + "' readOnly style='width:180px;text-align:left;' /> -- ";
+	                            lTmpStr += JS_LANCMN("service_id") + " -  <input type='text' value='" + lServInfo.m_ServID + "' readOnly style='width:50px;text-align:center;' /> -- ";
+	                            lTmpStr += JS_LANCMN("out_ts") + " - <select id='service_ids_" + lServInfo.m_IDs + "'" + lRouteMark + ">" + lServOutTsSelectUI.innerHTML + "</select>";
+	                            lServID = s_ServiceTreeItem.AddNewNode(lTsID, lTmpStr);
+
+	                            lTmpStr = JS_LANCMN("service_type") + " - <input type='text' value='" + JS_LANGetMpeg2ServiceTypeString(lServInfo.m_ServType) + "' readOnly style='width:270px;text-align:center;' />";
+	                            s_ServiceTreeItem.AddNewNode(lServID, lTmpStr);
+
+	                            lServInfo.m_ProvName = lServInfo.m_ProvName.replace(/(["])/g, '&#34;');
+	                            lServInfo.m_ProvName = lServInfo.m_ProvName.replace(/(['])/g, '&#39;');
+
+	                            lTmpStr = JS_LANCMN("service_provider") + " -  <input type='text' value='" + lServInfo.m_ProvName + "' readOnly style='width:120px;text-align:center;' />";
+	                            s_ServiceTreeItem.AddNewNode(lServID, lTmpStr);
+
+	                            lTmpStr = "PMT PID" + " -  <input type='text' value='" + lServInfo.m_PMTPID + "' readOnly style='width:40px;text-align:center;' /> -- ";
+	                            lTmpStr += JS_LANCMN("version") + " - <input type='text' value='" + lServInfo.m_PMTV + "' readOnly style='width:30px;text-align:center;' /> -- ";
+	                            lTmpStr += "CRC32" + " - <input type='text' value='" + lServInfo.m_PMTCRC32 + "' readOnly style='width:80px;text-align:center;' />";
+	                            s_ServiceTreeItem.AddNewNode(lServID, lTmpStr);
+
+	                            lPCRESMatchIndex = null;
+	                            lPCRESMatchIndex = JS_ParamCheckServicePCRESMatch(lServObj);
+	                            lTmpStr = "PCR PID" + " - <input type='text' value='" + lServInfo.m_PCRPID + "' readOnly style='width:40px;text-align:center;' />";
+	                            if (lPCRESMatchIndex != null)
+	                            {
+	                                //提示PCRPID和对应Index的ES的PID重叠
+	                                lTmpStr += " -- " + "PCR Match ES Index" + " -  <input type='text' value='" + (lPCRESMatchIndex + 1) + "' readOnly style='width:30px;text-align:center;' />";
+	                            }
+	                            s_ServiceTreeItem.AddNewNode(lServID, lTmpStr);
+
+	                            lTmpStr = JS_LANCMN("eit_s") + " -  <input type='text' value='" + lServInfo.m_EITSCMark + "' readOnly style='width:50px;text-align:center;' /> -- ";
+	                            lTmpStr += JS_LANCMN("eit_pn") + " - <input type='text' value='" + lServInfo.m_EITCNMark + "' readOnly style='width:80px;text-align:center;' />";
+	                            s_ServiceTreeItem.AddNewNode(lServID, lTmpStr);
+
+	                            /*Service CA Descriptor 信息*/
+	                            lCAArray = JS_ParamGetServCAArray(lServObj, true);
+	                            lTmpStr = JS_LANCMN("ca") + " (ECM)" + " -  <input type='text' value='" + lCAArray.length + "' readOnly style='width:40px;text-align:center;' />";
+	                            lCATID = s_ServiceTreeItem.AddNewNode(lServID, lTmpStr);
+	                            for (ca = 0; ca < lCAArray.length; ca++)
+	                            {
+	                                lCAInfo = JS_ParamGetMuxCAInfo(lCAArray[ca]);
+
+	                                lTmpStr = "CASystem ID" + " -  <input type='text' value='" + lCAInfo.m_CASID + "' readOnly style='width:60px;text-align:center;' /> -- ";
+	                                lTmpStr += "CA PID (ECM)" + " -  <input type='text' value='" + lCAInfo.m_CAPID + "' readOnly style='width:40px;text-align:center;' />";
+	                                lSubCAID = s_ServiceTreeItem.AddNewNode(lCATID, lTmpStr);
+
+	                                if (JS_ISValidObject(lCAInfo.m_PrivateData))
+	                                {
+	                                    if (lCAInfo.m_PrivateData.length > 0)
+	                                    {
+	                                        /*CA私有数据*/
+	                                        lTmpStr = "CA PRIVATE DATA" + " - <input type='text' value='" + lCAInfo.m_PrivateData + "' style='width:400px;text-align:left;' readOnly />";
+	                                        s_ServiceTreeItem.AddNewNode(lSubCAID, lTmpStr);
+	                                    }
+
+	                                }
+
+	                                lCAInfo = null;
+	                            }
+	                            lCAArray = null;
+
+	                            /*Service PMT Descriptor 信息*/
+	                            lDescArray = JS_ParamGetServPMTDescArray(lServObj, true);
+	                            lTmpStr = "PMT " + JS_LANCMN("descriptor") + " -  <input type='text' value='" + lDescArray.length + "' readOnly style='width:40px;text-align:center;' />";
+	                            lDescID = s_ServiceTreeItem.AddNewNode(lServID, lTmpStr);
+
+	                            for (des = 0; des < lDescArray.length; des++)
+	                            {
+	                                lDescInfo = JS_ParamGetDescriptorInfo(lDescArray[des]);
+
+	                                lTmpStr = JS_LANCMN("desc_content") + " -  <input type='text' value='" + lDescInfo.m_Data + "' readOnly style='width:220px;text-align:left;' />";
+	                                s_ServiceTreeItem.AddNewNode(lDescID, lTmpStr);
+
+	                                lDescInfo = null;
+	                            }
+
+	                            /*Service SDT Descriptor 信息*/
+	                            lDescArray = JS_ParamGetServSDTDescArray(lServObj, true);
+	                            lTmpStr = "SDT " + JS_LANCMN("descriptor") + " -  <input type='text' value='" + lDescArray.length + "' readOnly style='width:40px;text-align:center;' />";
+	                            lDescID = s_ServiceTreeItem.AddNewNode(lServID, lTmpStr);
+
+	                            for (des = 0; des < lDescArray.length; des++)
+	                            {
+	                                lDescInfo = JS_ParamGetDescriptorInfo(lDescArray[des]);
+
+	                                lTmpStr = JS_LANCMN("desc_content") + " -  <input type='text' value='" + lDescInfo.m_Data + "' readOnly style='width:220px;text-align:left;' />";
+	                                s_ServiceTreeItem.AddNewNode(lDescID, lTmpStr);
+
+	                                lDescInfo = null;
+	                            }
+	                            lDescArray = null;
+
+	                            /*Element Streams*/
+	                            lEsArray = JS_ParamGetEsArray(lServObj);
+	                            for (n = 0; n < lEsArray.length; n++)
+	                            {
+	                                lEsObj = lEsArray[n];
+	                                lCAArray = JS_ParamGetEsCAArray(lEsObj, true);
+	                                lEsInfo = JS_ParamGetEsInfo(lEsObj, true);
+	                                lTmpStr = JS_LANCMN("es_pid") + " -  <input type='text' value='" + lEsInfo.m_ESPID + "' readOnly style='width:50px;text-align:center;' /> -- ";
+	                                lTmpStr += JS_LANCMN("es_type") + " - <input type='text' value='" + JS_LANGetMpeg2EsTypeString(lEsInfo.m_ESType) + "' readOnly style='width:100px;text-align:center;' />";
+	                                lEsID = s_ServiceTreeItem.AddNewNode(lServID, lTmpStr);
+
+	                                /*ES CA信息*/
+	                                lTmpStr = "CA (ECM)" + " -  <input type='text' value='" + lCAArray.length + "' readOnly style='width:40px;text-align:center;' />";
+	                                lCAID = s_ServiceTreeItem.AddNewNode(lEsID, lTmpStr);
+	                                for (ca = 0; ca < lCAArray.length; ca++)
+	                                {
+	                                    lCAInfo = JS_ParamGetMuxCAInfo(lCAArray[ca]);
+
+	                                    lTmpStr = "CA System ID" + " -  <input type='text' value='" + lCAInfo.m_CASID + "' readOnly style='width:60px;text-align:center;' /> -- ";
+	                                    lTmpStr += "CA PID" + " -  <input type='text' value='" + lCAInfo.m_CAPID + "' readOnly style='width:40px;text-align:center;' />";
+	                                    lSubCAID = s_ServiceTreeItem.AddNewNode(lCAID, lTmpStr);
+
+	                                    if (JS_ISValidObject(lCAInfo.m_PrivateData))
+	                                    {
+	                                        if (lCAInfo.m_PrivateData.length > 0)
+	                                        {
+	                                            /*CA私有数据*/
+	                                            lTmpStr = "CA PRIVATE DATA" + " - <input type='text' value='" + lCAInfo.m_PrivateData + "' style='width:400px;text-align:left;' readOnly />";
+	                                            s_ServiceTreeItem.AddNewNode(lSubCAID, lTmpStr);
+	                                        }
+	                                    }
+
+	                                    lCAInfo = null;
+	                                }
+	                                lCAArray = null;
+
+	                                /*ES 描述符*/
+	                                lDescArray = JS_ParamGetESPMTDescArray(lEsObj, true);
+	                                lTmpStr = JS_LANCMN("es_desc") + " -  <input type='text' value='" + lDescArray.length + "' readOnly style='width:40px;text-align:center;' />";
+	                                lDescID = s_ServiceTreeItem.AddNewNode(lEsID, lTmpStr);
+
+	                                for (des = 0; des < lDescArray.length; des++)
+	                                {
+	                                    lDescInfo = JS_ParamGetDescriptorInfo(lDescArray[des]);
+	                                    lTmpStr = JS_LANCMN("desc_content") + " -  <input type='text' value='" + lDescInfo.m_Data + "' readOnly style='width:220px;text-align:left;' />";
+	                                    s_ServiceTreeItem.AddNewNode(lDescID, lTmpStr);
+
+	                                    lDescInfo = null;
+	                                }
+	                                lDescArray = null;
+
+	                            }
+	                            lEsArray = null;
+	                        }
+	                        lServArray = null;
+	                        lTsObj = null;
+	                    }
+	                    lSubInfo = null;
+	                    lSubObj = null;
+
+	                    lServOutTsSelectUI = null;
+	                }
+	            }
+	        }
+	        document.getElementById("tree_target").innerHTML = s_ServiceTreeItem.toString();
+	        s_ServiceTreeItem.ToggleCollapse(lRootID, 4, 2);
+
+            //alert(JS_TIMETestGetMs());
+
+	    }
+
+
+	    function OnCreateOutputTSSelectUI(OutTsArray, bHaveOFF, bBatch)
+	    {
+	        var i;
+	        var lHolderNode;
+	        var lOutTsInfo;
+	        var lRouteInfo, lTsInfo;
+	        var lAdded;
+
+
+	        if (bBatch)
+	        {
+	            lHolderNode = $("batch_out_ts");
+	            JS_UISelectAddOption(lHolderNode, "NONE", "   ");
+	            JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+	        }
+	        else
+	        {
+	            lHolderNode = JS_UISelectCreate();
+	            lHolderNode.style.height = "18px";
+	            if (bHaveOFF == true)
+	            {
+	                JS_UISelectAddOption(lHolderNode, "-1", "OFF");
+	            }
+	        }
+
+	        lAdded = 0;
+	        for (i = 0; i < OutTsArray.length; i++)
+	        {
+                 if (((JS_ParamGetTsRouteMark(OutTsArray[i]) == "OFF") && (JS_ParamGetTsMark(OutTsArray[i], false) == "ON")) || (bHaveOFF == false))
+                 {
+                     JS_UISelectAddOption(lHolderNode, i, JS_StrLeftPading(i + 1, 3));
+                     lAdded++;
+                 }
+	        }
+
+	        if (lAdded == 0)
+	        {
+	            lHolderNode.disabled = true;
+	        }
+	        return lHolderNode;
+	    }
+
+	    function OnCreateOutputTSSelectUI2(OutTsArray, bBatch)
+	    {
+	        var i, k;
+	        var lTmpValue;
+	        var lHolderNode;
+	        var lAdded;
+	        var lCHNArray, lSUBArray, lOutTsArray;
+	        var lColor;
+	        
+	        if (bBatch)
+	        {
+	            lHolderNode = $("batch_out_ts");
+	            JS_UISelectAddOption(lHolderNode, "NONE", "   ");
+	            JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+	        }
+	        else
+	        {
+	            lHolderNode = JS_UISelectCreate();
+	            lHolderNode.style.height = "18px";
+                JS_UISelectAddOption(lHolderNode, "-1", "OFF");
+	        }
+
+	        lAdded = 0;
+
+	        lCHNArray = JS_ParamGetChannelArray(false);
+	        for (i = 0; i < lCHNArray.length; i++)
+	        {
+	            lSUBArray = JS_ParamGetSubChannelArray(lCHNArray[i]);
+	            //lColor = JS_GetRandomRage(parseInt(0xFFFFFF / 2, 10), 0xFFFFFF);
+	            /*parseInt("FFFFFF", 16) - parseInt("220000", 16) * i*/;
+	            for (k = 0; k < lSUBArray.length; k++)
+	            {
+	                lSubInfo = JS_ParamGetSubChannelInfo(lSUBArray[k]);
+	                if (lSubInfo.m_Active == "ON")
+	                {
+                        if ((JS_ParamGetTsRouteMark(OutTsArray[lSubInfo.m_TsIndex]) == "OFF"))
+                        {
+                            if (k == 0) 
+                            {
+                                lColor = 0x0000FF;
+                            }
+                            else
+                            {
+                                lColor = 0x000000;
+                            }
+                            lTmpValue = "CHN" + " " + JS_StrLeftPading(i + 1, 2) + "-" + JS_StrLeftPading(k + 1, 3) + " - " + " ("+ "TS" + " " + JS_StrLeftPading(lSubInfo.m_TsIndex + 1, 3) + ")";
+                            JS_UISelectAddOptionColor(lHolderNode, lSubInfo.m_TsIndex, lTmpValue, "#" + JS_StrLeftPading(lColor.toString(16), 6), null);
+                            lAdded++;
+                        }
+	                }
+	            }
+	        }	        
+
+	        if (lAdded == 0)
+	        {
+	            lHolderNode.disabled = true;
+	        }
+	        return lHolderNode;
+	    }
+	    
+	    function OnSelectOutputTs(Item)
+	    {
+	        var lOutTsInd;
+	        var lServArray, lServObj, lServInfo;
+
+	        lOutTsInd = JS_UISelectGetCurValue(Item);
+	        if (lOutTsInd != "NONE")
+	        {
+	            /*搜集每个Service*/
+	            lServArray = JS_ParamGetServArrayByTsIndex(s_TsInd, true);
+	            for (m = 0; m < lServArray.length; m++)
+	            {
+	                lServObj = lServArray[m];
+	                lServInfo = JS_ParamGetServiceInfo(lServObj, true);
+	                JS_UISelectSetCurIndexByValue($("service_ids_" + lServInfo.m_IDs), lOutTsInd);
+	            }
+	        }
+	    }
+
+	    function OnValidation()
+	    {
+	        /*确保每个输出TS的节目个数不会超标*/
+	        var i, m;
+	        var lOutTsCurServNum, lOutTsInd;
+	        var lServArray, lServObj, lServInfo, lCurServArray;
+	        lCurServArray = JS_ParamGetServArrayByTsIndex(s_TsInd, true);
+	        for (m = 0; m < lCurServArray.length; m++)
+	        {
+	            lServObj = lCurServArray[m];
+	            lServInfo = JS_ParamGetServiceInfo(lServObj, true);
+	            //lOutTsInd = JS_UISelectGetCurValue($("service_ids_" + lServInfo.m_IDs));
+	            JS_UISetErrorIndicatorByID("service_ids_" + lServInfo.m_IDs, true, false);
+	        }
+
+	        /*得到节目输出的TS序号组*/
+	        lOutTsIndArray = new Array();
+	        for (m = 0; m < lCurServArray.length; m++)
+	        {
+	            lServObj = lCurServArray[m];
+	            lServInfo = JS_ParamGetServiceInfo(lServObj, true);
+	            lOutTsInd = JS_UISelectGetCurValue($("service_ids_" + lServInfo.m_IDs));
+	            if (lOutTsInd != -1)
+	            {
+	                for (i = 0; i < lOutTsIndArray.length; i++)
+	                {
+	                    if (lOutTsIndArray[i] == lOutTsInd) 
+	                    {
+	                        break;
+	                    }
+	                }
+	                
+	                if (i == lOutTsIndArray.length) 
+	                {
+	                    lOutTsIndArray.push(lOutTsInd);
+	                }
+	            }
+	        }
+
+	        for (i = 0; i < lOutTsIndArray.length; i++)
+	        {
+	            /*得到指定输出TS中非当前输入TS的节目的个数*/
+	            lOutTsCurServNum = 0;
+	            lServArray = JS_ParamGetServArrayByTsIndex(lOutTsIndArray[i], false);
+	            for (m = 0; m < lServArray.length; m++)
+	            {
+	                lServObj = lServArray[m];
+	                lServInfo = JS_ParamGetServiceIO(lServObj);
+	                if (lServInfo.m_InTsIndex != s_TsInd)
+	                {
+	                    lOutTsCurServNum++;
+	                }
+	            }
+
+	            /*加上当前输入TS到指定输出TS的节目的个数*/
+	            for (m = 0; m < lCurServArray.length; m++)
+	            {
+	                lServObj = lCurServArray[m];
+	                lServInfo = JS_ParamGetServiceInfo(lServObj, true);
+	                lOutTsInd = JS_UISelectGetCurValue($("service_ids_" + lServInfo.m_IDs));
+	                if (lOutTsInd == lOutTsIndArray[i])
+	                {
+	                    lOutTsCurServNum++;
+	                    if (lOutTsCurServNum > s_OutServiceLimit)
+	                    {
+	                        JS_UISetErrorIndicatorByID("service_ids_" + lServInfo.m_IDs, false, true);
+	                        return false;
+	                    }
+	                }
+	            }
+	        }
+	        return true;
+	    }
+
+	    function OnSubmit(Item)
+	    {
+	        var i, m, ca;
+	        var lBodyNode;
+	        var lHolderNode;
+	        var lTsObj;
+	        var lServArray, lServObj, lServInfo;
+	        var lCAArray, lCAObj, lCAInfo;
+	        var lXMLDom = JS_XMLCreateDomFromFile(null);
+	        if (Item.id == "submit_service_remux")
+	        {
+	            if (s_TsInd != null)
+	            {
+	                if (OnValidation() == false)
+	                {
+	                    return;
+	                }
+
+	                lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "input_service_remux", "");
+
+	                JS_XMLAddTextChild(lXMLDom, lBodyNode, "in_ts_index", s_TsInd);
+
+	                /*搜集每个Service*/
+	                lServArray = JS_ParamGetServArrayByTsIndex(s_TsInd, true);
+	                for (m = 0; m < lServArray.length; m++)
+	                {
+	                    lServObj = lServArray[m];
+	                    lServInfo = JS_ParamGetServiceInfo(lServObj, true);
+	                    lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "remuxed_service");
+	                    JS_XMLAddTextChild(lXMLDom, lHolderNode, "serv_ids", lServInfo.m_IDs);
+	                    JS_XMLAddTextChild(lXMLDom, lHolderNode, "out_ts_index", JS_HTMLGetValueByID("service_ids_" + lServInfo.m_IDs));
+	                }
+
+	                lTsObj = JS_ParamGetTsObject(s_TsInd, true);
+	                lCAArray = JS_ParamGetTsCAArray(lTsObj, true);
+	                for (ca = 0; ca < lCAArray.length; ca++)
+	                {
+	                    lCAInfo = JS_ParamGetMuxCAInfo(lCAArray[ca]);
+
+	                    lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "remuxed_ca");
+	                    JS_XMLAddTextChild(lXMLDom, lHolderNode, "out_mark", JS_HTMLGetValueByID("mux_ca_ids_" + lCAInfo.m_IDs));
+	                    JS_XMLAddTextChild(lXMLDom, lHolderNode, "mux_ca_ids", lCAInfo.m_IDs);
+
+	                    lCAInfo = null;
+	                }
+	                lCAArray = null;
+
+	                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	                window.top.document.frames["BottomFrame"].OnShowLoadingWindow(3, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	            }
+	        }
+	        else if (Item.id == "submit_analyse")
+	        {
+	            var lTimeout, lAnaylasyTimeout;
+	            if (s_TsInd != null)
+	            {
+	                lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "input_service_analyse", "");
+	                JS_XMLAddTextChild(lXMLDom, lBodyNode, "input_ts_index", s_TsInd);
+	                lAnaylasyTimeout = parseInt(JS_HTMLGetValueByID("analyse_timeout"), 10)
+	                if (lAnaylasyTimeout < 800 || lAnaylasyTimeout > 5000)
+	                {
+	                    lAnaylasyTimeout = 1200;
+	                }
+	                JS_XMLAddTextChild(lXMLDom, lBodyNode, "analyse_timeout", lAnaylasyTimeout);
+	                JS_XMLAddTextChild(lXMLDom, lBodyNode, "analyse_remove_service", JS_HTMLGetValueByID("remove_service"));
+	                JS_XMLAddTextChild(lXMLDom, lBodyNode, "charset", JS_HTMLGetValueByID("charset"));
+	                if ($("auto_map").disabled == false)
+	                {
+	                    JS_XMLAddTextChild(lXMLDom, lBodyNode, "auto_map", JS_HTMLGetValueByID("auto_map"));
+	                }
+
+	                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+
+	                lTimeout = parseInt(lAnaylasyTimeout * 2 / 1000, 10);
+	                window.top.document.frames["BottomFrame"].OnShowLoadingWindow(lTimeout, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	            }
+	        }
+	        else if (Item.id == "clean_in_ts")
+	        {
+	            if (s_TsInd != null)
+	            {
+	                if (confirm(JS_LAN("confirm_clean")))
+	                {
+	                    lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "clean_in_ts", 0);
+	                    JS_XMLAddTextChild(lXMLDom, lBodyNode, "input_ts_index", s_TsInd);
+	                    JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	                    window.top.document.frames["BottomFrame"].OnShowLoadingWindow(5, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	                }
+	            }
+	        }
+	    }
+
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                	<tr>
+                		<td><span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span></td>
+                	</tr>
+                </table>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+				<div id="tree_target" class="my_list_control" style="height: 427px; width: 800px; overflow: auto; padding: 10px; text-align: left;">
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+				<div id="assist_area" style="height: 30px; width: 800px; overflow: auto; padding: 9px 20px 0px 20px; text-align: left;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td style="text-align:left;">
+								<span><script type="text/javascript">JS_INLAN("anay_timeout")</script></span>&nbsp;<input id="analyse_timeout" type="text" style="text-align:center;width:50px" value="1500"/>&nbsp;&nbsp;
+								<span><script type="text/javascript">JS_INLAN("anay_charset")</script></span>&nbsp;<select id="charset" style="width:130px"></select>&nbsp;&nbsp;&nbsp;
+								<span><script type="text/javascript">JS_INLAN("clear_when_failed")</script></span>&nbsp;<select id="remove_service"><option selected value="OFF">OFF</option><option value="ON">ON</option></select>&nbsp;&nbsp;&nbsp;
+								<span><script type="text/javascript">JS_INLAN("auto_map")</script></span>&nbsp;&nbsp;&nbsp;<select id="auto_map"></select>
+							</td>
+							<td style="text-align:right;">
+								<button type="button" onclick='OnSubmit(this);' style="width:120px; height:25px" id="submit_analyse" ><script type="text/javascript">JS_INLAN("start")</script></button>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div id="cmd_area" style="height: 30px; width: 800px; overflow: auto; padding: 10px 20px 0px 20px; text-align: left;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td style="text-align:left;">
+								<span><script type="text/javascript">JS_INLAN("sel_out")</script></span>&nbsp;&nbsp;&nbsp;<select id="batch_out_ts" onchange="OnSelectOutputTs(this)" ></select>&nbsp;
+								<button type="button" onclick='OnSubmit(this);' style="width:80px; height:25px" id="clean_in_ts"><script type="text/javascript">JS_INLAN("clean_in_ts")</script></button>
+							</td>
+							<td style="text-align:right;">
+								<button type="button" onclick='OnSubmit(this);' style="width:80px; height:25px" id="submit_service_remux"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>
+								&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width:80px; height:25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

@@ -1,0 +1,368 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/components/my_loading_window/my_loading_window.js"></script>
+    <script type="text/javascript" src="/js/monitor_setting.js"></script>
+
+	<script type="text/javascript">
+		var s_LoadingWindow;
+		var s_ShowCounter = 0;
+		var s_CriticalTemp = 75;
+		var s_State = new Array();
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnAjaxStatusCB(XMLDom)
+		{
+			var i, lTmpValue, lAlarmNum, lBusyMark, lScrambleStatus, lCryptoNum, lCryptoDuration, lECMUpdate;
+			var lXMLSCSHolder, lXMLSCSArray, lXMLSCSObj;
+
+			if (XMLDom != null) 
+			{
+				lBusyMark = parseInt(JS_XMLGetTagValue(XMLDom, "busy_mark"), 10);
+				if (lBusyMark == false)
+				{
+					if (s_LoadingWindow.IsVisiable())
+					{
+						s_LoadingWindow.HideWindow(false);
+					}
+				}
+				else
+				{
+					if (!s_LoadingWindow.IsVisiable())
+					{
+						s_LoadingWindow.ShowWindow(0, false, false);
+					}
+				}
+
+				lTmpValue = parseInt(JS_XMLGetTagValue(XMLDom, "save_mark"), 10);
+				if (lTmpValue == 0)
+				{
+					$("save").disabled = true;
+				}
+				else
+				{
+					$("save").disabled = false;
+				}
+				$("apply").disabled = true;
+
+				lAlarmNum = parseInt(JS_XMLGetTagValue(XMLDom, "alarm"), 10);
+				if (lAlarmNum > 0)
+				{
+					$("status_mark").src = "/graphics/red.gif";
+				}
+				else
+				{
+					$("status_mark").src = "/graphics/green.gif";
+				}
+
+
+				$("input_bitrate").value = JS_BitrateFormatINT(parseFloat(JS_XMLGetTagValue(XMLDom, "input_bitrate")));
+				$("output_bitrate").value = JS_BitrateFormatINT(parseFloat(JS_XMLGetTagValue(XMLDom, "output_bitrate")));
+				$("inserter_bitrate").value = JS_BitrateFormatINT(parseInt(JS_XMLGetTagValue(XMLDom, "inserter_bitrate"), 10));
+				
+				{
+				    var lArray;
+				    var lState, lInTotal, lOutTotal, lInValid, lOutValid, lTemp, lAlarms;
+				    var lButtonDisable, lBottonReset;
+				    
+				    lArray = JS_XMLGetTagNameArray(XMLDom, "module");
+				    
+				    if (lArray != null) 
+				    {
+				        
+				        for (i = 0; i < lArray.length; i++)
+				        {
+				            lButtonDisable = true;
+				            lBottonReset = false;
+				            lState = JS_XMLGetTagValue(lArray[i], "state");
+				            if (lState == "idle")
+				            {
+				                $("module_led_" + i).src = "/graphics/grey.gif";
+				            }
+				            else if (lState == "wait_fpga" || lState == "fpga_config" || lState == "wait_fpga" || lState == "wait_module")
+				            {
+				                $("module_led_" + i).src = "/graphics/yellow.gif";
+				            }
+				            else if (lState == "normal")
+				            {
+				                lAlarms = parseInt(JS_XMLGetTagValue(lArray[i], "alarms", 10));
+				                if (lAlarms > 0) 
+				                {
+				                    if ($("module_led_" + i).src.slice(-13, -4) != "green_red") 
+				                    {
+				                        $("module_led_" + i).src = "/graphics/blink_green_red.gif";
+				                    }
+				                }
+				                else
+				                {
+				                    $("module_led_" + i).src = "/graphics/green.gif";
+				                }
+				                lButtonDisable = false;
+				            }
+				            else if (lState == "deinit")
+				            {
+				                $("module_led_" + i).src = "/graphics/yellow.gif";
+				            }
+				            else if (lState == "wait_remove")
+				            {
+				                if ($("module_led_" + i).src.slice(-14, -4) != "green_grey")
+				                {
+				                    $("module_led_" + i).src = "/graphics/blink_green_grey.gif";
+				                }
+				                lBottonReset = true;
+				                lButtonDisable = false;
+				            }
+				            else if (lState == "error")
+				            {
+				                $("module_led_" + i).src = "/graphics/red.gif";
+				                lButtonDisable = false;
+				            }
+
+				            $("button_" + i).disabled = lButtonDisable;
+				            if (lBottonReset == true) 
+				            {
+				                $("button_" + i).innerHTML = JS_LAN("reset");
+				            }
+				            else
+				            {
+				                $("button_" + i).innerHTML = JS_LAN("eject");
+				            }
+
+				            if (lState == "normal")
+				            {
+				                lInTotal = parseFloat(JS_XMLGetTagValue(lArray[i], "in_t_rate"));
+				                lOutTotal = parseFloat(JS_XMLGetTagValue(lArray[i], "out_t_rate"));
+				                lInValid = parseFloat(JS_XMLGetTagValue(lArray[i], "in_t_rate"));
+				                lOutValid = parseFloat(JS_XMLGetTagValue(lArray[i], "out_t_rate"));
+				                lTemp = parseFloat(JS_XMLGetTagValue(lArray[i], "temperature"));
+                                
+                                
+                                if (s_ShowCounter % 3 == 1) 
+                                {
+                                    $("module_io_" + i).value = lTemp.toFixed(1) + " / " + (lTemp * 9 / 5 + 32).toFixed(1) + " ℃/℉ ";
+//                                    if (lTemp > s_CriticalTemp)
+//                                    {
+//                                        $("module_io_" + i).style.color = "red";
+//                                    }
+                                }
+                                else if (s_ShowCounter % 3 == 2)
+                                {
+                                    $("module_io_" + i).value = JS_BitrateFormatINT(lInValid) + " / " + JS_BitrateFormatINT(lOutValid) + " Mbps(V)";
+                                    $("module_io_" + i).style.color = "black";
+                                } 
+                                else
+                                {
+                                    $("module_io_" + i).value = JS_BitrateFormatINT(lInTotal) + " / " + JS_BitrateFormatINT(lOutTotal) + " Mbps(T)";
+                                    $("module_io_" + i).style.color = "black";
+                                }
+                                
+				            }
+				            else
+				            {
+				                $("module_io_" + i).value = "0.000 / 0.000";
+				            }
+				            
+				            s_State[i] = lState;
+				        }
+				    }
+				    s_ShowCounter++;
+				}
+				
+
+				setTimeout(OnStatusTimeout, 2000);
+			}
+			else
+			{
+				setTimeout(OnStatusTimeout, 3000);
+			}
+		}
+		
+		function OnLoadingWindowTimeout()
+		{
+			s_LoadingWindow.OnTimer();
+			setTimeout(OnLoadingWindowTimeout, 1000);
+		}
+
+		function OnStatusTimeout()
+		{
+			var lXMLDom;
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+			JS_XMLParamSetHead(lXMLDom, "status", "card_status", "");
+			JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxStatusCB, false);
+		}
+
+		function OnWindowResize()
+		{
+			s_LoadingWindow.OnResize();
+		}
+
+		function OnShowLoadingWindow(Count, bShowCount, bAutoHide, Script)
+		{
+			s_LoadingWindow.ShowWindow(Count, bShowCount, bAutoHide, Script);
+		}
+
+		function OnSubmit(Node)
+		{
+			var lXMLDom, lHolderNode;
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+			if (Node.id == "apply")
+			{
+				lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "apply_all", "");
+				JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+				OnShowLoadingWindow(2, true, false, "");
+			}
+			else if (Node.id == "save")
+			{
+				lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "save_all_parameters", "");
+				JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+				OnShowLoadingWindow(2, true, false, "");
+			}
+		}
+		
+		function OnCardOP(ModuleSlot)
+		{
+			var lXMLDom, lBodyNode;
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+			if (s_State[ModuleSlot] == "normal" || s_State[ModuleSlot] == "error") 
+			{
+			    lBodyNode = JS_XMLParamSetModuleHead(lXMLDom, "module_power_control", "power_off");
+			}
+			else
+			{
+			    lBodyNode = JS_XMLParamSetModuleHead(lXMLDom, "module_power_control", "power_restart");
+			}
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "module_ind", ModuleSlot);
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			$("button_" + ModuleSlot).disabled = true;
+        }
+
+		function OnLoad()
+		{
+			s_LoadingWindow = new MyLoadingWindow(window.top.document, "loading_window");
+			window.onresize = OnWindowResize;
+			s_LoadingWindow.ShowWindow(0, false, false, null);
+			
+			JS_MONInitiate();
+
+			lLogInfo = JS_MONGetSystemInfo();
+
+			s_CriticalTemp = lLogInfo.m_CritcalTemp;
+
+			setTimeout(OnStatusTimeout, 200);
+			setTimeout(OnLoadingWindowTimeout, 1000);
+		}
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="100%" align="center" cellpadding="0" cellspacing="0" background="/graphics/bottombg.gif">
+        <tr>
+            <td width="100%" align="center">
+                <table width="1224px" align="center" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="90px" align="left" height="50px" style="padding-left: 10px">
+                            <img src="/graphics/green.gif" width="25px" height="25px" style="" id="status_mark" >&nbsp<span style="color:#0066cc;" ><script>document.write(JS_LAN("status"))</script></span>
+                        </td>
+                         <td width="2px">
+							<hr size="30px" width= "0px"   color="#FFFFFF" /> 
+                        </td>
+                       <td width="260px" align="left" style="padding-left: 10px; padding-right:10px">
+
+
+                            <table cellspacing="2px" cellpadding="0" width="100%">
+                            	<tr>
+                            		<td align="center"><img src="/graphics/grey.gif" id="module_led_3" /></td>
+                            		<td align="center" style="color:#0066cc"><span>04</span></td>
+                            		<td align="center"><button type="button" onclick='OnCardOP(3);' style="width:60px; height:20px" id="button_3" disabled><script>JS_INLAN("eject")</script></button></td>
+                            		<td align="right"><input id="module_io_3" style="width:130px; text-align:right;background-color:transparent;border:0px" value="0.000 / 0.000"/></td>
+                            	</tr>
+                            	<tr>
+                            		<td align="center"><img src="/graphics/grey.gif" id="module_led_0" /></td>
+                            		<td align="center" style="color:#0066cc"><span>01</span></td>
+                            		<td align="center"><button type="button" onclick='OnCardOP(0);' style="width:60px; height:20px" id="button_0" disabled><script>JS_INLAN("eject")</script></button></td>
+                            		<td align="right"><input id="module_io_0" style="width:130px; text-align:right;background-color:transparent;border:0px" value="0.000 / 0.000"/></td>
+                            	</tr>
+                            </table>
+                        </td>
+                        <td width="5px">
+							<hr size="30px" width= "0px"   color="#FFFFFF" /> 
+                        </td>
+                       <td width="260px" align="left" style="padding-left: 10px; padding-right:10px">
+                            <table cellspacing="2px" cellpadding="0" width="100%">
+                            	<tr>
+                            		<td align="center"><img src="/graphics/grey.gif" id="module_led_4" /></td>
+                            		<td align="center" style="color:#0066cc"><span>05</span></td>
+                            		<td align="center"><button type="button" onclick='OnCardOP(4);' style="width:60px; height:20px" id="button_4" disabled><script>JS_INLAN("eject")</script></button></td>
+                            		<td align="right"><input id="module_io_4" style="width:130px; text-align:right;background-color:transparent;border:0px" value="0.000 / 0.000"/></td>
+                            	</tr>
+                            	<tr>
+                            		<td align="center"><img src="/graphics/grey.gif" id="module_led_1" /></td>
+                            		<td align="center" style="color:#0066cc"><span>02</span></td>
+                            		<td align="center"><button type="button" onclick='OnCardOP(1);' style="width:60px; height:20px" id="button_1" disabled><script>JS_INLAN("eject")</script></button></td>
+                            		<td align="right"><input id="module_io_1" style="width:130px; text-align:right;background-color:transparent;border:0px" value="0.000 / 0.000"/></td>
+                            	</tr>
+                            </table>
+                        </td>
+                        <td width="2px">
+							<hr size="30px" width= "0px" color="#FFFFFF" /> 
+                        </td>
+                       <td width="260px" align="left" style="padding-left: 10px; padding-right:10px">
+                            <table cellspacing="2px" cellpadding="0" width="100%">
+                            	<tr>
+                            		<td align="center"><img src="/graphics/grey.gif" id="module_led_5" /></td>
+                            		<td align="center" style="color:#0066cc"><span>06</span></td>
+                            		<td align="center"><button type="button" onclick='OnCardOP(5);' style="width:60px; height:20px" id="button_5" disabled><script>JS_INLAN("eject")</script></button></td>
+                            		<td align="right"><input id="module_io_5" style="width:130px; text-align:right;background-color:transparent;border:0px" value="0.000 / 0.000"/></td>
+                            	</tr>
+                            	<tr>
+                            		<td align="center"><img src="/graphics/grey.gif" id="module_led_2" /></td>
+                            		<td align="center" style="color:#0066cc"><span>03</span></td>
+                            		<td align="center"><button type="button" onclick='OnCardOP(2);' style="width:60px; height:20px" id="button_2" disabled><script>JS_INLAN("eject")</script></button></td>
+                            		<td align="right"><input id="module_io_2" style="width:130px; text-align:right;background-color:transparent;border:0px" value="0.000 / 0.000"/></td>
+                            	</tr>
+                            </table>
+                        </td>
+                        <td width="2px">
+							<hr size="30px" width= "0px" color="#FFFFFF" /> 
+                        </td>
+                        <td width="120px" align="left" style="padding-left: 10px; padding-right:10px">
+                            <table  cellspacing="0px" cellpadding="0" width="100%">
+                            	<tr>
+                            		<td width="40px"><span style="color:#0066cc" id="input_text"><script>document.write(JS_LAN("in"))</script></span></td>
+                            		<td align="right"><input id="input_bitrate" style="width:50px; text-align:right;background-color:transparent;border:0px" value="0.000"/>&nbsp;<span>Mbps</span></td>
+                            	</tr>
+                            	<tr>
+                            		<td><span  style="color:#0066cc" id="output_text"><script>document.write(JS_LAN("out"))</script></span></td>
+                            		<td align="right"><input id="output_bitrate" style="width:50px; text-align:right;background-color:transparent;border:0px" value="0.000"/>&nbsp;<span>Mbps</span></td>
+                            	<tr>
+                            		<td><span style="color:#0066cc" id="inserter_text"><script>document.write(JS_LAN("inserter"))</script></span></td>
+                            		<td align="right"><input id="inserter_bitrate" style="width:50px; text-align:right;background-color:transparent;border:0px" value="0.000"/>&nbsp;<span>Mbps</span></td>
+                            	</tr>
+                           </table>
+                        </td>
+                        <td width="2px">
+							<hr size="30px" width= "0px" color="#FFFFFF" /> 
+                        </td>
+                        <td width="80px" align="left" style="padding-left: 10px; padding-right:10px">
+                            <table  cellspacing="2px" cellpadding="0" width="100%">
+                            	<tr>
+                             		<td width="60px"><button id="apply" type="button" style="width:60px" onclick="OnSubmit(this)" disabled ><script>JS_INCMNLAN("apply")</script></button></td> 
+                            	</tr>
+                            	<tr>
+                            		<td width="60px"><button id="save" type="button" style="width:60px" onclick="OnSubmit(this)" disabled ><script>JS_INCMNLAN("save")</script></button></td>
+                            	</tr>
+                           </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

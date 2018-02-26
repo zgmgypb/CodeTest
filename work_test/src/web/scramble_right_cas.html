@@ -1,0 +1,406 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem = null;
+		var s_SCSIndex;
+		var s_IDsArray = new Array();
+
+		//页面限制注意与规格书和C语言程序一致
+		var s_ACNumber = 256;
+		var s_NameMaxByteSize = 23;
+		var s_SCSACDataSize = 256;
+		var s_SCSMinEMMPort = 1000, s_SCSMaxEMMPort = 65535;
+		var s_SCSMinECMPort = 1000, s_SCSMaxECMPort = 65535;
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		function OnLoad()
+		{
+			var lTmpVar, i;
+			var lSCSArray, lSCSObj, lSCSInfo, lACArray, lACObj, lACInfo;
+
+			lTmpVar = JS_ArgGetArgs();
+			s_SCSIndex = JS_ArgGetValueByName(lTmpVar, "ca_index");
+
+			$("cas_title").value = JS_StrLeftPading((parseInt(s_SCSIndex, 10) + 1), 2);
+			JS_ParamInitate();
+
+			lSCSArray = JS_ParamGetSCSArray();
+
+			if (lSCSArray.length > s_SCSIndex)
+			{
+				lSCSObj = lSCSArray[s_SCSIndex];
+				lSCSInfo = JS_ParamGetSCSInfo(lSCSObj);
+
+				$("scs_name").value = lSCSInfo.m_Name;
+				JS_UISelectSetCurIndexByValue($("cas_switch"), lSCSInfo.m_Active, true);
+				$("cas_switch").disabled = lSCSInfo.m_Disabled;
+				$("supercas_id").value = lSCSInfo.m_SuperCASID;
+				$("emmg_port").value = lSCSInfo.m_EMMGPort;
+				$("ecmg_ip").value = lSCSInfo.m_ECMGIP;
+				$("ecmg_port").value = lSCSInfo.m_ECMGPort;
+				$("ecm_chn_id").value = lSCSInfo.m_ECMCHNID;
+				
+				$("submit").disabled = lSCSInfo.m_Disabled;//提交按钮也一同无效化
+
+				JS_RestrctInputHEX($("supercas_id"));
+				JS_RestrctInputInt($("emmg_port"));
+				JS_RestrctInputInt($("ecmg_port"));
+				JS_RestrctInputInt($("ecm_chn_id"));
+				JS_RestrctInputFloat($("ecmg_ip"));
+
+				s_BitrateListItem = new MyListControl("s_BitrateListItem", 820, 352, "list_target", true);
+				s_BitrateListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+				s_BitrateListItem.SetColProperty(1, 200, JS_LAN("ac_name"), "center", "center");
+				s_BitrateListItem.SetColProperty(2, 420, JS_LAN("ac_content"), "center", "center");
+				s_BitrateListItem.SetColProperty(3, 80, "", "center", "center");
+				s_BitrateListItem.UpdateListFrame();
+
+				s_IDsArray.length = 0;
+				lACArray = JS_ParamGetSCSACArray(lSCSObj);
+				for (i = 0; i < lACArray.length; i++)
+				{
+					lItemInfo = JS_ParamGetACInfo(lACArray[i]);
+					OnAddACRow(lItemInfo.m_IDs, lItemInfo.m_Name, lItemInfo.m_Data, false);
+					s_IDsArray[s_IDsArray.length] = lItemInfo.m_IDs;
+					lItemInfo = null;
+				}
+				lItemArray = null;
+			}
+			else
+			{
+				JS_UISetDisableByID("submit", false);
+			}
+		}
+
+		function OnSelectRemove()
+		{
+			s_BitrateListItem.RemoveSelectedRow();
+			if (s_BitrateListItem.GetRowNumber() < s_ACNumber)
+			{
+				JS_UISetDisableByID("add", true);
+			}
+		}
+
+
+		function OnAddACRow(IDs, Name, Data, bView)
+		{
+			var lHolderNode;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "180px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Name;
+			lHolderNode.defaultValue = lHolderNode.value;
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "400px";
+			lHolderNode.style.textAlign = "left";
+			lHolderNode.value = Data;
+			lHolderNode.defaultValue = lHolderNode.value;
+			s_BitrateListItem.SetColValue(2, lHolderNode);
+
+
+			s_BitrateListItem.AddRowToDom(false, IDs, bView);
+
+			if (s_BitrateListItem.GetRowNumber() >= s_ACNumber)
+			{
+				JS_UISetDisableByID("add", false);
+			}
+		}
+
+		function Validation()
+		{
+			var i;
+			var lCASystemID;
+			var lValidValue;
+			var lSCSObj, lSCSInfo;
+			//恢复出错标志
+			lRowNum = s_BitrateListItem.GetRowNumber();
+			for (i = 0; i < lRowNum; i++)
+			{
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+			}
+			JS_UISetErrorIndicator($("scs_name"), true, false);
+			JS_UISetErrorIndicator($("supercas_id"), true, false);
+			JS_UISetErrorIndicator($("emmg_port"), true, false);
+			JS_UISetErrorIndicator($("ecmg_ip"), true, false);
+			JS_UISetErrorIndicator($("ecmg_port"), true, false);
+			JS_UISetErrorIndicator($("ecm_chn_id"), true, false);
+
+			lValidValue = JS_HTMLGetValueByID("scs_name");
+			if (JS_HTMLStringByteLength(lValidValue) > s_NameMaxByteSize)
+			{
+				JS_UISetErrorIndicator($("scs_name"), false, true);
+				return false;
+			}
+
+			lValidValue = parseInt(JS_HTMLGetValueByID("supercas_id"), 16);
+			lCASystemID = parseInt(lValidValue / 65536, 10);
+			if (lCASystemID > 0)
+			{
+				var lSCSArray;
+				lSCSArray = JS_ParamGetSCSArray();
+				for (i = 0; i < lSCSArray.length; i++)
+				{
+					if (i != s_SCSIndex)
+					{
+						lSCSObj = lSCSArray[i];
+						lSCSInfo = JS_ParamGetSCSInfo(lSCSObj);
+						if ((parseInt(lSCSInfo.m_CASID, 16) == lCASystemID) && (lSCSInfo.m_Active == "ON"))
+						{
+							//CASystemID不能和其它的重复，且不能为0
+							JS_UISetErrorIndicator($("supercas_id"), false, true);
+							return false;
+						}
+					}
+				}
+			}
+			else
+			{
+				JS_UISetErrorIndicator($("supercas_id"), false, true);
+				return false;
+			}
+
+			lValidValue = parseInt(JS_HTMLGetValueByID("emmg_port"), 10);
+			if (lValidValue > s_SCSMaxEMMPort || lValidValue < s_SCSMinEMMPort)
+			{
+				JS_UISetErrorIndicator($("emmg_port"), false, true);
+				return false;
+			}
+			
+			if (JS_ParamCheckEMMConflictWithOtherDev(lValidValue))
+			{
+				JS_UISetErrorIndicator($("emmg_port"), false, true);
+				return false;
+			}
+			
+			
+
+			lValidValue = parseInt(JS_HTMLGetValueByID("ecmg_port"), 10);
+			if (lValidValue > s_SCSMaxECMPort || lValidValue < s_SCSMinECMPort)
+			{
+				JS_UISetErrorIndicator($("ecmg_port"), false, true);
+				return false;
+			}
+
+			lValidValue = parseInt(JS_HTMLGetValueByID("ecm_chn_id"), 16);
+			if (lValidValue > 65535 || lValidValue < 0)
+			{
+				JS_UISetErrorIndicator($("ecm_chn_id"), false, true);
+				return false;
+			}
+
+			/*IP地址校验*/
+			lValidValue = JS_HTMLGetValueByID("ecmg_ip");
+			if (JS_ValidIPv4(lValidValue) != 1)
+			{
+				JS_UISetErrorIndicator($("ecmg_ip"), false, true);
+				return false;
+			}
+
+			for (i = 0; i < lRowNum; i++)
+			{
+				//名称不能太长
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+				if (JS_HTMLStringByteLength(lTmpVar.value) > s_NameMaxByteSize || lTmpVar.value.length > 10)
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					return false;
+				}
+
+				//判断AC信息是否符合长度和2倍的原则，但不检查内容
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				if ((JS_ValidHexData(lTmpVar.value) != true) || (lTmpVar.value.length > (s_SCSACDataSize * 2)))
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+
+		function OnSubmit(Item)
+		{
+			var i, lRowNum;
+			var lXMLDom, lIDs;
+			var lHolderNode, lInforNode;
+
+			var lSCSArray, lSCSObj, lSCSInfo, lACArray, lACObj, lACInfo;
+
+			lSCSArray = JS_ParamGetSCSArray();
+
+			lSCSObj = lSCSArray[s_SCSIndex];
+			lSCSInfo = JS_ParamGetSCSInfo(lSCSObj);
+
+
+			if (Validation() == false)
+			{
+				return;
+			}
+
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "scramble", "scs_setting", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "scs_ids", lSCSInfo.m_IDs);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "scs_name", JS_HTMLGetValueByID("scs_name"));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "supercas_id", JS_HTMLGetValueByID("supercas_id"));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "emmg_port", JS_HTMLGetValueByID("emmg_port"));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "ecmg_ip", JS_HTMLGetValueByID("ecmg_ip"));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "ecmg_port", JS_HTMLGetValueByID("ecmg_port"));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "ecm_chn_id", JS_HTMLGetValueByID("ecm_chn_id"));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "active_mark", JS_HTMLGetValueByID("cas_switch"));
+
+			lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "add_modify_acs");
+			lRowNum = s_BitrateListItem.GetRowNumber();
+			for (i = 0; i < lRowNum; i++)
+			{
+				lIDs = s_BitrateListItem.GetRowData(i);
+
+				for (k = 0; k < s_IDsArray.length; k++)
+				{
+					if (s_IDsArray[k] == lIDs)
+					{
+						s_IDsArray.splice(k, 1);
+						break;
+					}
+				}
+
+				lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "ac");
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "ac_ids", lIDs);
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "ac_name", lTmpVar.value);
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "data", lTmpVar.value);
+			}
+
+
+			lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "remove_acs");
+			for (k = 0; k < s_IDsArray.length; k++)
+			{
+				lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "ac");
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "ac_ids", s_IDsArray[k]);
+			}
+
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+
+	</script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                	<tr>
+                		<td width="150px" align="right"></td>
+                        <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+                		<input id="cas_title" style="width:30px; text-align:center;background-color:transparent;border:0px; " value=""/>
+                		</td>
+                		<td width="150px" align="right"></td>
+                	</tr>
+                </table>
+			</td>
+		</tr>
+		<tr>
+			<td align="center" bgcolor="#F5F9FE" style="padding-left: 20px; padding-right: 20px; text-align: left;padding-top: 10px">
+				<table border="0" cellspacing="1" cellpadding="1" width="100%">
+					<tr style="height: 25px">
+						<td style="padding-left: 20px; width:380px" bgcolor="#E4EFF8">
+							<span><script type="text/javascript">JS_INLAN("cas_name")</script></span>&nbsp;&nbsp;<input type="text" style="width:240px;text-align:center;" id="scs_name"/>
+						</td>
+						<td style="padding-left: 20px;" >
+							<span><script type="text/javascript">JS_INLAN("cas_mark")</script></span>&nbsp;&nbsp;<select style="width:60px" id="cas_switch"><option value="OFF">OFF</option><option value="ON">ON</option></select>
+						</td>
+					</tr>
+					<tr style="height: 25px">
+						<td style="padding-left: 20px;">
+							<span><script type="text/javascript">JS_INLAN("supercasid")</script></span>&nbsp;&nbsp;<input type="text" style="width:120px;text-align:center;" value="" id="supercas_id"/>
+						</td>
+						<td style="padding-left: 20px;"bgcolor="#E4EFF8">
+							<span><script type="text/javascript">JS_INLAN("emmg_port")</script></span>&nbsp;&nbsp;<input type="text" style="width:100px;text-align:center;" value="" id="emmg_port"/>
+						</td>
+					</tr>
+					<tr style="height: 25px">
+						<td style="padding-left: 20px;"bgcolor="#E4EFF8">
+							<span><script type="text/javascript">JS_INLAN("ecmg_ip")</script></span>&nbsp;&nbsp;<input type="text" style="width:240px;text-align:center;" value="" id="ecmg_ip"/>
+						</td>
+						<td style="padding-left: 20px;">
+							<span><script type="text/javascript">JS_INLAN("ecmg_port")</script></span>&nbsp;&nbsp;<input type="text" style="width:100px;text-align:center;" value="" id="ecmg_port"/>
+						</td>
+					</tr>
+					<tr style="height: 25px">
+						<td style="padding-left: 20px;">
+							<span><script type="text/javascript">JS_INLAN("ecm_chn_id")</script></span>&nbsp;&nbsp;<input type="text" style="width:120px;text-align:center;" value="" id="ecm_chn_id"/>
+						</td>
+						<td style="padding-left: 20px;">
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+<!-- 				<div style="height:4px; width: 820px; overflow: hidden; padding: 5px 1px 15x 1px"> -->
+<!-- 					<div style="height:1px; width:800px;overflow:hidden; background:#666"></div> -->
+<!--                 </div> -->
+				<div id="list_target" style="height: 359px; width: 820px; overflow: auto; padding: 12px 10px 0px 10px;border: solid 0px #FF0000;">
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="3" height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+			<td valign="top" align="left" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick='OnAddACRow(0, "", "", true);' style="width:100px; height:25px" id="add"><script type="text/javascript">JS_INCMNLAN("add")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='OnSelectRemove();' style="width:100px; height:25px" ><script type="text/javascript">JS_INCMNLAN("remove")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='OnSubmit();' style="width:80px; height:25px" id="submit"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width:80px; height:25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

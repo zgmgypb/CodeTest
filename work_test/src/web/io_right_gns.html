@@ -1,0 +1,453 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+    <script type="text/javascript">
+
+        var s_UpdateTimeout;
+        var s_GNSInfo;
+
+        JS_LANInitiate(); //初始化语言脚本组件
+
+        function OnLoad()
+        {
+            var i;
+
+            JS_ParamInitate();
+
+            s_GNSInfo = JS_ParamGetGNSInfo();
+
+            JS_UISelectSetCurIndexByValue($("gns_mark"), s_GNSInfo.m_bGNSMark, true);
+            JS_UISelectSetCurIndexByValue($("gns_timing_mark"), s_GNSInfo.m_bTimingMark, true);
+            $("gns_timing_interval").value = s_GNSInfo.m_TimingInterval;
+            JS_UISelectSetCurIndexByValue($("gns_sys_type"), s_GNSInfo.m_GNSType, true);
+
+            if (s_GNSInfo.m_bGNSMark == "ON")
+            {
+                s_UpdateTimeout = 0;
+                setTimeout("OnRequestData()", 1000);
+            }
+        }
+
+        function OnAjaxCB(XMLDom)
+        {
+            var i, lTmpVar;
+            var lTmpValue;
+
+            if (XMLDom != null)
+            {
+                if (JS_XMLGetTagValue(XMLDom, "gns_lock") == "ON")
+                {
+                    $("gns_lock").src = "/graphics/green.gif";
+                }
+                else
+                {
+                    $("gns_lock").src = "/graphics/red.gif";
+                }
+                
+                $("gns_h_accuracy").value = JS_XMLGetTagValue(XMLDom, "gns_h_accuracy");
+                $("gns_v_accuracy").value = JS_XMLGetTagValue(XMLDom, "gns_v_accuracy");
+                $("gns_p_accuracy").value = JS_XMLGetTagValue(XMLDom, "gns_p_accuracy");
+
+                $("gns_latitude").value = JS_XMLGetTagValue(XMLDom, "gns_latitude_mark") + ":" + JS_XMLGetTagValue(XMLDom, "gns_latitude_degree") + "°" + JS_XMLGetTagValue(XMLDom, "gns_latitude_minite") + "\'" + parseFloat(JS_XMLGetTagValue(XMLDom, "gns_latitude_second")).toFixed(3) + "\"";
+                $("gns_longitude").value = JS_XMLGetTagValue(XMLDom, "gns_longitude_mark") + ":" + JS_XMLGetTagValue(XMLDom, "gns_longitude_degree") + "°" + JS_XMLGetTagValue(XMLDom, "gns_longitude_minite") + "\'" + parseFloat(JS_XMLGetTagValue(XMLDom, "gns_longitude_second")).toFixed(3) + "\"";
+                $("gns_altitude").value = JS_XMLGetTagValue(XMLDom, "gns_altitude");
+                $("gns_time").value = JS_XMLGetTagValue(XMLDom, "gns_time");
+
+                $("gns_sat_total").value = JS_XMLGetTagValue(XMLDom, "gns_sat_total");
+                $("gns_sat_used").value = JS_XMLGetTagValue(XMLDom, "gns_sat_used");
+
+                lTmpVar = XMLDom.getElementsByTagName("sat_info");
+
+                for (i = 0; i < ((lTmpVar.length > 32)?32:lTmpVar.length); i++)
+                {
+                    lTmpValue = parseInt(JS_XMLGetTagValue(lTmpVar[i], "sat_id"), 10);
+                    
+                    if (lTmpValue > 32 && lTmpValue < 198)
+                    {
+                        $("sat_img_" + i).src = "/graphics/bds.png";
+                    }
+                    else
+                    {
+                        $("sat_img_" + i).src = "/graphics/gps.png";
+                    }
+
+                    $("sat_snr_" + i).value = lTmpValue + " - " + JS_StrLeftPading(JS_XMLGetTagValue(lTmpVar[i], "sat_snr"), 2) + "%";
+
+                    if (JS_XMLGetTagValue(lTmpVar[i], "gns_used") == "ON")
+                    {
+                        $("sat_snr_" + i).style.backgroundColor = "aqua";
+                    }
+                    else
+                    {
+                        $("sat_snr_" + i).style.backgroundColor = "";
+                    }
+                    
+                }
+
+
+                s_UpdateTimeout = 3;
+                setTimeout("OnRequestData()", 1000);
+            }
+        }
+
+        function OnRequestData()
+        {
+            var lXMLDom, lBodyNode;
+            s_UpdateTimeout--;
+            if (s_UpdateTimeout < 0)
+            {
+                lXMLDom = JS_XMLCreateDomFromFile(null);
+                lBodyNode = JS_XMLParamSetHead(lXMLDom, "status", "gns_status", "");
+                JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxCB, false);
+            }
+            else
+            {
+                //更新页面时间
+//		        $("time_out_value").innerHTML = JS_StrLeftPading(s_UpdateTimeout, 2);
+                setTimeout("OnRequestData()", 1000);
+            }
+        }
+        
+        function OnSubmit(Item)
+        {
+            var lTmpValue;
+            var lHolderNode;
+            var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+            JS_UISetErrorIndicatorByID("gns_timing_interval", true, false);
+
+            lTmpValue = parseInt($("gns_timing_interval").value, 16);
+            if (lTmpValue < 60 || lTmpValue > 31536000)
+            {
+                JS_UISetErrorIndicatorByID("gns_timing_interval", false, true);
+                return;
+            }
+
+            lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "gns_setting", "");
+
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "gns_mark", JS_UISelectGetCurValue($("gns_mark")));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "gns_timing_mark", JS_UISelectGetCurValue($("gns_timing_mark")));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "gns_timing_interval", parseInt($("gns_timing_interval").value, 10));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "gns_sys_type", JS_UISelectGetCurValue($("gns_sys_type")));
+
+
+
+            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+        }
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+				<span><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td  bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+					            <span><script type="text/javascript">JS_INLAN("gns_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 33%">
+											<span><script type="text/javascript">JS_INLAN("gns_mark")</script></span>
+											<select id="gns_mark">
+											    <option value="OFF">OFF</option>
+											    <option value="ON">ON</option>
+											</select>&nbsp;&nbsp;&nbsp;
+										</td>
+									    <td style="text-align: left; width: 33%">
+										    <span><script type="text/javascript">JS_INLAN("gns_sys_type")</script></span>
+										    <select id="gns_sys_type">
+										        <option value=0><script type="text/javascript">JS_INLAN("gps")</script></option>
+										        <option value=1><script type="text/javascript">JS_INLAN("bds")</script></option>
+										        <option value=2><script type="text/javascript">JS_INLAN("gps_bds")</script></option>
+										    </select>&nbsp;&nbsp;&nbsp;
+									    </td>
+										<td style="text-align: left; width: 33%">
+											<span><script type="text/javascript">JS_INLAN("gns_set_time")</script></span>
+											<input type="text" id="gns_timing_interval" style='width: 70px;text-align:center;'  readonly/>
+											<select id="gns_timing_mark">
+											    <option value="OFF">OFF</option>
+											    <option value="ON">ON</option>
+											</select>&nbsp;&nbsp;&nbsp;
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+					            <span><script type="text/javascript">JS_INLAN("gns_status")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("gns_lock")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="gns_lock" >
+										</td>
+										<td style="text-align: left; width: 20%">
+											<span><script type="text/javascript">JS_INLAN("gns_h_accuracy")</script></span>
+											<input type="text" id="gns_h_accuracy" style='width: 100px;text-align:center;' readonly/>
+										</td>
+										<td style="text-align: left; width: 20%">
+											<span><script type="text/javascript">JS_INLAN("gns_v_accuracy")</script></span>
+											<input type="text" id="gns_v_accuracy" style='width: 100px;text-align:center;' readonly/>
+										</td>
+										<td style="text-align: left; width: 20%">
+											<span><script type="text/javascript">JS_INLAN("gns_p_accuracy")</script></span>
+											<input type="text" id="gns_p_accuracy" style='width: 100px;text-align:center;' readonly/>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+					            <span><script type="text/javascript">JS_INLAN("gns_position")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 30%">
+											<span><script type="text/javascript">JS_INLAN("gns_time")</script></span>
+											<input type="text" id="gns_time" style='width: 150px;text-align:center;' readonly/>
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("gns_latitude")</script></span>
+											<input type="text" id="gns_latitude" style='width: 110px;text-align:center;' readonly/>
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("gns_longitude")</script></span>
+											<input type="text" id="gns_longitude" style='width: 110px;text-align:center;' readonly/>
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("gns_altitude")</script></span>
+											<input type="text" id="gns_altitude" style='width: 80px;text-align:center;' readonly/>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+					            <span><script type="text/javascript">JS_INLAN("gns_sat")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("gns_sat_total")</script></span>
+											<input type="text" id="gns_sat_total" style='width: 70px;text-align:center;' readonly/>
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("gns_sat_used")</script></span>
+											<input type="text" id="gns_sat_used" style='width: 70px;text-align:center;' readonly/>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_0" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_0" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_1" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_1" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_2" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_2" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_3" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_3" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_4" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_4" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_5" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_5" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_6" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_6" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_7" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_7" >
+										</td>
+									</tr>
+									<tr>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_8" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_8" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_9" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_9" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_10" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_10" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_11" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_11" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_12" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_12" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_13" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_13" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_14" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_14" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_15" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_15" >
+										</td>
+									</tr>
+									<tr>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_16" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_16" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_17" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_17" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_18" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_18" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_19" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_19" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_20" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_20" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_21" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_21" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_22" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_22" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_23" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_23" >
+										</td>
+									</tr>
+									<tr>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_24" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_24" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_25" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_25" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_26" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_26" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_27" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_27" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_28" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_28" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_29" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_29" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_30" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_30" >
+										</td>
+										<td style="text-align: left;">
+											<input type="text" style='width: 60px;text-align:center;' id="sat_snr_31" readonly/>
+											<img src="/graphics/none.png" width="25px" height="17px" style="" id="sat_img_31" >
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+            <td colspan="3" height="30px" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

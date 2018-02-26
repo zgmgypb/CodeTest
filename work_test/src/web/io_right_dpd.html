@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+    <script type="text/javascript">
+
+        var s_UpdateTimeout;
+
+        JS_LANInitiate(); //初始化语言脚本组件
+
+        function OnLoad()
+        {
+            var i;
+            var lDPDXMLDom
+
+            JS_ParamInitate();
+            
+            lDPDXMLDom = JS_ParamGetDPDSetting();
+            if (lDPDXMLDom != null) 
+            {
+                JS_UISelectSetCurIndexByValue($("dpd_mark"), JS_XMLGetTagValue(lDPDXMLDom, "dpd_mark"), true);
+                JS_UISelectSetCurIndexByValue($("feedback_select"), JS_XMLGetTagValue(lDPDXMLDom, "feedback_select"), true);
+            }
+            
+            s_UpdateTimeout = 0;
+            setTimeout("OnRequestData()", 1000);
+        }
+
+        function OnAjaxCB(XMLDom)
+        {
+            var i;
+            var lTmpValue;
+
+            if (XMLDom != null)
+            {
+ 			    $("board_id").value = JS_XMLGetTagValue(XMLDom, "board_id");
+ 			    $("board_version").value = JS_XMLGetTagValue(XMLDom, "package_release") + " " + JS_XMLGetTagValue(XMLDom, "fpga_release") + " " + JS_XMLGetTagValue(XMLDom, "hardware_release");
+ 			
+               if (parseInt(JS_XMLGetTagValue(XMLDom, "dpd_status"), 10) == 1) 
+                {
+                    $("dpd_status").src="/graphics/green.gif";
+                }
+                else
+                {
+                    $("dpd_status").src="/graphics/red.gif";
+                }
+                
+                if (parseInt(JS_XMLGetTagValue(XMLDom, "dpd_track_status"), 10) == 0) 
+                {
+                    $("dpd_track_status").src="/graphics/green.gif";
+                }
+                else if (parseInt(JS_XMLGetTagValue(XMLDom, "dpd_track_status"), 10) == 1) 
+                {
+                    $("dpd_track_status").src="/graphics/yellow.gif";
+                }
+                else
+                {
+                    $("dpd_track_status").src="/graphics/red.gif";
+                }
+                
+                if (parseInt(JS_XMLGetTagValue(XMLDom, "dpd_feedback_status"), 10) == 0) 
+                {
+                    $("dpd_feedback_status").src="/graphics/green.gif";
+                }
+                else if (parseInt(JS_XMLGetTagValue(XMLDom, "dpd_feedback_status"), 10) == 1) 
+                {
+                    $("dpd_feedback_status").src="/graphics/red.gif";
+                }
+                else
+                {
+                    $("dpd_feedback_status").src="/graphics/yellow.gif";
+                }
+                
+                $("dpd_feedback_level").value = parseInt(JS_XMLGetTagValue(XMLDom, "dpd_feedback_level"), 10);
+                lTmpValue = parseInt(JS_XMLGetTagValue(XMLDom, "dpd_board_temp"), 10);
+                $("dpd_board_temp").value = lTmpValue + "/" + parseInt(lTmpValue * 9 / 5 + 32, 10);
+                $("dpd_feedback_dsn").value = parseFloat(JS_XMLGetTagValue(XMLDom, "dpd_feedback_dsn")).toFixed(2);
+                
+                
+            }
+           s_UpdateTimeout = 3;
+           setTimeout("OnRequestData()", 1000);
+       }
+
+        function OnRequestData()
+        {
+            var lXMLDom, lBodyNode;
+            s_UpdateTimeout--;
+            if (s_UpdateTimeout < 0)
+            {
+                lXMLDom = JS_XMLCreateDomFromFile(null);
+                lBodyNode = JS_XMLParamSetHead(lXMLDom, "status", "dpd_status", "");
+                JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxCB, false);
+            }
+            else
+            {
+                setTimeout("OnRequestData()", 1000);
+            }
+        }
+
+        function OnSubmit(Item)
+        {
+            var lTmpValue;
+            var lHolderNode;
+            var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+            lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "dpd_setting", "");
+
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "dpd_mark", JS_UISelectGetCurValue($("dpd_mark")));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "feedback_select", JS_UISelectGetCurValue($("feedback_select")));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "track_reset_mark", JS_UISelectGetCurValue($("track_reset_mark")));
+
+            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+        }
+        
+		function OnKeyBoard(Val)
+		{
+		     if(Val==13)
+		     {
+		         $("submit").onclick();
+		     }
+		}
+    </script>
+
+</head>
+<body onload="OnLoad()" onkeydown="OnKeyBoard(event.keyCode)">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+				<span><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td  bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("module_info")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("board_version")</script></span>
+											<input type="text" id="board_version" style='width: 300px;text-align:center;' readonly/>
+										</td>
+									</tr>
+									<tr>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("board_id")</script></span>
+											<input type="text" id="board_id" style='width: 300px;text-align:center;' readonly/>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("dpd_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("dpd_mark")</script></span>
+											<select id="dpd_mark">
+											    <option value="OFF"><script type="text/javascript">JS_INLAN("OFF")</script></option>
+											    <option value="ON"><script type="text/javascript">JS_INLAN("ON")</script></option>
+											</select>
+										</td>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("track_reset_mark")</script></span>
+											<select id="track_reset_mark">
+											    <option value="OFF"><script type="text/javascript">JS_INLAN("OFF")</script></option>
+											    <option value="ON"><script type="text/javascript">JS_INLAN("ON")</script></option>
+											</select>
+										</td>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("feedback_select")</script></span>
+											<select id="feedback_select">
+											    <option value="0"><script type="text/javascript">JS_INLAN("A")</script></option>
+											    <option value="1"><script type="text/javascript">JS_INLAN("B")</script></option>
+											</select>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("dpd_status_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 10%">
+											<span><script type="text/javascript">JS_INLAN("dpd_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="dpd_status" >
+										</td>
+										<td style="text-align: left; width: 10%">
+											<span><script type="text/javascript">JS_INLAN("dpd_track_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="dpd_track_status" >
+										</td>
+										<td style="text-align: left; width: 10%">
+											<span><script type="text/javascript">JS_INLAN("dpd_board_temp")</script><img src="/graphics/cf.gif"></span>
+											<input type="text" id="dpd_board_temp" style='width: 80px;text-align:center;' readonly/>
+										</td>
+									</tr>
+									<tr>
+										<td style="text-align: left; width: 20%">
+											<span><script type="text/javascript">JS_INLAN("dpd_feedback_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="dpd_feedback_status" >
+										</td>
+										<td style="text-align: left; width: 30%">
+											<span><script type="text/javascript">JS_INLAN("dpd_feedback_level")</script></span>
+											<input type="text" id="dpd_feedback_level" style='width: 60px;text-align:center;' readonly/>
+										</td>
+										<td style="text-align: left; width: 40%">
+											<span><script type="text/javascript">JS_INLAN("dpd_feedback_dsn")</script></span>
+											<input type="text" id="dpd_feedback_dsn" style='width: 80px;text-align:center;' readonly/>
+										</td>
+									</tr>
+									
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+            <td colspan="3" height="30px" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

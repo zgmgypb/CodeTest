@@ -1,0 +1,480 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem = null;
+		var s_Direction = "input";
+		var s_ChannelIndex = null;
+		var s_ChannelType = null;
+		var s_ChannelSubType = null;
+		var s_SubChannelNum = null;
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		function OnLoad()
+		{
+			var lTmpVar, lChnObj, lSubObj, lChnInfo, lSubInfo;
+			var i;
+
+			lTmpVar = JS_ArgGetArgs();
+			s_Direction = JS_ArgGetValueByName(lTmpVar, "direction");
+			s_ChannelIndex = parseInt(JS_ArgGetValueByName(lTmpVar, "chn_ind"), 10);
+			if (s_ChannelIndex != null)
+			{
+				JS_ParamInitate(); //初始化系统参数处理脚本组件
+				if (s_Direction == "input")
+				{
+				    lChnObj = JS_ParamGetInChannelObject(s_ChannelIndex);
+				}
+				else
+				{
+					lChnObj = JS_ParamGetOutCHNObj(s_ChannelIndex);
+				}
+
+				s_ChannelType = JS_ParamGetChannelType(lChnObj);
+				s_ChannelSubType = JS_ParamGetChannelSubType(lChnObj);
+				s_SubChannelNum = JS_ParamGetSubChannelNum(lChnObj);
+
+				$("chn_info").innerHTML = JS_LANCMN(s_Direction) + JS_LANCMN("chan") + " " + JS_StrLeftPading((s_ChannelIndex + 1), 2);
+				$("chn_type").innerHTML = JS_LANCMN(s_ChannelType);
+
+				s_BitrateListItem = new MyListControl("s_BitrateListItem", 830, 407, "sub_param", false);
+				if (s_Direction == "input")
+				{
+					if (s_ChannelType == "TUNER_S")
+					{
+					    s_BitrateListItem.SetColProperty(0, 30, JS_LANCMN("index"), "center", "center");
+					    s_BitrateListItem.SetColProperty(1, 50, JS_LANCMN("ts_index"), "center", "center");									   
+						s_BitrateListItem.SetColProperty(2, 95, JS_LAN("input_freq"), "center", "center");
+						s_BitrateListItem.SetColProperty(3, 95, JS_LAN("loacl_freq"), "center", "center");
+						s_BitrateListItem.SetColProperty(4, 95, JS_LAN("symbol_rate"), "center", "center");
+						s_BitrateListItem.SetColProperty(5, 75, JS_LAN("polar"), "center", "center");
+						s_BitrateListItem.SetColProperty(6, 65, JS_LAN("switch_22k"), "center", "center");
+						s_BitrateListItem.SetColProperty(7, 70, JS_LAN("specinv"), "center", "center");						
+						s_BitrateListItem.SetColProperty(8, 90, JS_LANCMN("signal_strength"), "center", "center");
+						s_BitrateListItem.SetColProperty(9, 85, JS_LANCMN("signal_quality"), "center", "center");
+						s_BitrateListItem.SetColProperty(10, 50, JS_LAN("lock"), "center", "center");
+						s_BitrateListItem.UpdateListFrame();
+
+
+						for (i = 0; i < s_SubChannelNum; i++)
+						{
+							lSubObj = JS_ParamGetSubChnObj(lChnObj, i);
+							lSubInfo = JS_ParamGetSubChannelInfoTUNER(lSubObj);
+
+							AddInTUNERRow(i, lSubInfo.m_TsIndex, lSubInfo.m_InputFreq, lSubInfo.m_LocalFreq, lSubInfo.m_SymbolRate, lSubInfo.m_PolarMethod,
+							                 lSubInfo.m_22kSwitch, lSubInfo.m_Specinv, lSubInfo.m_SignalStrength, lSubInfo.m_SignalQuality,lSubInfo.m_LockStatus,lSubInfo.m_Disabled);
+
+							lSubInfo = null; //删除对象！
+							lSubObj = null; //删除对象！
+						}
+						
+						 s_UpdateTimeout = 0;						 
+						 setTimeout("OnRequestData()", 500);
+						 //OnRequestAlarmData()
+						 
+
+						lTmpVar = $("tuner_container");
+						lTmpVar.style.display = "block";
+					}
+					
+				}
+
+
+			}
+		}
+
+		
+
+	function AddInTUNERRow(SubIndex, TsIndex, In_Frequency, Local_Frequency, SymRate, PolarMethod, Switch22k, Specinv, SignalStrength, SignalQuality, LockStatus, Disabled)
+		{
+			var i, lTmpValue, lDisable, lDisableFreq;
+			var lHolderNode;
+			var lIndex;
+
+			
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "40px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = JS_StrLeftPading(TsIndex + 1, 3);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+			
+			
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.value = (In_Frequency / 1000).toFixed(6);
+			//lHolderNode.value = 0;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.style.width = "70px";
+			lHolderNode.style.textAlign = "center"; //(MBaud)
+			//lHolderNode.disabled = ;
+			lHolderNode.id = "infreq_" + SubIndex;
+			lHolderNode.name = "infreq";
+			JS_RestrctInputFloat(lHolderNode);				
+			s_BitrateListItem.SetColValue(2, lHolderNode);
+			
+			
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.value = (Local_Frequency / 1000).toFixed(6);
+			//lHolderNode.value = 0;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.style.width = "70px";
+			lHolderNode.style.textAlign = "center"; //(MBaud)
+			//lHolderNode.disabled =  ;
+			lHolderNode.id = "localfreq_" + SubIndex;
+			lHolderNode.name = "localfreq";	
+			JS_RestrctInputFloat(lHolderNode);			
+			s_BitrateListItem.SetColValue(3, lHolderNode);
+			
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "70px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = (SymRate / 1000000).toFixed(6);
+			//lHolderNode.value = 0;
+			lHolderNode.defaultValue = lHolderNode.value;
+			//lHolderNode.disabled =  ;
+			lHolderNode.id = "symrate_" + SubIndex;
+			lHolderNode.name = "symrate";
+			JS_RestrctInputFloat(lHolderNode);				
+			s_BitrateListItem.SetColValue(4, lHolderNode);
+			
+			
+			
+			
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "None", "None");
+			JS_UISelectAddOption(lHolderNode, "HOR", "HOR");
+			JS_UISelectAddOption(lHolderNode, "VER", "VER");
+			JS_UISelectSetCurIndexByValue(lHolderNode, PolarMethod, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "polar_" + SubIndex;
+			lHolderNode.name = "polar";
+			//lHolderNode.disabled = Disabled;
+			s_BitrateListItem.SetColValue(5, lHolderNode);
+			
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Switch22k, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "switch22k_" + SubIndex;
+			lHolderNode.name = "switch22k";
+			//lHolderNode.disabled = Disabled;
+			s_BitrateListItem.SetColValue(6, lHolderNode);
+			
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectAddOption(lHolderNode, "AUTO", "AUTO");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Specinv, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "specinv_" + SubIndex;
+			lHolderNode.name = "specinv";
+			lHolderNode.disabled = Disabled;
+			s_BitrateListItem.SetColValue(7, lHolderNode);
+        			
+	
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "70px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.readOnly = true;
+			//lHolderNode.value = 0;
+			//lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.name = "signal_strength";
+			s_BitrateListItem.SetColValue(8, lHolderNode);
+			
+			
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "70px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.readOnly = true;
+			//lHolderNode.value = 0;
+			//lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.name = "signal_quality";
+			s_BitrateListItem.SetColValue(9, lHolderNode);
+			
+			
+			
+			lHolderNode = document.createElement("img");
+    		lHolderNode.name = "red";
+    		lHolderNode.src = "/graphics/grey.gif"
+    		s_BitrateListItem.SetColValue(10, lHolderNode);
+			
+			
+			s_BitrateListItem.AddRowToDom(false);
+
+		}
+		
+		function OnRequestData()
+        {
+            var lXMLDom, lBodyNode;
+            s_UpdateTimeout--;
+            if (s_UpdateTimeout < 0)
+            {
+                lXMLDom = JS_XMLCreateDomFromFile(null);
+                lBodyNode = JS_XMLParamSetHead(lXMLDom, "tuners", "tunerstatus", "monitor");
+                JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxCB, false);
+            }
+            else 
+            {
+                //更新页面时间
+                $("time_out_value").innerHTML = JS_StrLeftPading(s_UpdateTimeout, 2);
+                setTimeout("OnRequestData()", 1000);
+            }
+        }
+        
+        
+        function OnAjaxCB(XMLDom)
+    	{
+    		var i;
+    		var lTmpValue, lRowNum;
+    		var lLogArray, lLogObj;
+    		var lColVar;
+    		//s_UpdateTimeout = 15; 
+    		
+
+    		if (XMLDom != null) 
+    		{
+    		   
+    			lRowNum = s_BitrateListItem.GetRowNumber();
+    			lLogArray = XMLDom.getElementsByTagName("sig");
+    			if (lRowNum == lLogArray.length)
+    			{
+    				for (i = 0; i < lRowNum; i++)
+    				{
+    					lLogObj = lLogArray[i];
+    					lTmpValue = parseFloat(JS_XMLGetTagValue(lLogObj, "signal_strength")).toFixed(3);
+    					
+    					lColVar = s_BitrateListItem.GetColNodeByIndex(i, 8);
+
+    			        lColVar.value = lTmpValue ;
+
+    			        lTmpValue = parseFloat(JS_XMLGetTagValue(lLogObj, "signal_quality")).toFixed(3);
+    			       
+    			        lColVar = s_BitrateListItem.GetColNodeByIndex(i, 9);
+
+    			        lColVar.value = lTmpValue ;
+    			        
+    			
+    			        lTmpValue = parseInt(JS_XMLGetTagValue(lLogObj, "lock_status"), 10);
+    			        lColVar = s_BitrateListItem.GetColNodeByIndex(i, 10);
+    			          			        
+    					if ((lTmpValue == 0) && (lColVar.name == "green"))
+    					{
+    						lColVar.src = "/graphics/red.gif"
+    						lColVar.name = "red";
+    					}
+    					else if ((lTmpValue > 0) && (lColVar.name == "red"))
+    					{
+    						lColVar.src = "/graphics/green.gif"
+    						lColVar.name = "green";
+    					}
+    				}
+    			}
+    			setTimeout("OnRequestData()", 1000);
+    		}
+    	}
+    	
+    	
+    	
+		function OnValidationTuner()
+		{
+			var i, k;
+			var lChnObj, lChnInfo;
+			var lInFreq, lLocFreq, lSym;
+			var lFreqNode, lSymNode, lLocFreqNode;
+
+			for (i = 0; i < s_SubChannelNum; i++)
+			{
+				lFreqNode = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				lFreqNode.style.color = "";
+				lLocFreqNode = s_BitrateListItem.GetColNodeByIndex(i, 3);
+				lLocFreqNode.style.color = "";
+				lSymNode = s_BitrateListItem.GetColNodeByIndex(i, 4);
+				lSymNode.style.color = "";
+
+			}
+
+			lChnObj = JS_ParamGetInChannelObject(s_ChannelIndex);
+			lChnInfo = JS_ParamGetChannelInfoTUNER(lChnObj);
+			for (i = 0; i < s_SubChannelNum; i++)
+			{	
+			    lFreqNode = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				lInFreq = parseFloat(lFreqNode.value) * 1000;
+				lLocFreqNode = s_BitrateListItem.GetColNodeByIndex(i, 3);
+				lLocFreq = parseFloat(lLocFreqNode.value) * 1000;
+				if(lLocFreq - lInFreq >0)
+				{
+				    if ((lLocFreq - lInFreq) > lChnInfo.m_FreqLimitsHigh || (lLocFreq - lInFreq) < lChnInfo.m_FreqLimitsLow)
+				    {
+					    lFreqNode.style.borderColor = "#FF0000";
+					    lLocFreqNode.style.borderColor = "#FF0000";
+					    return false;
+				    }
+				    
+			    }
+				
+				else 
+				{
+				    if((lLocFreq - lInFreq) < (-lChnInfo.m_FreqLimitsHigh) || (lLocFreq - lInFreq) > -(lChnInfo.m_FreqLimitsLow))
+				    {
+					    lFreqNode.style.borderColor = "#FF0000";
+					    lLocFreqNode.style.borderColor = "#FF0000";
+					    return false;
+				    }
+
+				
+			     }
+					
+
+				lSymNode = s_BitrateListItem.GetColNodeByIndex(i, 4);
+				lSym = parseFloat(lSymNode.value) * 1000000;
+
+				if (lSym > lChnInfo.m_SymRateLimitsHigh || lSym < lChnInfo.m_SymRateLimitsLow)
+				{
+					lSymNode.style.borderColor = "#FF0000";
+					return false;
+				}			
+			
+			}
+			return true;
+		}
+
+
+        
+        
+
+		function OnSubmit(Item)
+		{
+			var i;
+			var lBodyNode, lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "parameters", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "chn_ind", s_ChannelIndex);
+			
+			if (s_Direction == "input")
+			{
+				JS_XMLAddTextChild(lXMLDom, lBodyNode, "direction", "IN");
+				if (s_ChannelType == "TUNER_S")
+				{
+					JS_XMLAddTextChild(lXMLDom, lBodyNode, "type", s_ChannelType);
+					JS_XMLAddTextChild(lXMLDom, lBodyNode, "sub_type", s_ChannelSubType);
+					for (i = 0; i < s_SubChannelNum; i++)
+					{
+					    lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "sub_channel");
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "sub_ind", i);						
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "in_freq",  parseFloat(JS_HTMLGetValueByID("infreq_" + i))* 1000);
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "local_freq", parseFloat(JS_HTMLGetValueByID("localfreq_" + i))* 1000);
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "sym_rate", parseFloat(JS_HTMLGetValueByID("symrate_" + i))* 1000000);
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "polar_method", JS_HTMLGetValueByID("polar_" + i));
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "switch_22k", JS_HTMLGetValueByID("switch22k_" + i));
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "spec_inv", JS_HTMLGetValueByID("specinv_" + i));
+						
+					}
+					if(OnValidationTuner())
+					{
+					JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+					window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+					
+					}					
+				}
+			}		
+
+		}
+
+        
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title"><script type="text/javascript">JS_INLAN("title")</script></td>
+        </tr>
+        <tr>
+            <td height="30px" align="center" bgcolor="#F5F9FE">
+				<div id="head" style="height: 60px; width: 800px; overflow: auto; padding: 10px 20px 0px 10px;">
+					<table width="100%">
+						<tr>
+							<td height="22px" bgcolor="#E4EFF8" width="25%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_info"></span>
+							</td>
+							<td height="20px" bgcolor="#F5F9FE" width="75%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_type"></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="25px" bgcolor="#F5F9FE" width="100%" align="left" style="color: #069; font-size: 10pt;" colspan="2">
+                                
+                                <div id="tuner_container" style="display: none; text-align: left">
+                                    &nbsp&nbsp<span><script type="text/javascript">JS_INLAN("tuner_setting")</script></span>
+                                </div>                                
+                                
+							</td>	
+							<td width="150px" align="right"><span id="time_out_value"></span>&nbsp;</td>		
+					   
+						</tr>
+					</table>
+				</div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="sub_param" style="height: 400px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+       <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

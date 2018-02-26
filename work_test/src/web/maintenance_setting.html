@@ -1,0 +1,1191 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+        td{text-align:center; height:25px;font-size:12px}
+        a:link{font-family: "宋体"; font-size:12px; color:#036;	text-decoration:none}
+        a:visited { font-family: "宋体";font-size:12px;color:#036;text-decoration:none}
+        a:hover{font-family: "宋体";font-size:12px;color:#cc0000;text-decoration:underline;}
+        a:active{ font-family: "宋体"; font-size:12px; color:#000000;text-decoration:none}
+        input{width:305px}
+        select{font-size:12px}
+        .td_1{width:254px;background-color:#EEF4FD;height:25px;font-size:12px;text-align:left}
+        .td_2{width:71px;text-align:center;font-size:12px;background-color: #ffffff;height:25px;}
+        .td_3{width:71px;text-align:center;font-size:12px;background-color: #ffffff;height:25px;}
+        .td_4{width:71px;text-align:center;font-size:12px;background-color: #ffffff;height:25px;}
+        .td_5{width:72px;text-align:center;font-size:12px;background-color: #ffffff;height:25px;}
+        label{font-size:12px;}
+        #button_1{width:50px;height:25px;font-size:12px;}
+    </style>
+
+    <script type="text/javascript" src="/js/common_process.js"></script>
+	<script type="text/javascript" src="/js/device_information.js"></script>
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+	<script type="text/javascript">
+	
+	    JS_InfoInitiate();
+
+        function OnParseEncoderSystemControlFpgaXML(XMLDom) 
+        {
+            var lEncoderFpgaOperationObj;
+            var lEncoderFpgaOperationAction;
+            var lEncoderFpgaOperationReadData;
+
+            lEncoderFpgaOperationObj = XMLDom.getElementsByTagName("encoder_fpge_operation")[0];
+
+            lEncoderFpgaOperationAction = JS_XMLGetTagValue(lEncoderFpgaOperationObj, "action");
+           
+            if (lEncoderFpgaOperationAction == "read")
+            {
+                lEncoderFpgaOperationReadData = JS_XMLGetTagValue(lEncoderFpgaOperationObj, "fpge_data_r");
+                $("fpga_data_r").value = lEncoderFpgaOperationReadData;
+            }
+        }
+
+        //write data to encoder main fpga
+        function writeToFpga() {
+            var reg = /^[0-9a-fA-F]{4}$/;
+            var addr = $("fpga_addr_w").value;
+            var data = $("fpga_data_w").value;
+            var fpga_type = $("fpga_type_w").value;
+
+            var lHolderNode;
+            var lXMLDom = JS_XMLCreateDomFromFile(null);
+            
+            if (addr.match(reg) && data.match(reg)) {
+                //addr = parseInt(addr, 16);
+                //data = parseInt(data, 16);
+
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "encoder_system_control", "encoder_fpge_operation", "");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "action", "write");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "fpge_addr_w", addr);
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "fpga_data_w", data);
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "fpga_type_w", fpga_type);
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false); //leonli
+            }
+            else {
+                alert("Wrong Format!");
+            }
+        }
+
+        function readFromFpga() {
+            var lXMLDom
+            var lHolderNode;
+            var reg = /^[0-9a-fA-F]{4}$/;
+            var addr = $("fpga_addr_r").value;
+            var fpga_type = $("fpga_type_r").value;
+
+            if (addr.match(reg)) 
+            {
+                //addr = parseInt(addr, 16);
+                lXMLDom = JS_XMLCreateDomFromFile(null);
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "encoder_system_control", "encoder_fpge_operation", "");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "action", "read");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "fpge_addr_r", addr);
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "fpga_type_r", fpga_type);
+                JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnParseEncoderSystemControlFpgaXML, false);
+            }
+            else 
+            {
+                alert("Wrong Format!");
+            }
+        }
+
+
+        //By Pass Set
+        function TsBypassSet() {
+            var reg = /^[1-9]$/;
+            var mainSel = $("MainBoardSel").value;
+            var outSel = $("OutBoardSel").value;
+
+            var lHolderNode;
+            var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+            if (mainSel.match(reg) | outSel.match(reg)) {
+                mainSel = parseInt(mainSel, 10);
+                outSel = parseInt(outSel, 10);
+
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "encoder_system_control", "encoder_ts_bypss_set", "");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "mainSel", mainSel);
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "outSel", outSel);
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false); //leonli
+            }
+            else {
+                alert("Wrong Format!");
+            }
+        }
+
+        //Stop SubBoard Channel
+        function stopSubboardApp() {
+            var reg = /^[1-9]$/;
+            var channel = JS_HTMLGetValueByID("transcode_ch_sel");
+
+            var lHolderNode;
+            var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+            if (channel.match(reg)) {
+                channel = parseInt(channel, 10);
+
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "encoder_system_control", "encoder_stop_subboard_channel", "");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "channel", channel);
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else {
+                alert("Wrong Format!");
+            }
+        }
+////////////////////////////////////////////////////////////////
+        function OnParseEncoderSystemControlStatusXML(XMLDom) {
+            var lEncoderEncoderSystemControlObj;
+            var lEncoderChannelStatus;
+            var i;
+            var lTmpVar;
+
+            if (XMLDom != "") 
+            {
+                lTmpVar = XMLDom.getElementsByTagName("encoder_status_get");
+                if (lTmpVar.length > 0) {
+                    lEncoderEncoderSystemControlObj = [0];
+
+                    for (i = 0; i < 8; ++i) {
+                        $("ch" + i + "_ts_status").innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "ts_status_" + i);
+                        $("ch" + i + "_ccas_status").innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "ccas_status_" + i);
+                        $("ch" + i + "_con_cnt_status").innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "con_cnt_status_" + i);
+                    }
+
+                    for (i = 0; i < 4; ++i) {
+                        $("ch" + i + "_para_w_status").innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "para_w_status_" + i);
+                    }
+
+                    $("ip_0_status").innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "ip_status_0");
+                    $("ip_1_status").innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "ip_status_1");
+
+                    for (i = 0; i < 4; ++i) {
+                        //$("sub_board_" + i).innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "firmware_update_support_" + i);
+                        $("firmware_" + i + "_v").innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "firmware_version_" + i);
+                    }
+
+                    $("fpga_main_v").innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "main_fpga_version");
+                    $("fpga_out_v").innerHTML = JS_XMLGetTagValue(lEncoderEncoderSystemControlObj, "out_fpga_version");
+                }
+            }
+
+            
+        }
+
+        function getEncoderStatus() {
+            var lXMLDom
+            var lHolderNode;
+
+            lXMLDom = JS_XMLCreateDomFromFile(null);
+            lHolderNode = JS_XMLParamSetHead(lXMLDom, "encoder_system_control", "encoder_status_get", "");
+            JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnParseEncoderSystemControlStatusXML, false);
+            
+        }
+////////////////////////////////////////////////////////////////
+
+        function OnLoad() {
+            var lXMLDoc;
+            lXMLDoc = JS_XMLCreateDomFromFile("/tmp/maintenance.xml"); ///
+            $("pll_freq_offset").value = JS_XMLGetTagValue(lXMLDoc, "pll_freq_offset");
+            $("power_up_count").value = JS_XMLGetTagValue(lXMLDoc, "power_up_count");
+            $("clk10m_da_value").value = "0x" + parseInt(JS_XMLGetTagValue(lXMLDoc, "clk10m_da_value"), 10).toString(16);
+            $("clk10m_trainning_value").value = parseFloat(JS_XMLGetTagValue(lXMLDoc, "clk10m_trainning_value")).toFixed(6);
+            JS_UISelectSetCurIndexByValue($("private_channel_setup_mark"), JS_XMLGetTagValue(lXMLDoc, "private_channel_setup_mark"), true);
+
+            //add by leonli for encoder
+            getEncoderStatus();
+            
+            if ((JS_InfoGetSN().substr(0,7) == "TC41A07") || (JS_InfoGetSN().substr(0,7) == "TC41A08")) {
+                var lListObj;
+                var i;
+                var lHolderNode;
+                var lTmpArray;
+                
+                lListObj = new MyListControl("s_SubList", 800, 150, "enc_adjust_param_list", false);
+			    lListObj.SetColProperty(0, 40, "通道", "center", "center");
+			    lListObj.SetColProperty(1, 120, "PTS 延迟时间(us)", "center", "center");
+			    lListObj.SetColProperty(2, 120, "pts-pcr 最大间隔(us)", "center", "center");
+			    lListObj.SetColProperty(3, 120, "pts-pcr 最小间隔(us)", "center", "center");
+			    lListObj.SetColProperty(4, 120, "音频相对 PTS 延迟(us)", "center", "center");
+			    lListObj.SetColProperty(5, 120, "音频延迟帧数目", "center", "center");
+			    lListObj.UpdateListFrame();
+			    
+			    lTmpArray = JS_XMLGetTagNameArray(lXMLDoc, "enc_adjust_param");
+			    for (i = 0; i < 4; i++) {
+			        	lHolderNode = document.createElement("input");
+						lHolderNode.type = "text";
+						lHolderNode.style.width = "40px";
+						lHolderNode.style.textAlign = "center";
+						lHolderNode.readOnly = true;
+						lHolderNode.value = JS_StrLeftPading(i + 1, 3);
+						lListObj.SetColValue(0, lHolderNode);
+						
+						lHolderNode = document.createElement("input");
+						lHolderNode.type = "text";
+						lHolderNode.style.width = "100px";
+						lHolderNode.style.textAlign = "center";
+                        lHolderNode.id = "pts_delay_time_" + i;
+                        lHolderNode.value = JS_XMLGetTagValue(lTmpArray[i], "pts_delay_time");
+						lListObj.SetColValue(1, lHolderNode);
+						
+						lHolderNode = document.createElement("input");
+						lHolderNode.type = "text";
+						lHolderNode.style.width = "100px";
+						lHolderNode.style.textAlign = "center";
+                        lHolderNode.id = "max_pts_pcr_interval_" + i;
+                        lHolderNode.value = JS_XMLGetTagValue(lTmpArray[i], "max_pts_pcr_interval");
+						lListObj.SetColValue(2, lHolderNode);
+						
+						lHolderNode = document.createElement("input");
+						lHolderNode.type = "text";
+						lHolderNode.style.width = "100px";
+						lHolderNode.style.textAlign = "center";
+                        lHolderNode.id = "min_pts_pcr_interval_" + i;
+                        lHolderNode.value = JS_XMLGetTagValue(lTmpArray[i], "min_pts_pcr_interval");
+						lListObj.SetColValue(3, lHolderNode);
+						
+						lHolderNode = document.createElement("input");
+						lHolderNode.type = "text";
+						lHolderNode.style.width = "100px";
+						lHolderNode.style.textAlign = "center";
+                        lHolderNode.id = "aud_pts_relative_delay_time_" + i;
+                        lHolderNode.value = JS_XMLGetTagValue(lTmpArray[i], "aud_pts_relative_delay_time");
+						lListObj.SetColValue(4, lHolderNode);
+						
+						lHolderNode = document.createElement("input");
+						lHolderNode.type = "text";
+						lHolderNode.style.width = "100px";
+						lHolderNode.style.textAlign = "center";
+                        lHolderNode.id = "aud_delay_frame_num_" + i;
+                        lHolderNode.value = JS_XMLGetTagValue(lTmpArray[i], "aud_delay_frame_num");
+						lListObj.SetColValue(5, lHolderNode);
+						
+						lListObj.AddRowToDom(false, i, false);
+			    }
+            }
+            else {
+                $("gn1846_enc_adjust_param").hide();
+            }
+        }
+
+        function OnAjaxStatusCB(XMLDom)
+        {
+            if (JS_ISValidObject(XMLDom))
+            {
+                var lCMDType, lRet;
+                
+                lCMDType = JS_XMLGetTagValue(XMLDom, "cmd_type");
+                lRet = JS_XMLGetTagValue(XMLDom, "cmd_status");
+                if (lCMDType == "read") 
+                {
+                    var lTmpValue;
+                    $("new_reg_r").disabled = false;
+                    lTmpValue = JS_XMLGetTagValue(XMLDom, "read_value");
+                    $("reg_value_r").value = lTmpValue;
+                }
+                else
+                {
+                    $("new_reg_w").disabled = false;
+                }
+                if (lRet != "ok")
+                {
+                    alert("Operation Failed!");
+                }
+            }
+        }
+        
+        function OnSubmit(Item)
+        {
+            var lHolderNode;
+            var lXMLDom = JS_XMLCreateDomFromFile(null);
+            if (Item.id == "pll_calibration") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "pll_calibration", "");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "pll_freq_offset", $("pll_freq_offset").value);
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "oem_reset") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "oem_reset", "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "config_reset") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "config_reset", "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "parameter_reset") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "parameter_reset", "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "user_reset") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "user_reset", "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "auth_reset") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "auth_reset", "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "user_param") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "user_param", "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "factory_preset") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "factory_preset", "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "clk_adj_module_preset") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", Item.id, "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "clk_adj_module_save") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", Item.id, "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "auth_random") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "auth_random", "");
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "direct_reg") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "direct_reg", "");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "ic_id", $("ic_id").value);
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "ic_addr", $("ic_addr").value);
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "ic_value", $("ic_value").value);
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "direct_p_q") {
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "direct_p_q", "");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "ad9789_p", $("9789_p").value);
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "ad9789_q", $("9789_q").value);
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);//leonli
+            }
+            else if (Item.id == "private_channel_setup_mark_submit") {
+            lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "private_channel_setup_type", "");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "private_channel_setup_mark", JS_UISelectGetCurValue($("private_channel_setup_mark")));
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+            else if (Item.id == "manual_reboot") {
+                lTmpStr = "Device will be rebooted! All unsaved data will be lost! Proceed any way?";
+                if (confirm(lTmpStr)) {
+                    lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "manual_reboot", "");
+                    JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+                }
+            }
+            else if (Item.id == "file_download") 
+            {
+
+            }
+            else if (Item.id == "new_reg_r" || Item.id == "new_reg_w") 
+            {
+                var lXMLDom, lBodyHolder;
+                lXMLDom = JS_XMLCreateDomFromFile(null);
+                lBodyHolder = JS_XMLParamSetHead(lXMLDom, "status", "manual_reg", "");
+
+                if (Item.id == "new_reg_r") 
+                {
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "cmd_type", "read");
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "chip_id", JS_HTMLGetValueByID("reg_id_r"));
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "bus_width", JS_HTMLGetValueByID("reg_width_r"));
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "addr", JS_HTMLGetValueByID("reg_addr_r"));
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "read_size", JS_HTMLGetValueByID("reg_size_r"));
+                    $("new_reg_r").disabled = true;
+                }
+                else
+                {
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "cmd_type", "write");
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "chip_id", JS_HTMLGetValueByID("reg_id_w"));
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "bus_width", JS_HTMLGetValueByID("reg_width_w"));
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "addr", JS_HTMLGetValueByID("reg_addr_w"));
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "write_data", JS_HTMLGetValueByID("reg_value_w"));
+                    $("new_reg_w").disabled = true;
+                }
+                
+                JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxStatusCB, false);
+            }
+            else if (Item.id == "btn_gn1846_enc_adjust_param") {
+                var i;
+                var lBodyHolder;
+                
+                lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "enc_adjust_param", "");
+                for (i = 0; i < 4; i++) {
+                    lBodyHolder = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "enc_adjust_param");
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "aud_pts_relative_delay_time", $("aud_pts_relative_delay_time_" + i).value);
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "pts_delay_time", $("pts_delay_time_" + i).value);
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "max_pts_pcr_interval", $("max_pts_pcr_interval_" + i).value);
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "min_pts_pcr_interval", $("min_pts_pcr_interval_" + i).value);
+                    JS_XMLAddTextChild(lXMLDom, lBodyHolder, "aud_delay_frame_num", $("aud_delay_frame_num_" + i).value);
+                }
+                JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            }
+        }
+        
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <div style="padding-bottom: 20px">
+    </div>
+    <table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <span>Maintenance Sttings - 维护设置</span>
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#F5F9FE">
+                <div style="height: 520px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>Device Calibration - 设备校正 (FDAC = 2160 MHz)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>PLL Offset Frequence - 锁相环偏移频率设置 (Hz):</span>&nbsp;&nbsp;&nbsp;<input type="text"
+                                                style="width: 110px; text-align: center" id="pll_freq_offset" />
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="pll_calibration" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>Device Reg Modification - 设备调试 (AD9789 ICID = 0x01)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>IC ID / Addr / Value - 芯片号/地址/值 (HEX):</span>&nbsp;&nbsp;&nbsp;<input type="text"
+                                                style="width: 40px; text-align: center" id="ic_id" value='01' />
+                                            -
+                                            <input type="text" style="width: 40px; text-align: center" id="ic_addr" value='00' />
+                                            :
+                                            <input type="text" style="width: 40px; text-align: center" id="ic_value" value='00' />
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="direct_reg" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>P / Q (HEX):</span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 100px;
+                                                text-align: center" id="9789_p" value='000000' />
+                                            -
+                                            <input type="text" style="width: 100px; text-align: center" id="9789_q" value='000000' />
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="direct_p_q" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>Reg Manul Acces - 寄存器手动访问</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 99%">
+                                            <span>CHIP ID(HEX) / Width / Read Size / Addr(HEX) / Value(HEX/CSV):</span>
+                                        </td>
+                                         <td style="text-align: right; width: 1">
+                                        </td>
+                                   </tr>
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <input type="text" style="width: 40px; text-align: center" id="reg_id_r" value='0000' />
+                                            -
+                                            <input type="text" style="width: 40px; text-align: center" id="reg_width_r" value='8' />
+                                            -
+                                            <input type="text" style="width: 40px; text-align: center" id="reg_size_r" value='1' />
+                                            -
+                                            <input type="text" style="width: 80px; text-align: center" id="reg_addr_r" value='00000000' />
+                                            :
+                                            <input type="text" style="width: 360px; text-align: left" id="reg_value_r" value='12345678,78,99' />
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="new_reg_r" onclick="OnSubmit(this);" style="width: 100px"> Read - 读操作</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: left; width: 99%">
+                                            <span>CHIP ID(HEX) / Width / Addr(HEX) / Value(HEX/CSV):</span>
+                                        </td>
+                                         <td style="text-align: right; width: 1">
+                                        </td>
+                                   </tr>
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <input type="text" style="width: 40px; text-align: center" id="reg_id_w" value='0000' />
+                                            -
+                                            <input type="text" style="width: 40px; text-align: center" id="reg_width_w" value='8' />
+                                            -
+                                            <input type="text" style="width: 80px; text-align: center" id="reg_addr_w" value='00000000' />
+                                            :
+                                            <input type="text" style="width: 415px; text-align: left" id="reg_value_w" value='12345678,78,99' />
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="new_reg_w" onclick="OnSubmit(this);" style="width: 100px"> Write - 写操作</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>Device Information - 设备信息</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>Power Up Count - 设备启动次数:</span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px;
+                                                text-align: center" readonly id="power_up_count" />
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>OEM Setup - 授权信息设置</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 60%">
+                                            <form target="_self" method="post" enctype="multipart/form-data" action="cgi-bin/upload.cgi"
+                                            id="form_oem_import" onsubmit="return(OnSubmit(this))">
+                                            <input type="hidden" name="type" value="oem" />
+                                            <input type="hidden" name="file_limit" value="2097152" />
+                                            <input type="hidden" name="redirect" value="/upload_right_cgi.html" />
+                                            <input type="hidden" name="back" value="/maintenance_setting.html" />
+                                            <input type="file" name="file" style="width: 200px; height: 20px" />
+                                            <button type="submit" style="width: 120px;">
+                                                Import - 导入</button>
+                                            </form>
+                                        </td>
+                                        <td style="text-align: right; width: 40%">
+                                            <button type="button" id="oem_reset" onclick="OnSubmit(this);" style="width: 260px">
+                                                Clear OEM Data - 清空OEM信息</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>Device Setting Mantaince - 设备设置维护</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>Restore Device Related Settings to Defaul - 重置设备相关设置</span>
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="config_reset" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>Parameter Mantaince - 参数维护</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>Restore Parameters to Default - 重置参数为默认值</span>
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="parameter_reset" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>User Login Information Mantaince - 用户信息维护</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>Reset User Information to Default - 重置用户登陆信息</span>
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="user_reset" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>Authrization Mantaince - 授权信息维护</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>Reset Authrization Data - 清除授权</span>
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="auth_reset" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>OEM User Define Parameters - OEM 用户自定义参数维护</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>Set User Defined Default Parameter - 设置用户自定义默认参数</span>
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="user_param" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>Factory Mantaince - 出厂维护</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span>Restore All Settings to default (Exclude Device Calibration) - 重置以上所有设置（设备校正参数除外）</span>
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="factory_preset" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>CLK ADJ Module Adjust - 时钟同步模块校正</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 60%">
+                                            <span>重置时钟模块参数</span>
+                                        </td>
+                                        <td style="text-align: center; width: 10%">
+                                            <input type="text" style="width: 80px; text-align: center" id="clk10m_da_value" value='01'
+                                                readonly />
+                                        </td>
+                                        <td style="text-align: center; width: 1%">
+                                            -
+                                        </td>
+                                        <td style="text-align: center; width: 10%">
+                                            <input type="text" style="width: 80px; text-align: center" id="clk10m_trainning_value"
+                                                value='01' readonly />
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="clk_adj_module_preset" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="text-align: left; width: 80%" colspan='4'>
+                                            <span>保存时钟模块参数（将设备设置为外部10M同步，然后等待设备同步成功后再进行保存！）</span>
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="clk_adj_module_save" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>Special Mantaince - 特殊维护</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                                padding-right: 25px">
+                                <table width="100%">
+                                    <tr>
+                                        <td style="text-align: left; width: 80%">
+                                            <span style="color: red">Reset Authrization Random Code, Unable to Reverse! - 重置授权随机码，不可逆操作！</span>
+                                        </td>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="auth_random" onclick="OnSubmit(this);" style="width: 100px">
+                                                Submit - 提交</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+ 						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table>
+									<tr>
+										<td style="text-align: left; width: 60%">
+											<span style="color:red">Set Private CAS - 设置私有CAS功能启用</span>
+										</td>
+										<td style="text-align: left; width: 20%">
+										
+										<select id="private_channel_setup_mark"><option value="ON">ON</option><option selected value="OFF">OFF</option></select>
+										
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="private_channel_setup_mark_submit" onclick="OnSubmit(this);" style="width:100px" >Submit - 提交</button>
+										</td>
+									</tr>
+								</table>
+							</td>
+					    </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>内核升级</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;padding-right: 25px">
+                                <form target="_self" method="post" enctype="multipart/form-data" action="cgi-bin/upload.cgi" id="form_soft_import" onsubmit="return(OnSubmit(this))">
+                                    <input type="hidden" name="type" value="kernel" />
+                                    <input type="hidden" name="file_limit" value="36700160" />
+                                    <input type="hidden" name="redirect" value="/upload_right_cgi.html" />
+                                    <input type="hidden" name="back" value="/maintenance_setting.html" />
+                                    <input type="file" name="file" id="kernel"style="width: 300px; height: 20px" />
+                                    <button type="submit" style="width: 120px;" id="submit_import_kernel">Upload - 上传</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>插卡式设备子板系统固件升级</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;padding-right: 25px">
+                                <form target="_self" method="post" enctype="multipart/form-data" action="cgi-bin/upload.cgi" id="form_soft_import" onsubmit="return(OnSubmit(this))">
+                                    <input type="hidden" name="type" value="sub_flash" />
+                                    <input type="hidden" name="file_limit" value="36700160" />
+                                    <input type="hidden" name="redirect" value="/upload_right_cgi.html" />
+                                    <input type="hidden" name="back" value="/maintenance_setting.html" />
+                                    <input type="file" name="file" id="sub_flash"style="width: 300px; height: 20px" />
+                                    <button type="submit" style="width: 120px;" id="submit_import_sub_flash">Upload - 上传</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>8358Q/8398Q编码模块调试</span>
+                            </td>
+                        </tr>
+                        <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;
+                            padding-right: 25px">
+                            <!--form method="post" action="/goform/fpga_debug" id="fpga_debug"-->
+                            <table>
+                                <tr>
+                                    <td style="width: 110px">
+                                        FPGA Address (0x)
+                                    </td>
+                                    <td>
+                                        <input style="width: 150px" id="fpga_addr_w" type="text" />
+                                    </td>
+                                    <td style="width: 10px">
+                                    </td>
+                                    <td style="width: 50px">
+                                        Data (0x)
+                                    </td>
+                                    <td>
+                                        <input style="width: 150px" id="fpga_data_w" type="text" />
+                                    </td>
+                                    <td style="width: 10px">
+                                    </td>
+                                    <td style="width: 100px">
+                                        <select id="fpga_type_w">
+                                            <option value="0">MainBoard</option>
+                                            <option value="1">OutBoard</option>
+                                        </select>
+                                    </td>
+                                    <td style="width: 10px">
+                                    </td>
+                                    <td>
+                                        <input style="width: 90px" value="WriteToFPGA" type="button" onclick="writeToFpga()" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 110px">
+                                        FPGA Address (0x)
+                                    </td>
+                                    <td>
+                                        <input style="width: 150px" id="fpga_addr_r" type="text" />
+                                    </td>
+                                    <td style="width: 10px">
+                                    </td>
+                                    <td style="width: 50px">
+                                        Data (0x)
+                                    </td>
+                                    <td>
+                                        <input style="width: 150px" id="fpga_data_r" type="text" />
+                                    </td>
+                                    <td style="width: 10px">
+                                    </td>
+                                    <td style="width: 100px">
+                                        <select id="fpga_type_r">
+                                            <option value="0">MainBoard</option>
+                                            <option value="1">OutBoard</option>
+                                        </select>
+                                    </td>
+                                    <td style="width: 10px">
+                                    </td>
+                                    <td>
+                                        <input style="width: 90px" value="ReadFromFPGA" type="button" onclick="readFromFpga()" />
+                                    </td>
+                                </tr>
+                                <!-- 20141128 -->
+                                <tr>
+                                    <td style="width: 100px">
+                                        Main Board TS Sel:
+                                    </td>
+                                    <td>
+                                        <input style="width: 75px" id="MainBoardSel" type="text" />
+                                    </td>
+                                    <td style="width: 7px">
+                                    </td>
+                                    <td style="width: 100px" disabled="true">
+                                        Output Board TS Sel:
+                                    </td>
+                                    <td >
+                                        <input style="width: 75px" disabled="true" id="OutBoardSel" type="text" />
+                                    </td>
+                                    <td style="width: 10px">
+                                    </td>
+                                    <td>
+                                        <input style="width: 90px" value="Execute" type="button" onclick="TsBypassSet()" />
+                                    </td>
+                                </tr>
+                            </table>
+                            <!--/form-->
+                        </td>
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                            </td>
+                        </tr>
+                        
+                        <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;padding-right: 25px">
+                                <table width="100%">
+                            <tr>
+                                <td style="width: 100px">
+                                    <span>Subboard debug :</span>
+                                </td>
+                                <td style="width: 100px">
+                                    <select style="width: 50px" id="transcode_ch_sel">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input style="width: 100px" value="Stop" type="button" onclick="stopSubboardApp()" />
+                                </td>
+                            </tr>
+                                </table>
+                        </td>
+                        
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                        
+                        <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px;padding-right: 25px">
+                                <table width="100%"; border="0" bgcolor="#F5F9FE" cellspacing="1"  align="center" cellpadding="3" >
+			                    <tr >
+				                    <td class="td_1" bgcolor="#E4EFF8"></td>				                    
+				                    <td class="td_2" bgcolor="#E4EFF8" id="ch0_txt" >Channel 1</td>
+				                    <td class="td_3" bgcolor="#E4EFF8" id="ch1_txt" >Channel 2</td>
+				                    <td class="td_4" bgcolor="#E4EFF8" id="ch2_txt" >Channel 3</td>
+				                    <td class="td_5" bgcolor="#E4EFF8" id="ch3_txt" >Channel 4</td>
+				                    		                    
+				                    <td class="td_2" bgcolor="#E4EFF8" id="ch4_txt" >Channel 5</td>
+				                    <td class="td_3" bgcolor="#E4EFF8" id="ch5_txt" >Channel 6</td>
+				                    <td class="td_4" bgcolor="#E4EFF8" id="ch6_txt" >Channel 7</td>
+				                    <td class="td_5" bgcolor="#E4EFF8" id="ch7_txt" >Channel 8</td>
+			                    </tr>
+			                     <tr >
+				                    <td class="td_1"  align="right">
+    				                    <label id="status_0_txt" style="font-size:13px">TS流状态</label>  <!--状态 1-->			                    
+				                    </td>				                    
+    			                     <td class="td_2" id="ch0_ts_status" ></td>         <!-- TS流状态 -->
+				                    <td class="td_3"  id="ch1_ts_status" ></td>
+				                    <td class="td_4"  id="ch2_ts_status" ></td>
+				                    <td class="td_5"  id="ch3_ts_status" ></td>		
+				                    
+                                    <td class="td_2" id="ch4_ts_status" ></td> 
+				                    <td class="td_3"  id="ch5_ts_status" ></td>
+				                    <td class="td_4"  id="ch6_ts_status" ></td>
+				                    <td class="td_5"  id="ch7_ts_status" ></td>		
+			                    </tr>
+			                    <tr disabled="true">
+				                    <td class="td_1" align="right" >
+					                    <label id="status_1_txt" style="font-size:13px">CCAS状态</label>  <!--状态 2-->
+				                    </td>
+				                    <td class="td_2"  id="ch0_ccas_status" ></td>      <!-- CCAS状态 -->
+				                    <td class="td_3"  id="ch1_ccas_status" ></td>
+				                    <td class="td_4"  id="ch2_ccas_status" ></td>
+				                    <td class="td_5"  id="ch3_ccas_status" ></td>	
+				                    
+				                    <td class="td_2"  id="ch4_ccas_status" ></td>
+				                    <td class="td_3"  id="ch5_ccas_status" ></td>
+				                    <td class="td_4"  id="ch6_ccas_status" ></td>
+				                    <td class="td_5"  id="ch7_ccas_status" ></td>		
+			                    </tr>
+			                    <tr >
+				                    <td class="td_1"  align="right">
+					                    <label id="status_2_txt" style="font-size:13px">TS流连续计数器状态</label>  <!--状态 3-->
+				                    </td>
+				                    <td class="td_2"  id="ch0_con_cnt_status" ></td>      <!-- TS流连续计数器状态 -->
+				                    <td class="td_3"  id="ch1_con_cnt_status" ></td>
+				                    <td class="td_4"  id="ch2_con_cnt_status" ></td>
+				                    <td class="td_5"  id="ch3_con_cnt_status" ></td>
+				                    
+				                    <td class="td_2"  id="ch4_con_cnt_status" ></td>
+				                    <td class="td_3"  id="ch5_con_cnt_status" ></td>
+				                    <td class="td_4"  id="ch6_con_cnt_status" ></td>
+				                    <td class="td_5"  id="ch7_con_cnt_status" ></td>		
+			                    </tr>
+			                    <tr >
+				                    <td class="td_1"   align="right">
+					                    <label id="status_3_txt" style="font-size:13px">编转码参数写入状态</label>  <!--状态 4-->
+				                    </td>
+				                     <td colspan="2" id="ch0_para_w_status" style="background-color: #ffffff"></td>      <!-- 编转码参数写入状态 -->
+				                    <td colspan="2" id="ch1_para_w_status" style="background-color: #ffffff"></td>				                    
+				                    <td colspan="2" id="ch2_para_w_status" style="background-color: #ffffff"></td>
+				                    <td colspan="2" id="ch3_para_w_status" style="background-color: #ffffff"></td>
+			                    </tr>	
+			                    <tr >
+				                    <td class="td_1"  align="right">
+					                    <label id="status_4_txt" style="font-size:13px" disabled="true">IP状态</label>  <!-- IP状态 -->
+	    		                    </td>                                                                           
+				                    <td class="" colspan="4" id="ip_0_status" disabled="true" style="background-color: #ffffff"></td>
+				                    <td class="" colspan="4" id="ip_1_status" disabled="true" style="background-color: #ffffff"></td>
+			                    </tr>	
+			                    <tr disabled="true">
+				                    <td class="td_1"  align="right">
+					                    <label id="upg_txt" style="font-size:13px">固件升级</label>  <!-- 子板升级 -->
+	    		                    </td>                                                                           
+				                    <td class="" colspan="2" id="sub_board_0" style="background-color: #ffffff">支持</td>
+				                    <td class="" colspan="2" id="sub_board_1" style="background-color: #ffffff">支持</td>
+				                    <td class="" colspan="2" id="sub_board_2" style="background-color: #ffffff">支持</td>
+				                    <td class="" colspan="2" id="sub_board_3" style="background-color: #ffffff">支持</td>
+			                    </tr>		 
+			                    <tr disabled="true">
+				                    <td class="td_1"  align="right">
+					                    <label id="status_5_txt" style="font-size:13px">(1)固件版本</label>  <!--状态 6-->
+				                    </td>
+				                    <td class="td_2" colspan ="8"; id="firmware_0_v" >3.00</td>        <!--(1)固件版本-->
+			                    </tr>    
+			                    <tr disabled="true">
+				                    <td class="td_1"  align="right">
+					                    <label id="status_6_txt" style="font-size:13px">(2)固件版本</label>
+				                    </td>
+				                    <td class="td_2" colspan ="8"; id="firmware_1_v" >3.00</td>        <!--(2)固件版本-->
+			                    </tr>      			        
+			                    
+			                    <tr disabled="true">
+				                    <td class="td_1"  align="right">
+					                    <label id="status_7_txt" style="font-size:13px">(3)固件版本</label> 
+				                    </td>
+				                    <td class="td_2" colspan ="8"; id="firmware_2_v" >3.00</td>        <!--(3)固件版本-->
+			                    </tr>    
+			                    <tr disabled="true"> 
+				                    <td class="td_1"  align="right">
+					                    <label id="status_8_txt" style="font-size:13px">(4)固件版本</label>
+				                    </td>
+				                    <td class="td_2" colspan ="8"; id="firmware_3_v" >3.00</td>        <!--(4)固件版本-->
+			                    </tr>  	   			                    
+			                     <tr >
+				                    <td class="td_1"  align="right">
+					                    <label id="status_9_txt" style="font-size:13px">主板FPGA版本</label><!--主板FPGA版本 -->
+				                    </td>
+				                    <td class="td_2" colspan ="8"; id="fpga_main_v" >11.17.17</td>
+			                    </tr> 	
+			                    <tr >
+				                    <td class="td_1"  align="right">
+					                    <label id="status_11_txt" style="font-size:13px">输出板FPGA版本</label><!--输出板FPGA版本 -->
+				                    </td>
+				                    <td class="td_2" colspan ="8"; id="fpga_out_v" >50.10.20</td>
+			                    </tr>  	
+			                    				
+                                </table>
+                                
+                                			                    <tr>
+                                        <td style="text-align: right; width: 20%">
+                                            <button type="button" id="Button1" onclick='location.reload();' style="width: 100px">
+                                                Refresh - 刷新</button>
+                                        </td>
+			                    </tr>	
+                        </td>     
+                        </tr>
+                        
+                        <tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>8358Q/8398Q编码子板升级</span>
+                            </td>
+                        </tr>
+                        
+                        <tr id="gn1846_enc_adjust_param">
+                            <td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px;
+                                color: #069; font-size: 12pt;">
+                                <span>GN1846 编码调整参数</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div id="enc_adjust_param_list" style="height: 160px; overflow: auto; padding: 5px;">	</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; width: 20%">
+                                <button type="button" id="btn_gn1846_enc_adjust_param" onclick='OnSubmit(this);' style="width: 100px">设置</button>
+                            </td>
+                        </tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 50%">
+                                            <form target="_self" method="post" enctype="multipart/form-data" action="cgi-bin/upload.cgi" id="form_soft_import" onsubmit="return(OnSubmit(this))">
+                                            <input type="hidden" name="type" value="firmware" />
+                                            <input type="hidden" name="file_limit" value="36700160" />
+                                            <input type="hidden" name="redirect" value="/right_encoder_upgrade_fireware.html" />
+                                            <input type="hidden" name="back" value="/maintenance_setting.html" />
+                                            <input type="file" name="file" id="software"style="width: 300px; height: 20px" />
+                                            <button type="submit" style="width: 60px;" id="submit_import_soft">
+                                                upgrade
+                                            </button>
+                                            </form>
+                                        </td>
+									</tr>
+								</table>
+							</td>
+						</tr>                        
+                
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="30px" valign="top" align="center" bgcolor="#F5F9FE" style="padding-left: 25px;
+                padding-right: 25px">
+                <button type="button" id="manual_reboot" onclick="OnSubmit(this);" style="width: 100px">
+                    Reboot - 重启</button>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

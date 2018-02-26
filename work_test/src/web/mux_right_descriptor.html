@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/system_parameter.js"></script>
+    <script type="text/javascript" src="/js/mpeg2.js"></script>
+    <script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem;
+		var s_DescriptorType;
+		var s_DescriptorMax;
+		var s_IDs;
+		var s_IDsArray = new Array();
+
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnLoad()
+		{
+			var i;
+			var lItemObj
+			var lItemArray;
+			var lItemInfo, lDeliveryInfo;
+
+			lTmpVar = JS_ArgGetArgs();
+			s_DescriptorType = JS_ArgGetValueByName(lTmpVar, "type");
+			s_IDs = JS_ArgGetValueByName(lTmpVar, "ids");
+
+			JS_ParamInitate();
+
+			s_BitrateListItem = new MyListControl("s_BitrateListItem", 810, 110, "list_target", true);
+			s_BitrateListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_BitrateListItem.SetColProperty(1, 550, JS_LAN("desc_content"), "center", "center");
+			s_BitrateListItem.SetColProperty(2, 80, JS_LAN("mark"), "center", "center");
+			s_BitrateListItem.SetColProperty(3, 80, "", "center", "center");
+			s_BitrateListItem.UpdateListFrame();
+
+			s_DescriptorMax = 0;
+			s_IDsArray.length = 0;
+			lItemArray = null;
+
+			if (s_DescriptorType == "NIT_NETWORK_DESC")
+			{
+				$("descriptor_type").value = "NIT Network Descriptors";
+
+				s_IDs = 0;
+				s_DescriptorMax = 8;
+
+				lItemArray = JS_ParamGetNITDescriptorArray();
+			}
+			else if (s_DescriptorType == "NIT_TS_DESC")
+			{
+				s_DescriptorMax = 8;
+
+				$("descriptor_type").value = "NIT TS Descriptors";
+
+				lItemObj = JS_ParamGetNITTSNodeByIDs(s_IDs);
+				if (lItemObj != null)
+				{
+					lItemArray = JS_ParamGetNITTSDescriptorArray(lItemObj);
+				}
+			}
+			else if (s_DescriptorType == "TS_CAT_DESC")
+			{
+				s_DescriptorMax = 8;
+
+				$("descriptor_type").value = "TS CAT Descriptors";
+
+				lItemObj = JS_ParamGetTsByIDs(s_IDs, false);
+				if (lItemObj)
+				{
+					lItemArray = JS_ParamGetTsDescrArray(lItemObj);
+				}
+
+			}
+			else if (s_DescriptorType == "SERVICE_PMT_DESC")
+			{
+				s_DescriptorMax = 8;
+
+				$("descriptor_type").value = "Service PMT Descriptors";
+
+				lItemObj = JS_ParamGetServByIDs(s_IDs);
+				if (lItemObj)
+				{
+					lItemArray = JS_ParamGetServPMTDescArray(lItemObj, false);
+				}
+
+			}
+			else if (s_DescriptorType == "SERVICE_SDT_DESC")
+			{
+				s_DescriptorMax = 8;
+
+				$("descriptor_type").value = "Service SDT Descriptors";
+
+				lItemObj = JS_ParamGetServByIDs(s_IDs);
+				if (lItemObj)
+				{
+					lItemArray = JS_ParamGetServSDTDescArray(lItemObj, false);
+				}
+
+			}
+			else if (s_DescriptorType == "ES_PMT_DESC")
+			{
+				s_DescriptorMax = 8;
+				$("descriptor_type").value = "ES PMT Descriptors";
+
+				lItemObj = JS_ParamGetEsByIDs(s_IDs);
+				if (lItemObj)
+				{
+					lItemArray = JS_ParamGetESPMTDescArray(lItemObj, false);
+				}
+			}
+			else
+			{
+				JS_UISetDisableByID("add");
+				JS_UISetDisableByID("remove");
+				JS_UISetDisableByID("submit");
+			}
+
+			if (lItemArray != null)
+			{
+				for (i = 0; i < lItemArray.length; i++)
+				{
+					lItemInfo = JS_ParamGetDescriptorInfo(lItemArray[i]);
+					OnAddDescriptor(lItemInfo.m_IDs, lItemInfo.m_Data, lItemInfo.m_Active, false);
+					s_IDsArray[s_IDsArray.length] = lItemInfo.m_IDs;
+				}
+			}
+		}
+
+		function OnSelectRemove()
+		{
+			s_BitrateListItem.RemoveSelectedRow();
+			if (s_BitrateListItem.GetRowNumber() < s_DescriptorMax)
+			{
+				JS_UISetDisableByID("add", true);
+			}
+		}
+
+
+		function OnAddDescriptor(IDs, Data, Active, bView)
+		{
+			var lHolderNode;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "500px";
+			lHolderNode.value = Data;
+			lHolderNode.name = "data";
+			lHolderNode.defaultValue = lHolderNode.value;
+			JS_RestrctInputHEX(lHolderNode);
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Active, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.name = "active";
+			s_BitrateListItem.SetColValue(2, lHolderNode);
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "checkbox";
+			lHolderNode.style.width = "40px";
+			lHolderNode.name = "list_selection";
+			s_BitrateListItem.SetColValue(3, lHolderNode);
+
+
+			s_BitrateListItem.AddRowToDom(false, IDs, bView);
+
+			if (s_BitrateListItem.GetRowNumber() >= s_DescriptorMax)
+			{
+				JS_UISetDisableByID("add", false);
+			}
+
+		}
+
+		function OnSubmit(Item)
+		{
+			var i, lRowNum;
+			var lXMLDom, lIDs;
+			var lHolderNode, lInforNode;
+
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+			lRowNum = s_BitrateListItem.GetRowNumber();
+
+			//恢复出错标志
+			for (i = 0; i < lRowNum; i++)
+			{
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+			}
+
+			//判断描述符是否符合协议，但不检查内容
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "descriptors", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "descriptor_type", s_DescriptorType);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "parent_ids", s_IDs);
+
+			lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "add_modify_descriptors");
+			for (i = 0; i < lRowNum; i++)
+			{
+				lIDs = s_BitrateListItem.GetRowData(i);
+
+				for (k = 0; k < s_IDsArray.length; k++)
+				{
+					if (s_IDsArray[k] == lIDs)
+					{
+						s_IDsArray.splice(k, 1);
+						break;
+					}
+				}
+
+				lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "descriptor");
+
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "desc_ids", lIDs);
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+				if (JS_MPEG2ValidateDescriptor(lTmpVar.value) != true)
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					return;
+				}
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "data", lTmpVar.value);
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "out_mark", JS_UISelectGetCurValue(lTmpVar));
+
+			}
+
+			lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "remove_descriptors");
+			for (k = 0; k < s_IDsArray.length; k++)
+			{
+				lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "descriptor");
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "desc_ids", s_IDsArray[k]);
+			}
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+	</script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="820px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" align="left" bgcolor="#F5F9FE">
+				<div style="height: 25px; overflow: hidden; padding: 0px 0px 0px 10px; border: solid 0px #999;">
+					<table style="width:795px">
+						<tr>
+							<td style="text-align: left">
+								<span><script type="text/javascript">JS_INLAN("desc_type")</script></span>&nbsp;&nbsp;<input type="text" id="descriptor_type" readonly style="text-align: center"></span>
+							</td>
+							<td style="text-align: right">
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div id="list_target" style="height: 110px; overflow: auto; padding: 0px; border: solid 0px #999;">
+				</div>
+                <div style="height: 30px; overflow: auto;padding: 5px 20px 5px 5px; text-align:right;border: solid 0px #0000FF;">
+                    <button type="button" onclick='OnAddDescriptor(0, "", "OFF", true);' style="width:80px; height:25px" id="add" ><script type="text/javascript">JS_INCMNLAN("add")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick="OnSelectRemove();" style="width:80px; height:25px" id="remove"><script type="text/javascript">JS_INCMNLAN("remove")</script></button>&nbsp;&nbsp;
+                    <button type="button" onclick="OnSubmit(this);" style="width:80px; height:25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width:80px; height:25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+    </table>
+</body>
+</html>

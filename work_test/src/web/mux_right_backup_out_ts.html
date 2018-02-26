@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+	    var s_ListItem = null;
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		function OnLoad()
+		{
+			var i;
+			var lTsArray, lTsBackArray, lTsInfo;
+
+			JS_ParamInitate(); //初始化系统参数处理脚本组件
+
+
+			s_ListItem = new MyListControl("s_ListItem", 830, 470, "sub_param", false);
+
+			s_ListItem.SetColProperty(0, 80, JS_LANCMN("index"), "center", "center");
+			s_ListItem.SetColProperty(1, 80, JS_LANCMN("ts_index"), "center", "center");
+			s_ListItem.SetColProperty(2, 140, JS_LAN("backup_ts"), "center", "center");
+			s_ListItem.SetColProperty(3, 120, JS_LAN("status"), "center", "center");
+			s_ListItem.SetColProperty(4, 140, JS_LAN("mode"), "center", "center");
+			s_ListItem.UpdateListFrame();
+
+			lTsArray = JS_ParamGetTsArray(false);
+			lTsBackArray = JS_ParamGetTsBackupOutTsArray();
+			for (i = 0; i < lTsArray.length; i++)
+			{
+			    lTsInfo = JS_ParamGetTsInfo(lTsArray[i], false);
+			    if (lTsInfo.m_TsMark == "ON") 
+			    {
+			        AddOutTSBackupRow(i, lTsBackArray[i].m_BackupTsInd, "MAIN", lTsBackArray[i].m_Mode);
+				}
+			}
+		}
+
+		function AddOutTSBackupRow(TsInd, BackupTSInd, Status, Mode)
+		{
+			var i;
+			var lHolderNode;
+			var lRowInd;
+
+			lRowInd = s_ListItem.GetRowNumber();
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "40px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = JS_StrLeftPading(TsInd + 1, 3);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			lHolderNode.name = "ts_index";
+			s_ListItem.SetColValue(1, lHolderNode);
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "80px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = BackupTSInd + 1;
+			lHolderNode.id = "backup_ts_" + lRowInd;
+			JS_RestrctInputInt(lHolderNode);	
+			s_ListItem.SetColValue(2, lHolderNode);
+			
+
+			//动态项目自动时实时显示当前状态
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "90px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value =  JS_LANCMN(Status);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			lHolderNode.id = "backup_status_" + lRowInd;
+			s_ListItem.SetColValue(3, lHolderNode);
+
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", JS_LANCMN("OFF"));
+			JS_UISelectAddOption(lHolderNode, "MAIN", JS_LAN("MAIN"));
+			JS_UISelectAddOption(lHolderNode, "BACKUP", JS_LAN("BACKUP"));
+			JS_UISelectAddOption(lHolderNode, "REMOTE", JS_LAN("REMOTE"));
+			JS_UISelectSetCurIndexByValue(lHolderNode, Mode, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "mode_" + lRowInd;
+			s_ListItem.SetColValue(4, lHolderNode);
+
+		
+			s_ListItem.AddRowToDom(false, TsInd);
+		}
+
+		function OnSubmit(Item)
+		{
+			var i;
+			var bit_rate;
+			var lBodyNode, lRootNode, lInArrayNode, lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "ts_backup_setting", "");
+		
+			//校验
+			if (OnValidation() != true) 
+			{
+				return;
+			}
+
+			lRootNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "ts_backup_setting_root");
+			
+			lInArrayNode = JS_XMLAddNormalChild(lXMLDom, lRootNode, "backup_ts_array_out");
+			for (i = 0; i < s_ListItem.GetRowNumber(); i++) 
+			{
+				lHolderNode = JS_XMLAddNormalChild(lXMLDom, lInArrayNode, "backup_ts_info");
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "ts_ind", s_ListItem.GetRowData(i));
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "backup_ts_ind", parseInt(JS_HTMLGetValueByID("backup_ts_" + i)) - 1);
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "mode", JS_HTMLGetValueByID("mode_" + i));
+			}
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(5, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+			
+		}
+
+        
+		
+		function OnValidation()
+		{
+		    var i;
+		    var lObj, lTmpValue1, lTmpValue2;
+		    var lMode, lTsArray;
+
+		    for (i = 0; i < s_ListItem.GetRowNumber(); i++)
+		    {
+		        JS_UISetErrorIndicatorByID("backup_ts_" + i, true, false);
+		    }
+
+		    lTsArray = JS_ParamGetTsArray(false);
+		    for (i = 0; i < s_ListItem.GetRowNumber(); i++)
+		    {
+		        lObj = $("backup_ts_" + i);
+		        
+		        lTmpValue = parseInt(lObj.value) - 1;
+		        lMode = JS_HTMLGetValue($("mode_" + i));
+		        
+		        lTsInfo = JS_ParamGetTsInfo(lTsArray[lTmpValue], false);
+		        if ((lTmpValue < 0) || (lTmpValue >= JS_ParamGetTsNum(false)) || ((lTsInfo.m_TsMark == "OFF") && (lMode != "OFF")))
+		        {
+		            JS_UISetErrorIndicator(lObj, false, true);
+		            return false;
+		        }
+		        
+		        
+		        if (lMode != "OFF")
+		        {
+		            if (parseInt(JS_HTMLGetValue($("backup_ts_" + i))) == parseInt(s_ListItem.GetRowData(i)) + 1)
+		            {
+		                JS_UISetErrorIndicator(lObj, false, true);
+		                return false;
+		            }
+		        }
+		    }
+		    return true;
+		}
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title"><script type="text/javascript">JS_INLAN("title")</script></td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="sub_param" bgcolor="#000000" style="height: 470px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+                <div style="height: 1px; width: 800px; overflow: hidden; background: #666">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div style="height: 30px;width:820px; overflow: auto;padding: 5px 5px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

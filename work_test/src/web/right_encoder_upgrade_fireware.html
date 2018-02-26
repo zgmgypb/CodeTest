@@ -1,0 +1,299 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(graphics/bg001.gif);
+        }
+    </style>
+    <script type="text/javascript" src="js/common_process.js"></script>
+    <script type="text/javascript" src="js/language.js"></script>
+    <script type="text/javascript" src="js/system_parameter.js"></script>
+    <script type="text/javascript">
+
+    
+    	var s_Back, s_Type;
+    	JS_LANInitiate();
+    
+    	function OnHTTPGetFuncCB(XMLDom)
+    	{
+    		var lTmpVar;
+
+    		if (XMLDom) 
+			{
+    			$("back").disabled = false;
+				
+				lTmpVar = parseInt(JS_XMLGetTagValue(XMLDom, "validation"), 10);
+				if (lTmpVar > 0)
+				{
+					//$("submit").disabled = false;
+					$("validation").src = "graphics/green_hook.gif";
+					$("information").value = JS_XMLGetTagValue(XMLDom, "information");
+				}
+			}
+			else
+			{
+			
+			}
+    	}
+
+    	function OnLoad()
+    	{
+    		var lTmpVar;
+    		var lXMLDom;
+    		var lStatus, lFileSize;
+    		lTmpVar = JS_ArgGetArgs();
+    		lStatus = JS_ArgGetValueByName(lTmpVar, "status");
+    		lFileSize = parseInt(JS_ArgGetValueByName(lTmpVar, "file_size"), 10);
+    		s_Type = JS_ArgGetValueByName(lTmpVar, "type");
+    		s_Back = JS_ArgGetValueByName(lTmpVar, "back");
+    		if (lStatus == "true")
+    		{
+    			$("status").src = "graphics/green_hook.gif";
+    			$("file_size").value = lFileSize;
+
+    			lXMLDom = JS_XMLCreateDomFromFile(null);
+    			JS_XMLParamSetHead(lXMLDom, "validation", "check", s_Type);
+    			JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnHTTPGetFuncCB, true);
+    		}
+    		else
+    		{
+    			$("back").disabled = false;
+            }
+
+            GetFirmwareUpgradeStatus(); 
+
+    	}
+
+    	function setUpgradePara() 
+    	{
+            var lHolderNode;
+            var lXMLDom = JS_XMLCreateDomFromFile(null);
+            var file_index = $("upgrade_file_index").value;
+            var file_number = $("all_upgrade_file_number").value;
+
+            lHolderNode = JS_XMLParamSetHead(lXMLDom, "validation", "confirm", s_Type);
+
+            JS_XMLAddTextChild(lXMLDom, lHolderNode, "upgrade_file_index", file_index);
+            JS_XMLAddTextChild(lXMLDom, lHolderNode, "all_upgrade_file_number", file_number);
+
+            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+        }
+        
+/////////////////////////////////////////////////////////////////////
+
+        function OnParseEncoderFirmwareUploadStatusXML(XMLDom) {
+            var lEncoderFirmwareUploadObj;
+            var lEncoderFirmwareUploadPercent;
+            var lEncoderFirmwareUploadFinishStatus;
+            var lEncoderFirmwareUploadResult;
+            var lFileIndex = $("upgrade_file_index").value;
+            var lFileNumber = $("all_upgrade_file_number").value;
+            var i;
+
+            lEncoderFirmwareUploadObj = XMLDom.getElementsByTagName("encoder_upload_firmware_status")[0];
+
+            lEncoderFirmwareUploadPercent = JS_XMLGetTagValue(lEncoderFirmwareUploadObj, "upload_percent");
+
+            $("SegProBar").style.width = lEncoderFirmwareUploadPercent + '%';
+            $("SegPercent").innerHTML = lEncoderFirmwareUploadPercent + '%';
+
+            lEncoderFirmwareUploadFinishStatus = JS_XMLGetTagValue(lEncoderFirmwareUploadObj, "finish_status");
+            lEncoderFirmwareUploadResult = JS_XMLGetTagValue(lEncoderFirmwareUploadObj, "upload_result");
+
+            if (lEncoderFirmwareUploadFinishStatus == 0) //Has finished
+            {
+                if (lEncoderFirmwareUploadResult == 0) 
+                {
+                    if (lFileIndex == lFileNumber) 
+                    {
+                        confirm("Upload encoder firmware success and reboot encoder module!");
+                    }
+                    else 
+                    {
+                        confirm("Upload encoder firmware success .Please click back andk upgrade next file!");
+                    }
+                    
+                }
+                else 
+                {
+                    confirm("Upload Encoder Firmware Fail , please reload again!");
+                }
+            }
+            else 
+            {
+                setTimeout("GetFirmwareUpgradeStatus()", 2000);
+            }
+        }
+
+        function GetFirmwareUpgradeStatus() 
+        {
+            var lXMLDom
+            var lHolderNode;
+
+            lXMLDom = JS_XMLCreateDomFromFile(null);
+            lHolderNode = JS_XMLParamSetHead(lXMLDom, "encoder_system_control", "encoder_upload_firmware_status", "");
+            JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnParseEncoderFirmwareUploadStatusXML, false);        
+            
+        }
+
+        function startUploadFirmware() {
+            var lHolderNode;
+            var lXMLDom = JS_XMLCreateDomFromFile(null);
+            var file_index = $("upgrade_file_index").value;
+            var file_number = $("all_upgrade_file_number").value;
+
+            lHolderNode = JS_XMLParamSetHead(lXMLDom, "validation", "start_upgrade_firmware", s_Type);
+
+            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+
+            //开始加载
+            setTimeout("GetFirmwareUpgradeStatus()", 2000);
+            
+        }
+
+    	function OnClick(Item) 
+    	{
+    	    if (Item.id == "back") 
+    	    {
+    	        location.href = s_Back;
+    		}
+        }
+    	
+    </script>
+</head>
+<body onload="OnLoad()">
+    <table width="850px" border="0" align="center" cellpadding="0" cellspacing="0" >
+        <tr>
+            <td height="30px" align="center" background="graphics/boxmenu_850.gif">
+                <span>Encoder Fireware Upgrade Status</script></span>
+            </td>
+        </tr>
+        <tr>
+            <td height="527px" valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="confirm_table" style="height: 472px;width:820px; overflow: auto; padding:5px 10px 0px 10px;">
+					<table width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span>Upgrade File Infomation:</span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 30%">
+											<span>Upload Status:</span>&nbsp;&nbsp;&nbsp;<img id="status" src="graphics/red_fork.gif" style="height: 20px; width: 20px; display: inline" />
+										</td>
+										<td style="text-align: left; width: 70%">
+											<span>Upload Size(Bytes):</span>&nbsp;&nbsp;&nbsp;<input id="file_size" type="text" style="width: 110px; text-align:center" id="file_size" readOnly="true"/>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span>Firmware Upgrade Status:</span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 30%">
+											<span>Firmware File Check Status：</span>&nbsp;&nbsp;&nbsp;<img id="validation" src="graphics/red_fork.gif" style="height: 20px; width: 20px; display: inline" />
+										</td>
+										<td style="text-align: left; width: 70%">
+											<span>File Status</span>&nbsp;&nbsp;&nbsp;<input id="information" type="text" style="width: 300px; text-align:center" id="file_size"readOnly="true" />
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span>Firmware Upgrade File Index:</span>
+							</td>
+						</tr>
+						
+                         
+                        <tr>
+                        	<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+		                        <table width="100%">
+		                            <tr>
+                                        <td style="width: 110px">
+                                            Upgrade File Index:
+                                        </td>
+                                        
+                                        <td>
+                                            <input style="width: 150px" id="upgrade_file_index" type="text" />
+                                        </td>
+
+                                        <td style="width: 110px">
+                                           All Upgrade File Number:
+                                        </td>
+                                        
+                                        <td>
+                                            <input style="width: 150px" id="all_upgrade_file_number" type="text" />
+                                        </td>
+                                        
+                                        <td>
+                                            <input style="width: 90px" value="Set Upgrade Para" type="button" onclick="setUpgradePara()" />
+                                        </td>
+                                        
+                                    </tr>
+                            	</table>
+	                        </td>
+                        </tr>
+                           
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span>Firmware Upgrade Percent:</span>
+							</td>
+						</tr>    
+						
+						
+						<tr>
+                            <td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+		                        <table width="100%">
+						            <tr>
+                                        <td>
+                                        <div style="left: 0; width: 450px; height: 25px; top: 360px; border: 3px #99CCFF solid;">
+                                            <div id="SegProBar" align="center" style="width: 0%; line-height: 25px; visibility: visible; background-color: #66CCFF;height: 25px;">
+                                                <span id="SegPercent" style="font-size: 14px;"></span>
+                                            </div>
+                                        </div>                                    
+                                        </td>
+                                    </tr>   
+                                   
+                        		</table>
+	                        </td>
+	                        
+	                         <td>
+                                   <input style="width: 90px" value="Start To Upload" type="button" onclick="startUploadFirmware()" />
+                             </td>
+                        </tr>                   
+                            
+                        </td>						
+						
+					</table>
+				</div>
+				<div style="height: 30px; width: 820px; overflow: auto; padding: 5px 20px 5px 2px; text-align: right">
+					<button type="button" onclick='OnClick(this);' style="width:80px;height:25px" id="back" disabled><script type="text/javascript">JS_INCMNLAN("back")</script></button>
+                </div>
+           </td>
+        </tr>
+        <tr>
+            <td height="13px"  background="graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

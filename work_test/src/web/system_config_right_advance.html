@@ -1,0 +1,330 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/device_setting.js"></script>
+    <script type="text/javascript" src="/js/device_information.js"></script>
+
+	<script type="text/javascript">
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		JS_InfoInitiate();
+		JS_DevSettingInitiate();
+
+		function OnLoad()
+		{
+			var lItemInfo;
+			$("app_code").innerHTML = JS_InfoGetApplicationCode();
+
+			lItemInfo = JS_DevGetBackupParameterInfo();
+
+			if (lItemInfo.m_bHaveBackup > 0)
+			{
+				$("cur_desc").value = lItemInfo.m_BackupInfo;	
+			}
+			else
+			{
+				$("submit_restore").disabled = true;	
+			}
+		}
+
+
+		function OnSubmit(Item) {
+		    var file;
+		    var lTmpStr;
+		    var lHolderNode;
+		    var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+		    if (Item.id == "form_parameter_import") 
+		    {
+		        file = document.getElementById("para").value;
+			    if (file == null || file == "") 
+			    {
+			        alert(JS_LAN("confirm_file"));
+			        return (false);
+			    }
+			    return true;
+			}
+		    else if (Item.id == "form_parameter_export")
+			{
+				var lTmpDate = new Date();
+				var lTmpIP;
+				var lTmpInfo;
+				lTmpInfo = JS_DevGetManagePortSetting();
+				lTmpIP = JS_ParseIPString(lTmpInfo.m_IPv4Addr);
+			    lTmpStr = lTmpDate.getFullYear() + "-" + (lTmpDate.getMonth() + 1) + "-" + lTmpDate.getDate();
+			    $("parameter_remote_filename").value = JS_InfoGetModelName() + "_" + "Parameter_" + lTmpIP.toString(16) + "_" + lTmpStr + ".bin";
+			    return true;
+			}
+			else if (Item.id == "form_service_xml_export")
+			{
+				var lTmpDate = new Date();
+				var lTmpIP;
+				var lTmpInfo;
+				lTmpInfo = JS_DevGetManagePortSetting();
+				lTmpIP = JS_ParseIPString(lTmpInfo.m_IPv4Addr);
+			    lTmpStr = lTmpDate.getFullYear() + "-" + (lTmpDate.getMonth() + 1) + "-" + lTmpDate.getDate();
+			    $("service_xml_remote_filename").value = JS_InfoGetModelName() + "_" + "Service_" + lTmpIP.toString(16) + "_" + lTmpStr + ".xml";
+			    return true;
+			}
+			else if (Item.id == "submit_parameter_reset")
+			{
+				if (confirm(JS_LAN("confirm_reset"))) 
+			    {
+			    	if (confirm(JS_LANCMN("confirm_reboot")))
+			    	{
+			    		lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "parameter_reset", "");
+						JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+						window.top.document.frames["BottomFrame"].OnShowLoadingWindow(50, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+			    	}
+			    }
+			}
+			else if (Item.id == "submit_backup")
+			{
+				if (confirm(JS_LAN("confirm_backup"))) 
+			    {
+			    	lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "parameter_backup", "");
+			    	JS_XMLAddTextChild(lXMLDom, lHolderNode, "user_description", JS_HTMLGetValueByID("user_description"));
+			        JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			        window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+			    }
+			}
+			else if (Item.id == "submit_restore")
+			{
+				if (confirm(JS_LAN("confirm_restore")))
+			    {
+			    	if (confirm(JS_LANCMN("confirm_reboot")))
+			    	{
+			    		lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "parameter_restore", "");
+			    		JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			    		window.top.document.frames["BottomFrame"].OnShowLoadingWindow(50, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+			    	}
+			    }
+			}
+			else if (Item.id == "form_soft_import") 
+			{
+			    file = document.getElementById("software").value;
+			    if (file == null || file == "") 
+			    {
+			        alert(JS_LAN("confirm_file"));
+			        return (false);
+			    }
+			    return true;
+			}
+			else if (Item.id == "form_soft_export") 
+			{			   
+			    $("soft_remote_filename").value = "software.bin";			    
+				return true;
+			}
+			else if (Item.id == "form_license_import") 
+			{
+			    file = document.getElementById("license").value;
+			    if (file == null || file == "") 
+			    {
+			        alert(JS_LAN("confirm_file"));
+			        return (false);
+			    }
+			    return true;
+			}
+			else if (Item.id == "submit_reboot")
+			{
+				if (confirm(JS_LANCMN("confirm_reboot"))) 
+			    {
+			        lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "manual_reboot", "");
+			        JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			        window.top.document.frames["BottomFrame"].OnShowLoadingWindow(50, true, false, "window.top.location.reload()");
+			    }
+			}
+		}
+        
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("param_io")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 50%">
+                                            <form target="_self" method="post" enctype="multipart/form-data" action="/cgi-bin/upload.cgi" id="form_parameter_import" onsubmit="return(OnSubmit(this))">
+                                                <input type="hidden" name="type" value="parameter" />
+                                                <input type="hidden" name="file_limit" value="8388608" />
+                                                <input type="hidden" name="redirect" value="/upload_right_cgi.html" />
+                                                <input type="hidden" name="back" value="/system_config_right_advance.html" />
+                                                <input type="file" name="file" id="para"style="width: 300px; height: 20px" />
+                                                <button type="submit" style="width: 60px;" id="submit_parameter_import"><script type="text/javascript">JS_INCMNLAN("import")</script></button>
+                                            </form>
+                                        </td>
+										<td style="text-align: left; width: 20%">
+                                            <form target="_self" method="post" action="/goform/downloadcgi" id="form_parameter_export" onsubmit="return OnSubmit(this);">
+                                                <input type="hidden" name="type" value="parameter" />
+                                                <input type="hidden" id="parameter_remote_filename" name="remote_file" value="Parameter.bin" />
+                                                <button type="submit" style="width: 60px;" ><script type="text/javascript">JS_INCMNLAN("export")</script></button>
+                                            </form>
+                                        </td>
+                                        <td style="text-align: left; width: 15%">
+                                            <form target="_self" method="post" action="/goform/downloadcgi" id="form_service_xml_export" onsubmit="return OnSubmit(this);">
+                                                <input type="hidden" name="type" value="service_xml" />
+                                                <input type="hidden" id="service_xml_remote_filename" name="remote_file" value="Service.xml" />
+                                                <button type="submit" style="width: 80px;" ><script type="text/javascript">JS_INCMNLAN("export_xml")</script></button>
+                                            </form>
+                                        </td>
+										<td style="text-align: left; width: 30%">
+											<button type="button" id="submit_parameter_reset" onclick="OnSubmit(this);" style="width: 80px;" ><script type="text/javascript">JS_INCMNLAN("reset")</script></button>
+                                        </td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("param_br")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 50%">
+											<span><script type="text/javascript">JS_INLAN("enter_desc")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 120px" id="user_description" />&nbsp;&nbsp;&nbsp;
+											<button type="button" id="submit_backup" onclick="OnSubmit(this);" style="width: 60px;" ><script type="text/javascript">JS_INCMNLAN("backup")</script></button>
+										</td>
+										<td style="text-align: left; width: 50%">
+											<span><script type="text/javascript">JS_INLAN("cur_desc")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 120px" id="cur_desc" />&nbsp;&nbsp;&nbsp;<button type="button" id="submit_restore" onclick="OnSubmit(this);" style="width: 60px;" ><script type="text/javascript">JS_INCMNLAN("restore")</script></button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("soft_upgrade")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 50%">
+                                            <form target="_self" method="post" enctype="multipart/form-data" action="cgi-bin/upload.cgi" id="form_soft_import" onsubmit="return(OnSubmit(this))">
+                                            <input type="hidden" name="type" value="software" />
+                                            <input type="hidden" name="file_limit" value="36700160" />
+                                            <input type="hidden" name="redirect" value="/upload_right_cgi.html" />
+                                            <input type="hidden" name="back" value="/system_config_right_advance.html" />
+                                            <input type="file" name="file" id="software"style="width: 300px; height: 20px" />
+                                            <button type="submit" style="width: 60px;" id="submit_import_soft"><script type="text/javascript">JS_INCMNLAN("upgrade")</script></button>
+                                            </form>
+                                        </td>
+										<td style="text-align: left; width: 50%">
+                                            <form target="_self" method="post" action="/goform/downloadcgi" id="form_soft_export" onsubmit="return OnSubmit(this);">
+                                                <input type="hidden" name="type" value="software" />
+                                                <input type="hidden" id="soft_remote_filename" name="remote_file" value="software.bin" />
+                                                <button type="submit" style="width: 60px;" disabled><script type="text/javascript">JS_INCMNLAN("backup")</script></button>
+                                            </form>
+                                        </td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("license")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 50%">
+                                            <form target="_self" method="post" enctype="multipart/form-data" action="cgi-bin/upload.cgi" id="form_license_import" onsubmit="return(OnSubmit(this))">
+                                            <input type="hidden" name="type" value="license" />
+                                            <input type="hidden" name="file_limit" value="4194304" />
+                                            <input type="hidden" name="redirect" value="/upload_right_cgi.html" />
+                                            <input type="hidden" name="back" value="/system_config_right_advance.html" />
+                                            <input type="file" name="file" id = "license" style="width: 300px; height: 20px" />
+                                            <button type="submit" style="width: 60px;" id="submit_import_license"><script type="text/javascript">JS_INCMNLAN("import")</script></button>
+                                            </form>
+                                        </td>
+										<td style="text-align: left; width: 50%">
+                                            <form target="_self" method="post" action="/goform/downloadcgi" id="form_license_export" onsubmit="return OnSubmit(this);">
+                                                <input type="hidden" name="type" value="license" />
+                                                <input type="hidden" id="license_remote_filename" name="remote_file" value="license.bin" />
+                                                <button type="submit" style="width: 60px;" disabled><script type="text/javascript">JS_INCMNLAN("export")</script></button>
+                                            </form>
+                                        </td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("app_code")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="80px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 0px">
+							<textarea rows="4" cols="94" id="app_code"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("device_control")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<button type="button" id="submit_reboot" onclick="OnSubmit(this);" style="width: 80px;" ><script type="text/javascript">JS_INLAN("reboot")</script></button>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+        <tr>
+            <td height="30px" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">					                                                                                                  	JS_INCMNLAN("refresh")</script></button>
+                </div>
+           </td>
+        </tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+    <script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem;
+		var s_NitTsMaxNum = 64;
+		var s_MaxNITNameByteSize = 31; //名称最大字节数
+		var s_IDsArray = new Array();
+
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnLoad()
+		{
+			var i;
+			var lItemArray;
+			var lItemInfo, lDeliveryInfo;
+
+
+			JS_RestrctInputInt(document.getElementById("net_id"));
+			JS_RestrctInputInt(document.getElementById("nit_version"));
+
+			JS_ParamInitate();
+
+			s_BitrateListItem = new MyListControl("s_BitrateListItem", 810, 278, "list_target", true);
+			s_BitrateListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_BitrateListItem.SetColProperty(1, 60, JS_LAN("ts_id"), "center", "center");
+			s_BitrateListItem.SetColProperty(2, 60, JS_LAN("on_id"), "center", "center");
+			s_BitrateListItem.SetColProperty(3, 100, JS_LAN("freq"), "center", "center");
+			s_BitrateListItem.SetColProperty(4, 80, JS_LAN("mode"), "center", "center");
+			s_BitrateListItem.SetColProperty(5, 110, JS_LAN("sr"), "center", "center");
+			s_BitrateListItem.SetColProperty(6, 100, JS_LAN("fec_in"), "center", "center");
+			s_BitrateListItem.SetColProperty(7, 100, JS_LAN("fec_out"), "center", "center");
+			s_BitrateListItem.SetColProperty(8, 70, JS_LAN("ts_desc"), "center", "center");
+			s_BitrateListItem.SetColProperty(9, 30, "", "center", "center");
+			s_BitrateListItem.UpdateListFrame();
+
+			lItemInfo = JS_ParamGetNITInformation();
+			s_MaxNITNameByteSize = lItemInfo.m_MaxNameBytes;
+			document.getElementById("net_id").value = lItemInfo.m_NetID;
+			document.getElementById("net_name").value = lItemInfo.m_NetName;
+			document.getElementById("nit_version").value = lItemInfo.m_NitVersion;
+			s_NitTsMaxNum = lItemInfo.m_MaxTsInfoNum;
+			JS_UISelectSetCurIndexByValue(document.getElementById("nit_global_mark"), lItemInfo.m_NitMark, true);
+			lItemInfo = null;
+
+
+			s_IDsArray.length = 0;
+			lItemArray = JS_ParamGetNITTSArray();
+			for (i = 0; i < lItemArray.length; i++)
+			{
+				lItemInfo = JS_ParamGetNITTSInfo(lItemArray[i]);
+				lDeliveryInfo = JS_ParamGetNITCableDeliveryInfo(lItemArray[i]);
+
+				s_IDsArray[s_IDsArray.length] = lItemInfo.m_IDs;
+
+				OnAddNitCableDelivery(lItemInfo.m_IDs, lItemInfo.m_TSID, lItemInfo.m_ONID, lDeliveryInfo.m_Freq, lDeliveryInfo.m_Mode, lDeliveryInfo.m_SR, lDeliveryInfo.m_FECOut, lDeliveryInfo.m_FECIn, false);
+
+				lDeliveryInfo = null;
+				lItemInfo = null;
+			}
+			lItemArray = null;
+
+
+			if (JS_ParamGetRemuxSystemInfo().m_DisableRemuxMark == "ON")
+			{
+			    $("submit_edit").disabled = true;
+			}
+			else
+			{
+			    $("submit_edit").disabled = false;
+			}
+
+		}
+
+
+
+		function OnSelectRemove()
+		{
+			s_BitrateListItem.RemoveSelectedRow();
+			if (s_BitrateListItem.GetRowNumber() < s_NitTsMaxNum)
+			{
+				JS_UISetDisableByID("add_ts", true);
+			}
+		}
+
+
+		function OnAddNitCableDelivery(IDs, TSID, ONID, Freq, Mode, SR, FECOuter, FECInner, bShow)
+		{
+			var lHolderNode;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "50px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = TSID;
+			lHolderNode.name = "ts_id";
+			lHolderNode.defaultValue = lHolderNode.value;
+			JS_RestrctInputInt(lHolderNode);
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "50px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = ONID;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.name = "on_id";
+			JS_RestrctInputInt(lHolderNode);
+			s_BitrateListItem.SetColValue(2, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "90px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = (Freq / 1000000).toFixed(6);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.name = "freq";
+			JS_RestrctInputFloat(lHolderNode);
+			s_BitrateListItem.SetColValue(3, lHolderNode);
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "Not Defined", "Not Defined");
+			JS_UISelectAddOption(lHolderNode, "16QAM", "16QAM");
+			JS_UISelectAddOption(lHolderNode, "32QAM", "32QAM");
+			JS_UISelectAddOption(lHolderNode, "64QAM", "64QAM");
+			JS_UISelectAddOption(lHolderNode, "128QAM", "128QAM");
+			JS_UISelectAddOption(lHolderNode, "256QAM", "256QAM");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Mode, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.name = "mode";
+			s_BitrateListItem.SetColValue(4, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "80px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = (SR / 1000000).toFixed(6);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.name = "symbol_rate";
+			JS_RestrctInputFloat(lHolderNode);
+			s_BitrateListItem.SetColValue(5, lHolderNode);
+
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, 0, "not defined");
+			JS_UISelectAddOption(lHolderNode, 1, "1/2 conv.");
+			JS_UISelectAddOption(lHolderNode, 2, "2/3 conv.");
+			JS_UISelectAddOption(lHolderNode, 3, "3/4 conv.");
+			JS_UISelectAddOption(lHolderNode, 4, "5/6 conv.");
+			JS_UISelectAddOption(lHolderNode, 5, "7/8 conv.");
+			JS_UISelectAddOption(lHolderNode, 6, "8/9 conv.");
+			JS_UISelectAddOption(lHolderNode, 7, "3/5 conv.");
+			JS_UISelectAddOption(lHolderNode, 8, "4/5 conv.");
+			JS_UISelectAddOption(lHolderNode, 9, "9/10 conv.");
+			JS_UISelectAddOption(lHolderNode, 10, "reserved");
+			JS_UISelectAddOption(lHolderNode, 11, "reserved");
+			JS_UISelectAddOption(lHolderNode, 12, "reserved");
+			JS_UISelectAddOption(lHolderNode, 13, "reserved");
+			JS_UISelectAddOption(lHolderNode, 14, "reserved");
+			JS_UISelectAddOption(lHolderNode, 15, "no conv.");
+			JS_UISelectSetCurIndexByValue(lHolderNode, FECInner, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.name = "mode";
+			s_BitrateListItem.SetColValue(6, lHolderNode);
+
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, 0, "not defined");
+			JS_UISelectAddOption(lHolderNode, 1, "no FEC");
+			JS_UISelectAddOption(lHolderNode, 2, "RS(204/188)");
+			JS_UISelectAddOption(lHolderNode, 3, "reserved");
+			JS_UISelectSetCurIndexByValue(lHolderNode, FECOuter, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.name = "mode";
+			s_BitrateListItem.SetColValue(7, lHolderNode);
+
+			if (IDs != 0)
+			{
+				lHolderNode = document.createElement("button");
+				lHolderNode.style.width = "45px";
+				lHolderNode.onclick = function()
+				{
+					document.getElementById("descriptor_frame").src = "mux_right_descriptor.html?type=NIT_TS_DESC&ids=" + IDs;
+				}
+				lHolderNode.innerHTML = JS_LAN("edit");
+			}
+			else
+			{
+				lHolderNode = "";
+			}
+			s_BitrateListItem.SetColValue(8, lHolderNode);
+
+
+			s_BitrateListItem.AddRowToDom(false, IDs, bShow);
+
+			if (s_BitrateListItem.GetRowNumber() >= s_NitTsMaxNum)
+			{
+				JS_UISetDisableByID("add_ts", false);
+			}
+		}
+
+		function OnSubmit(Item)
+		{
+			var lTmpVar;
+			var i, k, lRowNum;
+			var lTsID, lONID, lFreq, lSym, lMode, lFECIn, lFECOut;
+			var lHolderNode, lInforNode, lSublInforNode;
+
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+			lRowNum = s_BitrateListItem.GetRowNumber();
+
+			//恢复出错控制
+			JS_UISetErrorIndicatorByID("net_id", true, false);
+			JS_UISetErrorIndicatorByID("net_name", true, false);
+			JS_UISetErrorIndicatorByID("nit_version", true, false);
+			for (i = 0; i < lRowNum; i++)
+			{
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+			}
+
+			//固定参数错误判断
+			lTmpValue = parseInt(JS_HTMLGetValueByID("net_id"),10);
+			if (lTmpValue < 0 || lTmpValue > 65535)
+			{
+				JS_UISetErrorIndicatorByID("net_id", false, false);
+				return;
+			}
+
+			lTmpValue = JS_HTMLGetValueByID("net_name");
+			if (JS_HTMLStringByteLength(lTmpValue) > s_MaxNITNameByteSize)
+			{
+				JS_UISetErrorIndicatorByID("net_name", false, false);
+				return false;
+			}
+
+			lTmpValue = parseInt(JS_HTMLGetValueByID("nit_version"),10);
+			if (lTmpValue < 0 || lTmpValue > 31)
+			{
+				JS_UISetErrorIndicatorByID("nit_version", false, false);
+				return;
+			}
+
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "nit_information", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "network_id", JS_HTMLGetValueByID("net_id"));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "network_name", JS_HTMLGetValueByID("net_name"));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "version", JS_HTMLGetValueByID("nit_version"));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "nit_global_mark", JS_HTMLGetValueByID("nit_global_mark"));
+
+
+			lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "add_modify_nit_tsinfo");
+			for (i = 0; i < lRowNum; i++)
+			{
+				lIDs = s_BitrateListItem.GetRowData(i);
+
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+				lTsID = parseInt(lTmpVar.value, 10);
+				if (lTsID < 0 || lTsID > 65535)
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					return;
+				}
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				lONID = parseInt(lTmpVar.value, 10);
+				if (lONID < 0 || lONID > 65535)
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					return;
+				}
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 3);
+				lFreq = parseFloat(lTmpVar.value) * 1000000;
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 4);
+				lMode = JS_UISelectGetCurValue(lTmpVar);
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 5);
+				lSym = parseFloat(lTmpVar.value) * 1000000;
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 6);
+				lFECIn = JS_UISelectGetCurValue(lTmpVar);
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 7);
+				lFECOut = JS_UISelectGetCurValue(lTmpVar);
+
+
+
+				for (k = 0; k < s_IDsArray.length; k++)
+				{
+					if (s_IDsArray[k] == lIDs)
+					{
+						s_IDsArray.splice(k, 1);
+						break;
+					}
+				}
+
+				lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "ts_info");
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "nit_ts_ids", lIDs);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "ts_id", lTsID);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "on_id", lONID);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "delivery_type", "CABLE");
+
+				lSublInforNode = JS_XMLAddNormalChild(lXMLDom, lInforNode, "delivery_info");
+				JS_XMLAddTextChild(lXMLDom, lSublInforNode, "freq", lFreq);
+				JS_XMLAddTextChild(lXMLDom, lSublInforNode, "mode", lMode);
+				JS_XMLAddTextChild(lXMLDom, lSublInforNode, "symbol_rate", lSym);
+				JS_XMLAddTextChild(lXMLDom, lSublInforNode, "fec_inner", lFECIn);
+				JS_XMLAddTextChild(lXMLDom, lSublInforNode, "fec_outer", lFECOut);
+
+			}
+
+
+			lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "remove_nit_tsinfo");
+			for (k = 0; k < s_IDsArray.length; k++)
+			{
+				lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "ts_info");
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "nit_tsinfo_ids", s_IDsArray[k]);
+			}
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+           </td>
+        </tr>
+        <tr>
+            <td height="25px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 30px; padding-top: 5px;">
+                <span><script type="text/javascript">JS_INLAN("net_id")</script></span>&nbsp;&nbsp;<span><input type="text" style="text-align: center; width: 70px" id="net_id" /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span><script type="text/javascript">JS_INLAN("net_name")</script></span>&nbsp;<span><input type="text" style="text-align: center; width: 120px" id="net_name" /></span>&nbsp;&nbsp;&nbsp;&nbsp; <span><script type="text/javascript">JS_INLAN("nit_v")</script></span>&nbsp;<span><input type="text" style="text-align: center; width: 60px" id="nit_version" /></span>&nbsp;&nbsp;&nbsp;&nbsp;<span><script type="text/javascript">JS_INLAN("nit_mark")</script></span>&nbsp;<span><select id="nit_global_mark"><option value="OFF">OFF</option>
+                    <option value="ON">ON</option>
+                </select></span>&nbsp;&nbsp;&nbsp;
+                <!-- 				<span><a target="descriptor_frame" href="mux_right_descriptor.html?type=NIT_NETWORK_DESC">Edit Network Descriptor</a></span> -->
+                <span>
+                    <button style="width: 120px;" onclick="document.getElementById('descriptor_frame').src='mux_right_descriptor.html?type=NIT_NETWORK_DESC';"><script type="text/javascript">JS_INLAN("nit_desc")</script></span></button></span>
+            </td>
+        </tr>
+        <tr>
+            <td height="477px" valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="list_target" style="height: 278px; width: 820px; overflow: auto; padding: 1px 10px 0px 10px; border: solid 0px #FF0000;">
+                </div>
+                <div style="height: 30px; width: 820px; overflow: hidden; padding: 5px 20px 5px 5px; text-align: right; border: solid 0px #0000FF;">
+                    <button type="button" style="width: 80px; height: 25px" id="add_ts" onclick='OnAddNitCableDelivery(0,1,1, 474000000, "64QAM", 6875000, 1, 15, true);'><script type="text/javascript">JS_INCMNLAN("add")</script></button>&nbsp;&nbsp;
+                    <button type="button" style="width: 80px; height: 25px" onclick='OnSelectRemove();'><script type="text/javascript">JS_INCMNLAN("remove")</script></button>&nbsp;&nbsp;
+                    <button type="button" style="width: 80px; height: 25px" id="submit_edit" onclick="OnSubmit();"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+                    <button type="button" style="width: 80px; height: 25px" onclick='location.reload();'><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+                <iframe src="mux_right_descriptor.html?type=NIT_NETWORK_DESC" height="175px" width="820px" frameborder="0" name="descriptor_frame" id="descriptor_frame"></iframe>
+            </td>
+        </tr>
+        <tr>
+            <td height="13px" background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

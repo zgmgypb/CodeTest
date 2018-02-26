@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+	<script type="text/javascript" src="/card/card_language.js"></script>
+	<script type="text/javascript" src="/card/card_system.js"></script>
+    <script type="text/javascript">
+    	var s_CriticalTemp = 90, s_CriticalTempMax = 90, s_CriticalTempMin = 10;
+    	var s_NoTemp;
+    	var s_UpdateTimeout;
+    	var s_ModuleInd;
+
+    	JS_LANInitiate();
+    	JS_CLANInitiate();
+    	JS_CardParamInitiate();
+
+    	function OnAjaxStatusCB(XMLDom)
+    	{   		
+    		if (JS_ISValidObject(XMLDom)) 
+    		{
+    		    lInTotal = parseFloat(JS_XMLGetTagValue(XMLDom, "in_t_rate"));
+    		    lOutTotal = parseFloat(JS_XMLGetTagValue(XMLDom, "out_t_rate"));
+    		    lInValid = parseFloat(JS_XMLGetTagValue(XMLDom, "in_t_rate"));
+    		    lOutValid = parseFloat(JS_XMLGetTagValue(XMLDom, "out_t_rate"));
+    		    lTemp = parseFloat(JS_XMLGetTagValue(XMLDom, "temperature"));
+    		    
+    		    $("temperature").value = lTemp.toFixed(1) + " / " + (lTemp * 9 / 5 + 32).toFixed(1);
+
+    		    if (lTemp > s_CriticalTemp)
+    		    {
+    		        $("temperature").style.color = "red";
+    		    }
+    		    else
+    		    {
+    		        $("temperature").style.color = "green";
+    		    }
+    		    
+    		    
+    		    $("board_io_v").value = JS_BitrateFormatINT(lInValid) + " / " + JS_BitrateFormatINT(lOutValid);
+    		    $("board_io_t").value = JS_BitrateFormatINT(lInTotal) + " / " + JS_BitrateFormatINT(lOutTotal);
+
+    		    lChnArray = JS_XMLGetTagNameArray(XMLDom, "trans_chn");
+    		    if (JS_ISValidObject(lChnArray))
+    		    {
+    		        for (i = 0; i < lChnArray.length; i++)
+    		        {
+    		            lChnObj = lChnArray[i];
+    		            lSubArray = JS_XMLGetTagNameArray(lChnObj, "sub_chn");
+    		            if (JS_ISValidObject(lSubArray))
+    		            {
+    		                for (k = 0; k < lSubArray.length; k++)
+    		                {
+    		                    lSubObj = lSubArray[k];
+    		                    if (JS_XMLGetTagValueINT(lSubObj, "enable") == 1)
+    		                    {
+    		                        if (JS_XMLGetTagValueINT(lSubObj, "in_err") == 1)
+    		                        {
+    		                            $("in_led_" + (i * lSubArray.length + k)).src = "/graphics/red.gif";
+    		                        }
+    		                        else
+    		                        {
+    		                            $("in_led_" + (i * lSubArray.length + k)).src = "/graphics/green.gif";
+    		                        }
+
+    		                        if (JS_XMLGetTagValueINT(lSubObj, "out_err") == 1)
+    		                        {
+    		                            $("out_led_" + (i * lSubArray.length + k)).src = "/graphics/red.gif";
+    		                        }
+    		                        else
+    		                        {
+    		                            $("out_led_" + (i * lSubArray.length + k)).src = "/graphics/green.gif";
+    		                        }
+    		                    }
+    		                    else
+    		                    {
+    		                        $("in_led_" + (i * lSubArray.length + k)).src = "/graphics/grey.gif";
+    		                        $("out_led_" + (i * lSubArray.length + k)).src = "/graphics/grey.gif";
+    		                    }
+    		                    
+    		                }
+    		                
+    		            }
+    		        
+    		        }
+    		    }
+
+
+
+    		}
+    		
+    		s_UpdateTimeout = 15;
+    		setTimeout("OnRequestStatusData()", 1000);
+        }
+
+    	function OnRequestStatusData()
+        {
+            var lXMLDom, lBodyNode;
+            s_UpdateTimeout--;
+            if (s_UpdateTimeout <= 0)
+            {
+                lXMLDom = JS_XMLCreateDomFromFile(null);
+                lBodyHolder = JS_XMLParamSetSubModuleHead(lXMLDom, s_ModuleInd, "monitor_get");
+                JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxStatusCB, false);
+            }
+            else 
+            {
+                //更新页面时间
+                $("time_out_value").innerHTML = JS_StrLeftPading(s_UpdateTimeout, 2);
+                setTimeout("OnRequestStatusData()", 1000);
+            }
+        }
+
+
+        function OnUpdateData(Item)
+        {
+    		s_UpdateTimeout = 0;
+    		$("refresh_data").disabled = true;
+        }
+        
+        function OnSubmit(Item)
+        {
+        	var i, lTmpValue, lHoldVar;
+        	var lIDs, lRowNum, lCriticalTemp, lFanEnaTemp, lFanDisTemp;
+        	var lXMLDom, lBodyNode, lHolderNode, lInfoNode;
+
+        	JS_UISetErrorIndicator($("critical_temp"), true, false);
+
+        	lCriticalTemp = JS_HTMLGetValue($("critical_temp"));
+        	if (lCriticalTemp > s_CriticalTempMax || lCriticalTemp < s_CriticalTempMin)
+        	{
+        		JS_UISetErrorIndicator($("critical_temp"), false, true);
+        		return;
+        	}
+
+        	lXMLDom = JS_XMLCreateDomFromFile(null);
+
+        	lBodyHolder = JS_XMLParamSetSubModuleHead(lXMLDom, s_ModuleInd, "monitor_set");
+
+        	lHolder = JS_XMLAddNormalChild(lXMLDom, lBodyHolder, "monitor");
+        	
+        	JS_XMLAddTextChild(lXMLDom, lHolder, "global_mark", JS_HTMLGetValue($("global_mark")));
+        	JS_XMLAddTextChild(lXMLDom, lHolder, "critical_temp", JS_HTMLGetValue($("critical_temp")));
+
+
+        	JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+        	window.top.document.frames["BottomFrame"].OnShowLoadingWindow(1, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+        }
+        
+    	function OnLoad()
+    	{
+    		var i, lTmpVar;
+    		var lLogArray, lLogObj, lLogInfo;
+
+    		lTmpVar = JS_ArgGetArgs();
+
+
+    		s_ModuleInd = parseInt(JS_ArgGetValueByName(lTmpVar, "module"), 10);
+    		s_ModuleTag = JS_ArgGetValueByName(lTmpVar, "module_tag");
+
+    		$("cur_name").innerHTML = JS_LANCMN("module") + "-" + JS_StrLeftPading(s_ModuleInd + 1, 2);
+
+    		lModuleParam = JS_CardParamGetSubModuleParamNode(s_ModuleInd);
+		    if (JS_ISValidObject(lModuleParam)) 
+		    {
+		        var lHolder;
+		        
+		        lHolder = JS_XMLGetTagNameFirstObj(lModuleParam, "monitor");
+		        
+		        s_CriticalTemp = JS_XMLGetTagValueINT(lHolder, "critical_temp", 10);
+
+		        $("critical_temp").value = s_CriticalTemp;
+		        JS_RestrctInputInt($("critical_temp"));
+		        JS_UISelectSetCurIndexByValue($("global_mark"), JS_XMLGetTagValue(lHolder, "global_mark", true));
+
+		    }
+		    
+		    for (i = 0; i < 3; i++)
+		    {
+	            for (k = 0; k < 2; k++)
+	            {
+	                $("in_" + (i * 2 + k)).innerHTML = JS_LANCMN("chan") + " - " + JS_StrLeftPading(i + 1, 2) + " - " + JS_StrLeftPading(k + 1, 2)
+	                $("out_" + (i * 2 + k)).innerHTML = JS_LANCMN("chan") + " - " + JS_StrLeftPading(i + 1, 2) + " - " + JS_StrLeftPading(k + 1, 2)
+	            }
+		    }
+
+    		s_UpdateTimeout = 0;
+    		setTimeout("OnRequestStatusData()", 500);
+    	}
+
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="30px" colspan="3" align="center" background="/graphics/boxmenu_850.gif">
+                 <table border="0" cellspacing="0" cellpadding="0" width="100%" style="padding-left:20px;padding-right:20px;">
+					<tr>
+						<td width="250px" align="right">
+						</td>
+						<td align="center">
+							<span style="font-weight: bold"><script type="text/javascript" >JS_CINLAN("title")</script></span>
+						</td>
+						<td width="220px" align="right">
+						    <span id="cur_name" ></span>
+						</td>
+						<td width="30px" align="right">
+							<span id="time_out_value">00</span>&nbsp;
+						</td>
+					</tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div style="height:474px; width:360px; overflow: auto; padding: 5px;" >
+                    <table width="100%" border="1px" align="center" cellpadding="10px" cellspacing="2px" style="table-layout: fixed">
+                        <tr>
+                            <td height="25" colspan="2" align="center" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span><script type="text/javascript">JS_INCMNLAN("input")</script></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="in_0"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="in_led_0" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="in_1"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="in_led_1" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="in_2"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="in_led_2" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="in_3"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="in_led_3" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="in_4"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="in_led_4" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="in_5"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="in_led_5" />
+                            </td>
+                        </tr>
+                    </table>
+                    <table width="100%" border="1px" align="center" cellpadding="10px" cellspacing="2px" style="table-layout: fixed">
+                        <tr>
+                            <td height="25" colspan="2" align="center" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span><script type="text/javascript">JS_INCMNLAN("output")</script></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="out_0"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="out_led_0" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="out_1"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="out_led_1" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="out_2"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="out_led_2" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="out_3"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="out_led_3" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="out_4"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="out_led_4" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span id="out_5"></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="out_led_5" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+            <td bgcolor="#F5F9FE" style="padding-top:5px; padding-bottom:5px;">
+				<div style="height:460px; width: 1px; background:#666"></div>
+            </td>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div style="height: 182px; width:360px; overflow: auto; padding:5px;" >
+                    <table width="100%" border="1px" align="center" cellpadding="10px" cellspacing="2px" style="table-layout: fixed">
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span><script type="text/javascript">JS_CINLAN("global_mark")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+                                <select id="global_mark"><option value="0">OFF</option><option value="1">ON</option></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25" align="left" style="padding-left:10px">
+                                <span><script type="text/javascript">JS_CINLAN("critical_temp")</script></span>
+                            </td>
+                            <td align="center">
+                                <input id="critical_temp" type="text" style="width:80px; text-align:center"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+				<div style="height:1px; width:400px;overflow:hidden; background:#666;border-spacing:5px"></div>
+                <div style="height: 280px; width:360px; overflow: auto; padding:5px;" >
+                    <table width="100%" border="1px" align="center" cellpadding="10px" cellspacing="2px" style="table-layout: fixed">
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_CINLAN("temperature")</script><img src="/graphics/cf.gif"> : </span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+                                <input id="temperature" type="text" style="width:80px; text-align:center; color:green;background-color:transparent;border:0px;" value ="--/--" readonly/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_CINLAN("board_io_v")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<input id="board_io_v" style="width:140px; text-align:center;background-color:transparent;;border:0px" value="-----"  readonly/>
+                            </td>
+                        </tr>                      
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_CINLAN("board_io_t")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<input id="board_io_t" style="width:140px; text-align:center;background-color:transparent;;border:0px" value="-----"  readonly/>
+                            </td>
+                        </tr>                      
+                    </table>
+                    
+                </div>
+           </td>
+        </tr>
+        <tr>
+            <td colspan="3" bgcolor="#F5F9FE" align="center" >
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+			<td colspan="3" bgcolor="#F5F9FE">
+				<div style="height: 30px; overflow: auto; padding: 5px 25px 7px 25px; text-align: right">
+				    <table width="100%" align="center" cellpadding="0" cellspacing="0">
+						<tr>
+							<td width="50%" align="left">
+								<button type="button" onclick='OnUpdateData(this);' style="width: 100px; height: 25px" id="refresh_data"><script type="text/javascript">JS_INCMNLAN("update_data")</script></button>&nbsp;&nbsp;
+							</td>
+							<td width="50%" align="right">
+								<button type="button" onclick='OnSubmit(this);' style="width:80px; height:25px"id="submit_pidmap" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="3" height="13"  background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

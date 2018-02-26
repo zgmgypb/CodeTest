@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript">
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		
+	</script>
+	
+</head>
+
+<body>
+    <table width="850px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title"><script type="text/javascript">JS_INLAN("title")</script></td>
+        </tr>
+        <tr>
+            <td height="30px" align="center" bgcolor="#F5F9FE">
+				<div id="head" style="height: 60px; width: 800px; overflow: auto; padding: 10px 20px 0px 10px;">
+					<table width="100%">
+						<tr>
+							<td height="22px" bgcolor="#E4EFF8" width="25%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_info"></span>
+							</td>
+							<td height="20px" bgcolor="#F5F9FE" width="75%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_type"></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="25px" bgcolor="#F5F9FE" width="100%" align="left" style="color: #069; font-size: 10pt;" colspan="2">
+							</td>
+						</tr>
+					</table>
+				</div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="sub_param" style="height: 400px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+       <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" disabled><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

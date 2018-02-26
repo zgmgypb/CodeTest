@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_MosiacListItem = null;
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		function OnLoad()
+		{
+			var lTmpVar, i;
+			var lMosiacArray;
+
+			JS_ParamInitate();
+
+			s_MosiacListItem = new MyListControl("s_MosiacListItem", 820, 400, "list_target", false);
+			s_MosiacListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_MosiacListItem.SetColProperty(1, 80, JS_LANCMN("ts_index"), "center", "center");
+			s_MosiacListItem.SetColProperty(2, 100, JS_LANCMN("service_id"), "center", "center");
+			s_MosiacListItem.SetColProperty(3, 200, JS_LANCMN("service_name"), "center", "center");
+			s_MosiacListItem.SetColProperty(4, 100, JS_LAN("offset"), "center", "center");
+			s_MosiacListItem.SetColProperty(5, 120, JS_LAN("ori_service_id"), "center", "center");
+			s_MosiacListItem.SetColProperty(6, 120, JS_LAN("ori_ts_id"), "center", "center");
+			s_MosiacListItem.UpdateListFrame();
+
+			lMosiacArray = JS_ParamGetMosiacArray();
+			for (i = 0; i < lMosiacArray.length; i++)
+			{
+			    lItemInfo = lMosiacArray[i];
+			    OnAddMosiacRow(lItemInfo.m_InTsInd, lItemInfo.m_ServiceID, lItemInfo.m_ServiceName, lItemInfo.m_Offset, lItemInfo.m_OriServiceID, lItemInfo.m_OriTSID);
+			}
+		}
+
+		function OnAddMosiacRow(InTsInd, ServID, ServName, Offset, OriServID, OriTsID)
+		{
+			var lHolderNode, lACNodeArray, lCAInfo;
+			var i;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.readOnly = true;
+			lHolderNode.value = InTsInd;
+			lHolderNode.defaultValue = lHolderNode.value;
+			s_MosiacListItem.SetColValue(1, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "80px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = ServID;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			s_MosiacListItem.SetColValue(2, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "180px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = ServName;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			s_MosiacListItem.SetColValue(3, lHolderNode);
+			
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "80px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Offset;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = false;
+			s_MosiacListItem.SetColValue(4, lHolderNode);
+			
+			
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "100px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = OriServID;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = false;
+			s_MosiacListItem.SetColValue(5, lHolderNode);
+			
+			
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "100px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = OriTsID;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = false;
+			s_MosiacListItem.SetColValue(6, lHolderNode);
+			
+			s_MosiacListItem.AddRowToDom(false, ServID, false);
+		}
+		
+		function OnValidation() 
+		{
+		    var i, k, lRowNum;
+		    var lTmpVar, lTmpOffset;
+			lRowNum = s_MosiacListItem.GetRowNumber();
+			for (i = 0; i < lRowNum; i++)
+			{
+				lTmpVar = s_MosiacListItem.GetColNodeByIndex(i, 4);
+				lTmpOffset = parseInt(JS_HTMLGetValue(lTmpVar), 10);
+				if (lTmpOffset > 32767 && lTmpOffset < -32767)
+				{
+				    JS_UISetErrorIndicator(lTmpVar, true, false);
+				    return false;
+				}
+			}
+			return true;
+		}
+		
+		function OnSubmit(Item)
+		{
+			var i, k, lRowNum;
+			var lXMLDom, lBodyNode, lHolderNode, lGroupNode;
+
+			if (OnValidation() == false)
+			{
+			    return false;
+			}
+
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "mosiac_setting", "");
+
+			lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "mosiac_gn2000");
+			
+			lRowNum = s_MosiacListItem.GetRowNumber();
+			for (i = 0; i < lRowNum; i++)
+			{
+			    lGroupNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "group");
+
+			    JS_XMLAddTextChild(lXMLDom, lGroupNode, "in_ts_ind", JS_HTMLGetValue(s_MosiacListItem.GetColNodeByIndex(i, 1)));
+			    JS_XMLAddTextChild(lXMLDom, lGroupNode, "service_id", JS_HTMLGetValue(s_MosiacListItem.GetColNodeByIndex(i, 2)));
+			    JS_XMLAddTextChild(lXMLDom, lGroupNode, "service_name", JS_HTMLGetValue(s_MosiacListItem.GetColNodeByIndex(i, 3)));
+			    JS_XMLAddTextChild(lXMLDom, lGroupNode, "offset", JS_HTMLGetValue(s_MosiacListItem.GetColNodeByIndex(i, 4)));
+			    JS_XMLAddTextChild(lXMLDom, lGroupNode, "ori_service_id", JS_HTMLGetValue(s_MosiacListItem.GetColNodeByIndex(i, 5)));
+			    JS_XMLAddTextChild(lXMLDom, lGroupNode, "ori_ts_id", JS_HTMLGetValue(s_MosiacListItem.GetColNodeByIndex(i, 6)));
+			}
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title">
+                <span><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+				<div style="height: 31px; width: 820px; overflow: auto; padding-left: 20px; padding-top: 10px; text-align: left; border: solid 0px #00FF00;">
+				</div>
+				<div id="list_target" style="height: 403px; width: 820px; overflow: auto; padding: 1px 10px 0px 10px; border: solid 0px #FF0000;">
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+			<td valign="top" align="left" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+                </div>
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

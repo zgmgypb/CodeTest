@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/device_setting.js"></script>
+
+	<script type="text/javascript">
+		var s_PortlLow = 100;
+		var s_PortHigh = 65535;
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnLoad()
+		{
+			var lItemInfo;
+			var lLevelArray;
+			var lLevelInfo;
+
+
+			JS_RestrctInputFloat($("remote_ipv4_addr"));
+			JS_RestrctInputInt($("remote_ip_port"));
+
+			JS_DevSettingInitiate();
+
+			lItemInfo = JS_DevGetSyslogInfo();
+			$("syslog_active_mark").value = lItemInfo.m_SyslogActive;
+			$("remote_active_mark").value = lItemInfo.m_RemoteActive;
+			$("remote_ipv4_addr").value = lItemInfo.m_IPv4Addr;
+			$("remote_ip_port").value = lItemInfo.m_IPPort;
+
+			lLevelArray = JS_ParamGetSyslogLevelArray();
+			for (i = 0; i < lLevelArray.length; i++) 
+			{
+				lLevelInfo = JS_ParamGetSyslogLevel(lLevelArray[i]);
+				JS_UISelectAddOption($("log_level_select"), lLevelInfo.m_Value, lLevelInfo.m_Txt);
+			}
+
+			JS_UISelectSetCurIndexByValue($("log_level_select"), lItemInfo.m_LogLevel, true);
+
+			if (lItemInfo.m_SyslogActive == "ON") 
+			{
+			    setTimeout(OnLoadRefreshLog, 1000);
+			}
+			
+		}
+		
+		function OnLoadRefreshLog() 
+		{
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+			lHolderNode = JS_XMLParamSetHead(lXMLDom, "monitor", "refresh_syslog", 0);
+			JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxSyslogContentCB, false);
+		}
+		
+     	function OnAjaxSyslogContentCB(XMLDom)
+     	{
+     		$("log_content").value = XMLDom;
+     	}
+
+
+
+     	function OnSubmit(Item) 
+     	{
+     		var lHolderNode;
+     		var lTmpTarget;
+     		var lValidValue;
+     		var lXMLDom = JS_XMLCreateDomFromFile(null);
+     		if (Item.id == "syslog_manege") 
+     		{
+
+     			JS_UISetErrorIndicator($("remote_ipv4_addr"), true, false);
+     			JS_UISetErrorIndicator($("remote_ip_port"), true, false);
+
+     			lValidValue = JS_HTMLGetValueByID("remote_ipv4_addr");
+     			if (JS_ValidIPv4(lValidValue) != 1) 
+     			{
+     				JS_UISetErrorIndicator($("remote_ipv4_addr"), false, true);
+     				return;
+     			}
+
+     			lValidValue = JS_HTMLGetValueByID("remote_ip_port");
+     			if (JS_ValidPort(lValidValue, s_PortlLow, s_PortHigh) != 1) 
+     			{
+     				JS_UISetErrorIndicator($("remote_ip_port"), false, true);
+     				return false;
+     			}
+
+     			lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "syslog_manage", "");
+
+     			JS_XMLAddTextChild(lXMLDom, lHolderNode, "syslog_active_mark", JS_HTMLGetValueByID("syslog_active_mark"));
+     			JS_XMLAddTextChild(lXMLDom, lHolderNode, "remote_active_mark", JS_HTMLGetValueByID("remote_active_mark"));
+     			JS_XMLAddTextChild(lXMLDom, lHolderNode, "remote_ipv4_addr", JS_HTMLGetValueByID("remote_ipv4_addr"));
+     			JS_XMLAddTextChild(lXMLDom, lHolderNode, "remote_ip_port", JS_HTMLGetValueByID("remote_ip_port"));
+     			JS_XMLAddTextChild(lXMLDom, lHolderNode, "log_level", JS_HTMLGetValueByID("log_level_select"));
+
+
+     			if (JS_HTMLGetValueByID("syslog_active_mark") == "ON") 
+     			{
+     				if (confirm(JS_LANCMN("confirm_reboot")))
+     				{
+     					JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+     					window.top.document.frames["BottomFrame"].OnShowLoadingWindow(50, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+     				}
+     			}
+     			else 
+     			{
+     				JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+     				window.top.document.frames["BottomFrame"].OnShowLoadingWindow(4, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");     	
+     			}
+     		}
+     		else if (Item.id == "refresh_log") 
+     		{
+     			lHolderNode = JS_XMLParamSetHead(lXMLDom, "monitor", "refresh_syslog", 0);
+     			JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxSyslogContentCB, false);
+     		}
+     		else if (Item.id == "clear_log") 
+     		{
+     			$("log_content").value = "";
+     			lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "syslog_clean", 0);
+     			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+     		}
+     	}
+        
+    </script>
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("syslog_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 50%">
+											<span><script type="text/javascript">JS_INLAN("syslog_active")</script></span>
+											<select id="syslog_active_mark">
+												<option value="OFF">OFF</option>
+												<option value="ON">ON</option>
+											</select>&nbsp;&nbsp;&nbsp; 
+										</td>										
+										<td style="text-align: left; width: 50%">
+											<span><script type="text/javascript">JS_INLAN("log_level")</script></span>
+											<select id="log_level_select">
+											</select>&nbsp;&nbsp;&nbsp; 
+										</td>										
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("remote_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 80%">
+											<span><script type="text/javascript">JS_INLAN("remote_ipv4_addr")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px;text-align:center;" id="remote_ipv4_addr" />&nbsp;&nbsp;&nbsp; <span><script type="text/javascript">JS_INLAN("remote_ip_port")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 60px;text-align:center;" id="remote_ip_port" />&nbsp;&nbsp;&nbsp;
+											<span><script type="text/javascript">JS_INLAN("remote_active")</script></span>&nbsp;&nbsp;&nbsp;
+											<select id="remote_active_mark">
+												<option value="OFF">OFF</option>
+												<option value="ON">ON</option>
+											</select>&nbsp;&nbsp;&nbsp;
+										</td>										
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("log_title")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 80%">
+											<textarea rows="2" cols="30" style="width:780px; height:280px; white-space:pre-wrap" id="log_content" readonly></textarea>
+										</td>										
+									</tr>
+									<tr>
+										<td style="text-align: left; width: 80%">
+											<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="refresh_log" ><script type="text/javascript">JS_INLAN("refresh_log")</script></button>&nbsp;&nbsp;
+											<button type="button" onclick='OnSubmit(this);' style="width: 80px; height: 25px" id="clear_log"><script type="text/javascript">JS_INLAN("clear_log")</script></button>
+										</td>										
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="3" height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                    	<tr>
+                    		<td align="left" width="70%">
+                    		</td>
+                     		<td align="right">
+								<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="syslog_manege" ><script type="text/javascript">								                                                                                                   JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">								                                                                                                      JS_INCMNLAN("refresh")</script></button>
+                     		</td>
+                   		</tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

@@ -1,0 +1,639 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+    <script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+    <script type="text/javascript">
+
+        var s_BitrateListItem = null;
+        var s_UpdateTimeout;
+        var s_lItemInfo;
+
+        JS_LANInitiate(); //初始化语言脚本组件
+
+        function OnLoad()
+        {
+            var i;
+
+            JS_ParamInitate();
+
+            s_lItemInfo = JS_ParamGetSFNAInfo();
+
+            $("sfn_max_bitrate").value = (s_lItemInfo.m_MaxBitrate / 1000000).toFixed(6);
+            
+            if (JS_ParamCheckGNS())
+            {
+                JS_UISelectAddOption($("sfn_ex1pps_mark"), "OFF", JS_LAN("internal_1pps"));
+            }
+            JS_UISelectAddOption($("sfn_ex1pps_mark"), "ON", JS_LAN("external_1pps"));
+
+            JS_UISelectSetCurIndexByValue($("sfn_10m_sel"), s_lItemInfo.m_SFN10MSel, true);
+            JS_UISelectSetCurIndexByValue($("sfn_ex1pps_mark"), s_lItemInfo.m_SFNEx1PPSMark, true);
+
+            JS_UISelectSetCurIndexByValue($("sfn_carrier_mode"), s_lItemInfo.m_CMode, true);
+            JS_UISelectSetCurIndexByValue($("sfn_code_rate"), s_lItemInfo.m_CodeRate, true);
+            JS_UISelectSetCurIndexByValue($("sfn_constellation"), s_lItemInfo.m_Constellation, true);
+            JS_UISelectSetCurIndexByValue($("sfn_pn_mode"), s_lItemInfo.m_PNMode, true);
+            JS_UISelectSetCurIndexByValue($("sfn_ti_mode"), s_lItemInfo.m_TIMode, true);
+            JS_UISelectSetCurIndexByValue($("sfn_dp"), s_lItemInfo.m_DP, true);
+            
+            $("sfn_max_delay_100ns").value = (s_lItemInfo.m_SFNMaxDelay100NS / 10).toFixed(1);
+            
+            lSelObj = $("sfn_input_asi_mod");
+            JS_UISelectAddOption(lSelObj, 1, "ASI 1");
+            JS_UISelectAddOption(lSelObj, 2, "ASI 2");
+            JS_UISelectAddOption(lSelObj, 3, "AUTO");
+            JS_UISelectSetCurIndexByValue(lSelObj, s_lItemInfo.m_SFNTsInd, true);
+            
+
+
+            JS_UISelectSetCurIndexByValue($("sfn_sat_mark"), s_lItemInfo.m_SFNSatMark, true);
+            $("sfn_sat_null_pid").value = s_lItemInfo.m_SFNSatNullPID;
+
+
+            s_BitrateListItem = new MyListControl("s_BitrateListItem", 770, 147, "list_target", false);
+
+            s_BitrateListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+            s_BitrateListItem.SetColProperty(1, 140, JS_LAN("indv_addr"), "center", "center");
+            s_BitrateListItem.SetColProperty(2, 140, JS_LAN("indv_freq_offset_hz"), "center", "center");
+            s_BitrateListItem.SetColProperty(3, 140, JS_LAN("indv_delay"), "center", "center");
+            s_BitrateListItem.SetColProperty(4, 170, JS_LAN("indv_power"), "center", "center");
+            s_BitrateListItem.SetColProperty(5, 80, JS_LAN("mark"), "center", "center");
+            s_BitrateListItem.UpdateListFrame();
+
+            for (i = 0; i < s_lItemInfo.m_SFNINDVArray.length; i++)
+            {
+                lItemInfo = JS_ParamGetSFNAINDVInfo(s_lItemInfo.m_SFNINDVArray[i]);
+                OnAddIndvRow(i, lItemInfo, false);
+            }
+           
+            s_UpdateTimeout = 0;
+            setTimeout("OnRequestData()", 2000);
+        }
+        
+        function OnAddIndvRow(IDs, ItemInfo, bView)
+        {
+            var lHolderNode
+            var lHtmlContainer;
+
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.style.width = "120px";
+            lHolderNode.value = ItemInfo.m_Addr.toString(16).toUpperCase();
+            lHolderNode.id = "indv_addr" + IDs;
+            lHolderNode.defaultValue = lHolderNode.value;
+            JS_RestrctInputHEX(lHolderNode);
+            s_BitrateListItem.SetColValue(1, lHolderNode);
+            
+            
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.style.width = "120px";
+            lHolderNode.value = ItemInfo.m_FreqOffsetHz;
+            lHolderNode.id = "indv_freq_offset_hz" + IDs;
+            lHolderNode.defaultValue = lHolderNode.value;
+            JS_RestrctInputInt(lHolderNode);
+            s_BitrateListItem.SetColValue(2, lHolderNode);
+            
+            
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.style.width = "120px";
+            lHolderNode.value = (ItemInfo.m_Delay / 10).toFixed(1);
+            lHolderNode.id = "indv_delay" + IDs;
+            lHolderNode.defaultValue = lHolderNode.value;
+            JS_RestrctInputFloat(lHolderNode);
+            s_BitrateListItem.SetColValue(3, lHolderNode);
+
+
+            lHtmlContainer = document.createElement("div");
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.style.width = "100px";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.value = ItemInfo.m_Power;
+            lHolderNode.defaultValue = lHolderNode.value;
+            lHolderNode.id = "indv_power" + IDs;
+            JS_RestrctInputInt(lHolderNode);
+            lHtmlContainer.appendChild(lHolderNode);
+            lHolderNode = document.createElement("span");
+            lHolderNode.innerHTML = ":";
+            lHtmlContainer.appendChild(lHolderNode);
+            lHolderNode = JS_UISelectCreate();
+            JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+            JS_UISelectAddOption(lHolderNode, "ON", "ON");
+            JS_UISelectSetCurIndexByValue(lHolderNode, ItemInfo.m_PowMark, true);
+            lHolderNode.style.height = "18px";
+            lHolderNode.id = "indv_power_mark" + IDs;
+            lHtmlContainer.appendChild(lHolderNode);
+            s_BitrateListItem.SetColValue(4, lHtmlContainer);
+
+            lHolderNode = JS_UISelectCreate();
+            JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+            JS_UISelectAddOption(lHolderNode, "ON", "ON");
+            JS_UISelectSetCurIndexByValue(lHolderNode, ItemInfo.m_ActiveMark, true);
+            lHolderNode.style.height = "18px";
+            lHolderNode.id = "active_mark" + IDs;
+            s_BitrateListItem.SetColValue(5, lHolderNode);
+            
+            
+
+
+            s_BitrateListItem.AddRowToDom(false, IDs, bView);
+
+
+        }
+
+        function OnAjaxCB(XMLDom)
+        {
+            var i;
+            var lTmpValue;
+
+
+            if (XMLDom != null)
+            {
+               
+                if (JS_XMLGetTagValue(XMLDom, "sfn_ext10m_status") == "ON") 
+                {
+                    $("sfn_ext10m_status").src="/graphics/green.gif";
+                }
+                else
+                {
+                    if (s_lItemInfo.m_SFN10MSel == '1')
+                    {
+                        $("sfn_ext10m_status").src="/graphics/red.gif";
+                    }
+                }
+                
+                
+               if (JS_XMLGetTagValue(XMLDom, "sfn_int10m_status") == "ON") 
+                {
+                    $("sfn_int10m_status").src="/graphics/green.gif";
+                }
+                else
+                {
+                    $("sfn_int10m_status").src="/graphics/red.gif";
+                }
+                
+                if (JS_XMLGetTagValue(XMLDom, "sfn_ext1pps_status") == "ON") 
+                {
+                    $("sfn_ext1pps_status").src="/graphics/green.gif";
+                }
+                else
+                {
+                    if (s_lItemInfo.m_SFNEx1PPSMark == "ON")
+                    {
+                       $("sfn_ext1pps_status").src="/graphics/red.gif";
+                    }
+                }
+                
+                if (JS_XMLGetTagValue(XMLDom, "sfn_int1pps_status") == "ON") 
+                {
+                    $("sfn_int1pps_status").src = "/graphics/green.gif";
+                }
+                else
+                {
+                    if ((s_lItemInfo.m_SFNEx1PPSMark == "OFF") && (JS_ParamCheckGNS() == true))
+                    {
+                        $("sfn_int1pps_status").src = "/graphics/red.gif";
+                    }
+                }
+                
+                if (JS_XMLGetTagValue(XMLDom, "sfn_10m_lock_status") == "ON")
+                {
+                    $("sfn_10m_lock_status").src = "/graphics/green.gif";
+                }
+                else
+                {
+                    $("sfn_10m_lock_status").src = "/graphics/red.gif";
+                }
+                
+                
+                if (JS_XMLGetTagValue(XMLDom, "asi0_status") == "ON") 
+                {
+                    $("asi0_status").src="/graphics/green.gif";
+                }
+                else
+                {
+                    $("asi0_status").src="/graphics/red.gif";
+                }
+                
+                
+                if (JS_XMLGetTagValue(XMLDom, "asi1_status") == "ON") 
+                {
+                    $("asi1_status").src="/graphics/green.gif";
+                }
+                else
+                {
+                    $("asi1_status").src="/graphics/red.gif";
+                }
+                
+                s_UpdateTimeout = 3;
+                setTimeout("OnRequestData()", 1000);
+            }
+        }
+
+        function OnRequestData()
+        {
+            var lXMLDom, lBodyNode;
+            s_UpdateTimeout--;
+            if (s_UpdateTimeout < 0)
+            {
+                lXMLDom = JS_XMLCreateDomFromFile(null);
+                lBodyNode = JS_XMLParamSetHead(lXMLDom, "status", "sfna_status", "");
+                JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxCB, false);
+            }
+            else
+            {
+                //更新页面时间
+                //		        $("time_out_value").innerHTML = JS_StrLeftPading(s_UpdateTimeout, 2);
+                setTimeout("OnRequestData()", 1000);
+            }
+        }
+
+        function OnSubmit(Item)
+        {
+            var lTmpValue;
+            var lHolderNode;
+            var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+            lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "sfn_adaptor_setting", "");
+
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_10m_sel", JS_UISelectGetCurValue($("sfn_10m_sel")));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_ex1pps_mark", JS_UISelectGetCurValue($("sfn_ex1pps_mark")));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_input_asi_mod", parseInt($("sfn_input_asi_mod").value, 10));
+            
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_max_delay_100ns", parseFloat(JS_HTMLGetValueByID("sfn_max_delay_100ns")) * 10);
+            
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_carrier_mode", JS_HTMLGetValueByID("sfn_carrier_mode"));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_code_rate", JS_HTMLGetValueByID("sfn_code_rate"));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_constellation", JS_HTMLGetValueByID("sfn_constellation"));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_pn_mode", JS_HTMLGetValueByID("sfn_pn_mode"));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_ti_mode", JS_HTMLGetValueByID("sfn_ti_mode"));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_dp", JS_HTMLGetValueByID("sfn_dp"));
+           
+
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_sat_null_pid", parseInt($("sfn_sat_null_pid").value, 10));
+            JS_XMLAddTextChild(lXMLDom, lBodyNode, "sfn_sat_mark", JS_UISelectGetCurValue($("sfn_sat_mark")));
+
+
+            for (i = 0; i < s_lItemInfo.m_SFNINDVArray.length; i++)
+            {
+                lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "sfn_indv_node");
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "indv_addr", parseInt(JS_HTMLGetValueByID("indv_addr" + i), 16));
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "indv_freq_offset_hz", parseFloat(JS_HTMLGetValueByID("indv_freq_offset_hz" + i)));
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "indv_delay", parseFloat(JS_HTMLGetValueByID("indv_delay" + i)) * 10);
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "indv_power", parseInt(JS_HTMLGetValueByID("indv_power" + i), 10));
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "indv_power_mark", JS_HTMLGetValueByID("indv_power_mark" + i));
+                JS_XMLAddTextChild(lXMLDom, lHolderNode, "active_mark", JS_HTMLGetValueByID("active_mark" + i));
+            }
+            
+
+            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+        }
+
+        function OnDataChange() 
+        {
+            var lMode;
+            
+            lMode = parseInt(JS_UISelectGetCurValue($("sfn_modle")), 10);
+            
+            switch(lMode) 
+            {
+                case 1:
+                    {
+                        JS_UISelectSetCurIndexByValue($("sfn_carrier_mode"), "C3780");
+                        JS_UISelectSetCurIndexByValue($("sfn_code_rate"), "0.4");
+                        JS_UISelectSetCurIndexByValue($("sfn_constellation"), "16QAM");
+                        JS_UISelectSetCurIndexByValue($("sfn_pn_mode"), "PN945C");
+                        JS_UISelectSetCurIndexByValue($("sfn_ti_mode"), "M720");
+                        JS_UISelectSetCurIndexByValue($("sfn_dp"), "SP");
+                    }
+                    break;
+                case 2:
+                    {
+                        JS_UISelectSetCurIndexByValue($("sfn_carrier_mode"), "C1");
+                        JS_UISelectSetCurIndexByValue($("sfn_code_rate"), "0.8");
+                        JS_UISelectSetCurIndexByValue($("sfn_constellation"), "4QAM");
+                        JS_UISelectSetCurIndexByValue($("sfn_pn_mode"), "PN595");
+                        JS_UISelectSetCurIndexByValue($("sfn_ti_mode"), "M720");
+                        JS_UISelectSetCurIndexByValue($("sfn_dp"), "SP");
+                    }
+                    break;
+                case 3:
+                    {
+                        JS_UISelectSetCurIndexByValue($("sfn_carrier_mode"), "C3780");
+                        JS_UISelectSetCurIndexByValue($("sfn_code_rate"), "0.6");
+                        JS_UISelectSetCurIndexByValue($("sfn_constellation"), "16QAM");
+                        JS_UISelectSetCurIndexByValue($("sfn_pn_mode"), "PN945C");
+                        JS_UISelectSetCurIndexByValue($("sfn_ti_mode"), "M720");
+                        JS_UISelectSetCurIndexByValue($("sfn_dp"), "SP");
+                   }
+                    break;
+                case 4:
+                    {
+                        JS_UISelectSetCurIndexByValue($("sfn_carrier_mode"), "C1");
+                        JS_UISelectSetCurIndexByValue($("sfn_code_rate"), "0.8");
+                        JS_UISelectSetCurIndexByValue($("sfn_constellation"), "16QAM");
+                        JS_UISelectSetCurIndexByValue($("sfn_pn_mode"), "PN595");
+                        JS_UISelectSetCurIndexByValue($("sfn_ti_mode"), "M720");
+                        JS_UISelectSetCurIndexByValue($("sfn_dp"), "SP");
+                    }
+                    break;
+                case 5:
+                    {
+                        JS_UISelectSetCurIndexByValue($("sfn_carrier_mode"), "C3780");
+                        JS_UISelectSetCurIndexByValue($("sfn_code_rate"), "0.8");
+                        JS_UISelectSetCurIndexByValue($("sfn_constellation"), "16QAM");
+                        JS_UISelectSetCurIndexByValue($("sfn_pn_mode"), "PN420C");
+                        JS_UISelectSetCurIndexByValue($("sfn_ti_mode"), "M720");
+                        JS_UISelectSetCurIndexByValue($("sfn_dp"), "SP");
+                    }
+                    break;
+                case 6:
+                    {
+                        JS_UISelectSetCurIndexByValue($("sfn_carrier_mode"), "C3780");
+                        JS_UISelectSetCurIndexByValue($("sfn_code_rate"), "0.6");
+                        JS_UISelectSetCurIndexByValue($("sfn_constellation"), "64QAM");
+                        JS_UISelectSetCurIndexByValue($("sfn_pn_mode"), "PN420C");
+                        JS_UISelectSetCurIndexByValue($("sfn_ti_mode"), "M720");
+                        JS_UISelectSetCurIndexByValue($("sfn_dp"), "SP");
+                    }
+                    break;
+                case 7:
+                    {
+                        JS_UISelectSetCurIndexByValue($("sfn_carrier_mode"), "C1");
+                        JS_UISelectSetCurIndexByValue($("sfn_code_rate"), "0.8");
+                        JS_UISelectSetCurIndexByValue($("sfn_constellation"), "32QAM");
+                        JS_UISelectSetCurIndexByValue($("sfn_pn_mode"), "PN595");
+                        JS_UISelectSetCurIndexByValue($("sfn_ti_mode"), "M720");
+                        JS_UISelectSetCurIndexByValue($("sfn_dp"), "SP");
+                    }
+                    break;
+                default:
+            }
+        
+        }
+        
+		function OnKeyBoard(Val)
+		{
+		     if(Val==13)
+		     {
+		         $("submit").onclick();
+		     }
+		}
+    </script>
+
+</head>
+<body onload="OnLoad()" onkeydown="OnKeyBoard(event.keyCode)">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+				<span><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td  bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 50%">
+								            <span><script type="text/javascript">JS_INLAN("sfn_setting")</script></span>
+										</td>
+										<td style="text-align: right; width: 50%">
+										    <span><script type="text/javascript">JS_INLAN("sfn_max_bitrate")</script></span>
+                                            <input type="text" id="sfn_max_bitrate" style='width: 100px;text-align:center;' readOnly/> Mbps
+                                        </td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 20%">
+											<span><script type="text/javascript">JS_INLAN("sfn_input_asi_mod")</script></span>
+											<select id="sfn_input_asi_mod">
+											</select>
+										</td>
+										<td style="text-align: left; width: 80%">
+											<select id="sfn_carrier_mode">
+											    <option value="C1">C1</option>
+											    <option value="C3780">C3780</option>
+											</select>
+											<select id="sfn_code_rate">
+											    <option value="0.4">0.4</option>
+											    <option value="0.6">0.6</option>
+											    <option value="0.8">0.8</option>
+											</select>
+											<select id="sfn_constellation">
+											    <option value="4QAMNR">4QAM-NR</option>
+											    <option value="4QAM">4QAM</option>
+											    <option value="16QAM">16QAM</option>
+											    <option value="32QAM">32QAM</option>
+											    <option value="64QAM">64QAM</option>
+											</select>
+											<select id="sfn_pn_mode">
+											    <option value="PN420">PN420</option>
+											    <option value="PN420C">PN420C</option>
+											    <option value="PN595">PN595</option>
+											    <option value="PN945">PN945</option>
+											    <option value="PN945C">PN945C</option>
+											</select>
+											<select id="sfn_ti_mode">
+											    <option value="M240">M240</option>
+											    <option value="M720">M720</option>
+											</select>
+											<select id="sfn_dp">
+											    <option value="DP">Double Pilot</option>
+											    <option value="SP">Single Pilot</option>
+											</select>
+										</td>
+										<td style="text-align: left; width: 25%">
+											<select id="sfn_modle" onchange="OnDataChange()">
+											    <option value="1">1</option>
+											    <option value="2">2</option>
+											    <option value="3">3</option>
+											    <option value="4">4</option>
+											    <option value="5">5</option>
+											    <option value="6">6</option>
+											    <option value="7">7</option>
+											</select>
+										</td>
+										<td style="text-align: left; width: 25%">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("sfn_clock_ref")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 50%">
+											<span><script type="text/javascript">JS_INLAN("sfn_10m_sel")</script></span>
+											<select id="sfn_10m_sel">
+											    <option value=0><script type="text/javascript">JS_INLAN("internal_10m")</script></option>
+											    <option value=1><script type="text/javascript">JS_INLAN("external_10m")</script></option>
+											    <option value=2><script type="text/javascript">JS_INLAN("a1pps_source")</script></option>
+											</select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 50%">
+											<span><script type="text/javascript">JS_INLAN("sfn_ex1pps_mark")</script></span>
+											<select id="sfn_ex1pps_mark">
+											</select>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+												
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("input_status")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 10%">
+											<span><script type="text/javascript">JS_INLAN("asi0_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="asi0_status" >
+										</td>
+										<td style="text-align: left; width: 10%">
+											<span><script type="text/javascript">JS_INLAN("asi1_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="asi1_status" >
+										</td>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("sfn_int1pps_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="sfn_int1pps_status" >
+										</td>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("sfn_ext1pps_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="sfn_ext1pps_status" >
+										</td>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("sfn_int10m_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="sfn_int10m_status" >
+										</td>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("sfn_ext10m_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="sfn_ext10m_status" >
+										</td>
+										<td style="text-align: left; width: 16%">
+											<span><script type="text/javascript">JS_INLAN("sfn_10m_lock_status")</script></span>
+											<img src="/graphics/grey.gif" width="25px" height="25px" style="" id="sfn_10m_lock_status" >
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("sfn_sat")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 15%">
+											<span><script type="text/javascript">JS_INLAN("sfn_sat_mark")</script></span>
+											<select id="sfn_sat_mark">
+											    <option value="OFF">OFF</option>
+											    <option value="ON">ON</option>
+											</select>
+										</td>
+										<td style="text-align: left; width: 27%">
+											<span><script type="text/javascript">JS_INLAN("sfn_sat_null_pid")</script></span>
+											<input type="text" id="sfn_sat_null_pid" style='width: 80px;text-align:center;' />
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 100%">
+								            <span><script type="text/javascript">JS_INLAN("sfn_indv_sip_info")</script></span>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 100%">
+											<span><script type="text/javascript">JS_INLAN("sfn_max_delay_100ns")</script></span>
+											<input type="text" id="sfn_max_delay_100ns" style='width: 80px;text-align:center;' />
+										</td>
+									</tr>
+									<tr>
+										<td style="text-align: left; width: 100%" id="list_target">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+            <td colspan="3" height="30px" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+    <script type="text/javascript" src="/js/common_process.js"></script>
+
+    <script type="text/javascript" src="/js/language.js"></script>
+
+    <script type="text/javascript" src="/js/system_parameter.js"></script>
+
+    <script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+    <script type="text/javascript">
+        var s_BitrateListItem;
+        var s_TsIndex = null;
+        var s_OutIndex = 0;
+        var s_NameMaxByteSize = 31;
+        var s_ServArray;
+        
+
+        JS_LANInitiate(); //初始化语言脚本组件
+        JS_ParamInitate();
+        
+        function OnLoad() 
+        {
+            var i, j, k;
+            var lTmpVar, lChnObj, lSubObj, lChnInfo, lSubInfo, lSUBArray, lServArray, lETHServArray;
+            var lETHSubObj, lETHSubInfo, lInServInfo, lOutServInfo, lServInInfo, lServIO;
+            var lServID, lServInfo, lServObj;
+            var lOutSUBInfo;
+            var lServIndex = 0;
+            var lOutChannelNum;
+            lTmpVar = JS_ArgGetArgs();
+
+            s_BitrateListItem = new MyListControl("s_BitrateListItem", 830, 407, "sub_param", false);
+            s_BitrateListItem.SetColProperty(0, 50, JS_LANCMN("index"), "center", "center");
+            s_BitrateListItem.SetColProperty(1, 110, JS_LAN("out_ts"), "center", "center");
+            s_BitrateListItem.SetColProperty(2, 120, JS_LAN("service_name"), "center", "center");
+            s_BitrateListItem.SetColProperty(3, 110, JS_LAN("service_id"), "center", "center");
+            s_BitrateListItem.SetColProperty(4, 20, "", "center", "center");
+            s_BitrateListItem.SetColProperty(5, 110, JS_LAN("in_ts"), "center", "center");
+            s_BitrateListItem.SetColProperty(6, 100, JS_LAN("service_name"), "center", "center");
+            s_BitrateListItem.SetColProperty(7, 90, JS_LAN("service_id"), "center", "center");
+            s_BitrateListItem.UpdateListFrame();
+            
+            
+            
+            s_ServArray = JS_ParamGetServArray();
+            for (k = 0; k < s_ServArray.length; k++) 
+            {
+                lServObj = s_ServArray[k];
+                lServInInfo = JS_ParamGetServiceInfo(lServObj, true);
+                lServInfo = JS_ParamGetServiceInfo(lServObj, false);
+
+                lServIO = JS_ParamGetServiceIO(lServObj);
+                
+                lServInfo.m_ServName = lServInfo.m_ServName.replace(/(["])/g, '&#34;');
+                lServInInfo.m_ServName = lServInInfo.m_ServName.replace(/(["])/g, '&#34;');
+                if (lServIO.m_OutTsIndex >= 0) 
+                {
+                    AddETHOutRow(lServInfo.m_IDs, lServIO.m_OutTsIndex, lServInfo.m_ServName, lServInfo.m_ServID, lServIO.m_InTsIndex, lServInInfo.m_ServName, lServInInfo.m_ServID);
+                }
+            }
+        }
+
+
+
+
+        function AddETHOutRow(ServIds, TsIndex, ServiceName, ServiceID, InTsIndex, InServiceName, InServiceID) 
+	    {
+	        var i;
+	        var lHolderNode;
+	        var lContainer;
+
+	        lHolderNode = document.createElement("input");
+	        lHolderNode.type = "text";
+	        lHolderNode.style.width = "80px";
+	        lHolderNode.style.textAlign = "center";
+	        if (TsIndex >= 0)
+	        {
+	            lHolderNode.value = JS_StrLeftPading(TsIndex + 1, 0);
+	        }
+	        else
+	        {
+	            lHolderNode.value = "----";
+	        }
+	        
+	        lHolderNode.defaultValue = lHolderNode.value;
+	        lHolderNode.readOnly = true;
+	        lHolderNode.id = "out_ts_" + ServIds;
+	        lHolderNode.name = "ts_index";
+	        s_BitrateListItem.SetColValue(1, lHolderNode);
+
+	       
+	        lHolderNode = document.createElement("input");
+	        lHolderNode.type = "text";
+	        lHolderNode.style.width = "100px";
+	        lHolderNode.style.textAlign = "center";
+	        lHolderNode.value = ServiceName;
+	        lHolderNode.defaultValue = lHolderNode.value;
+	        lHolderNode.id = "out_service_name_" + ServIds;
+	        //lHolderNode.readOnly = true;
+
+	        s_BitrateListItem.SetColValue(2, lHolderNode);
+	        
+	        
+	        lHolderNode = document.createElement("input");
+	        lHolderNode.type = "text";
+	        lHolderNode.style.width = "90px";
+	        lHolderNode.style.textAlign = "center";
+	        //lHolderNode.disabled = Disabled;
+	        lHolderNode.style.height = "18px";
+	        lHolderNode.id = "out_service_id_" + ServIds;
+	        lHolderNode.value = ServiceID;
+	        lHolderNode.defaultValue = lHolderNode.value;
+	        JS_RestrctInputInt(lHolderNode);	
+	        s_BitrateListItem.SetColValue(3, lHolderNode);
+	        
+//	        lHolderNode = document.createElement("input");
+//	        lHolderNode.type = "text";
+//	        lHolderNode.style.width = "60px";
+//	        lHolderNode.style.textAlign = "center";
+//	        //lHolderNode.disabled = Disabled;
+//	        lHolderNode.style.height = "18px";
+//	        lHolderNode.id = "out_port_" + ServIds;
+//	        lHolderNode.value = Port;
+//	        lHolderNode.readOnly = true;	        
+//	        lHolderNode.defaultValue = lHolderNode.value;
+//	        s_BitrateListItem.SetColValue(4, lHolderNode);
+
+	        lHolderNode = document.createElement("input");
+	        lHolderNode.type = "text";
+	        lHolderNode.style.width = "80px";
+	        lHolderNode.style.textAlign = "center";
+	        //lHolderNode.disabled = Disabled;
+	        lHolderNode.style.height = "18px";
+	        lHolderNode.id = "in_ts_" + ServIds;
+	        lHolderNode.value = JS_StrLeftPading(InTsIndex + 1, 0);
+	        lHolderNode.readOnly = true;
+	        lHolderNode.defaultValue = lHolderNode.value;
+
+	        s_BitrateListItem.SetColValue(5, lHolderNode);
+
+
+	        lHolderNode = document.createElement("input");
+	        lHolderNode.type = "text";
+	        lHolderNode.style.width = "80px";
+	        lHolderNode.style.textAlign = "center";
+	        //lHolderNode.disabled = Disabled;
+	        lHolderNode.style.height = "18px";
+	        lHolderNode.id = "in_service_name_" + ServIds;
+	        lHolderNode.value = InServiceName;
+	        lHolderNode.readOnly = true;
+	        lHolderNode.defaultValue = lHolderNode.value;
+	        s_BitrateListItem.SetColValue(6, lHolderNode);
+
+
+	        lHolderNode = document.createElement("input");
+	        lHolderNode.type = "text";
+	        lHolderNode.style.width = "60px";
+	        lHolderNode.style.textAlign = "center";
+	        //lHolderNode.disabled = Disabled;
+	        lHolderNode.style.height = "18px";
+	        lHolderNode.id = "in_service_id_" + ServIds;
+	        lHolderNode.value = InServiceID;
+	        lHolderNode.readOnly = true;
+	        lHolderNode.defaultValue = lHolderNode.value;
+
+	        s_BitrateListItem.SetColValue(7, lHolderNode); 
+            s_BitrateListItem.AddRowToDom(false);
+	    }
+
+
+	    function OnSortByServiceID(a, b)
+	     {
+	        var lServInfoA, lServInfoB;
+	        lServInfoA = JS_ParamGetServiceInfo(a, true);
+	        lServInfoB = JS_ParamGetServiceInfo(b, true);
+	        return lServInfoA.m_ServID - lServInfoB.m_ServID;
+	    }
+
+
+	    function OnValidation(Item) 
+	    {
+	        var i, j, k;
+	        var lRowNum, lOutTsIndex, lServNum;
+	        var lServArray;
+	        var lTmpValue, lTmpServiceIdSloe, lTmpIndex, lServiceId;
+	        var c, lOutTsNode, lServiceIDNode, lServNameNode;
+	        lRowNum = s_BitrateListItem.GetRowNumber();
+	        for (i = 0; i < lRowNum; i++) 
+	        {
+
+	            lTmpNode = s_BitrateListItem.GetColNodeByIndex(i, 3);
+	            JS_UISetErrorIndicatorByID(lTmpNode.id, true, false);
+
+	        }
+
+	        for (i = 0; i < lRowNum; i++) 
+	        {
+	            lServiceIDNode = s_BitrateListItem.GetColNodeByIndex(i, 3);
+	            lServiceId = parseInt(lServiceIDNode.value, 10);
+	            if ((lServiceId < 1) || (lServiceId > 65535) || (lServiceIDNode.value == "")) 
+	            {
+	                JS_UISetErrorIndicatorByID(lServiceIDNode.id, false, false);
+	                return false;
+	            }
+	            lServNameNode = s_BitrateListItem.GetColNodeByIndex(i, 2);
+	            if (JS_HTMLStringByteLength(lServNameNode.value) > s_NameMaxByteSize) 
+	            {
+	                JS_UISetErrorIndicatorByID(lServNameNode.id, false, false);
+	                return false;
+	            }
+
+
+	        }
+
+	    }
+
+
+	    function OnAnalyse(Item) 
+	    {
+	        var lTmpValue;
+	        var lBodyNode, lHolderNode;
+	        var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+	        if (Item.id == "submit_all_analyse") 
+	        {
+	            lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "input_batch_analyse", "");
+
+	            lTmpValue = parseInt(JS_HTMLGetValueByID("analyse_timeout"), 10)
+	            if (lTmpValue < 800 || lTmpValue > 5000) 
+	            {
+	                lTmpValue = 1200;
+	            }
+	            JS_XMLAddTextChild(lXMLDom, lBodyNode, "analyse_timeout", lTmpValue);
+	            JS_XMLAddTextChild(lXMLDom, lBodyNode, "analyse_remove_service", JS_HTMLGetValueByID("remove_service"));
+	            JS_XMLAddTextChild(lXMLDom, lBodyNode, "charset", JS_HTMLGetValueByID("charset"));
+	            JS_XMLAddTextChild(lXMLDom, lBodyNode, "remux_service", JS_HTMLGetValueByID("remux_service"));
+
+	            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+
+	        }
+
+	    }
+
+
+
+	    function OnSubmit(Item) 
+	    {
+	        var i, j, k, lServIndex = 0;
+	        var lBodyNode, lHolderNode;
+	        var lChnObj, lChannelType;
+	        var lSubChannelNum, lSUBObj, lSUBInfo;
+	        var lServID, lServInfo, lServObj;
+	        var lServArray;
+	        var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+	        var lRowNum, lTmpValue;
+	        if (OnValidation() == false) 
+	        {
+	            return;
+	        }
+
+	        lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "batch_output_service_config", "");
+
+	        for (j = 0; j < s_ServArray.length; j++) 
+	        {
+	            lServObj = s_ServArray[j];
+	            lServInfo = JS_ParamGetServiceInfo(lServObj, false);  
+	            
+	            lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "serv_ids");
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "serv_ids", lServInfo.m_IDs);
+	            lTmpValue = JS_HTMLGetValueByID("out_ts_" + lServInfo.m_IDs);
+	            if (lTmpValue == "----")
+	            {
+	                lTmpValue = -1;
+	            }
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "out_ts_index", lTmpValue);
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "out_service_name", JS_HTMLGetValueByID("out_service_name_" + lServInfo.m_IDs));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "out_service_id", JS_HTMLGetValueByID("out_service_id_" + lServInfo.m_IDs));
+
+	        }
+	        JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	        window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+
+	    }
+        
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0"
+        id="table_whole">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title">
+
+                <script type="text/javascript">                    JS_INLAN("title")</script>
+
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="sub_param" style="height: 400px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+                <div style="height: 1px; width: 800px; overflow: hidden; background: #666">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+      <!--
+                <div style="height: 30px; width: 820px; overflow: auto; padding: 5px 20px 5px 2px;
+                    text-align: right">
+                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                        <tr>
+                            <td style="text-align: left;">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span> <script type="text/javascript"> JS_INLAN("anay_timeout")</script></span>&nbsp;<input id="analyse_timeout" type="text" style="text-align: center;width:35px" value="1500" />&nbsp;&nbsp;&nbsp;<span><script type="text/javascript"> JS_INLAN("anay_charset")</script></span>&nbsp;
+                                    <select id="charset"><option value="1">LATIN</option><option value="2">GB2312</option><option value="3">UTF-8</option></select>&nbsp;&nbsp; 
+                                    &nbsp;<span><script type="text/javascript"> JS_INLAN("clear_when_failed")</script></span>&nbsp;<select id="remove_service"><option selected value="OFF">OFF</option> <option value="ON">ON</option></select>
+                                    &nbsp;&nbsp;&nbsp;<span><script type="text/javascript"> JS_INLAN("remux_service")</script></span>&nbsp;<select id="remux_service"><option selected value="OFF">OFF</option> <option value="ON">ON</option></select>                                
+                            </td>
+                            <td style="text-align:right;">
+                              <button type="button" id="submit_all_analyse" onclick="OnAnalyse(this);" style="width: 105px;"><script type="text/javascript">  JS_INLAN("startanalyse")</script>
+                                </button>
+							</td>
+                        </tr>
+                    </table>
+                </div>
+       -->
+                <div style="height: 30px; width: 820px; overflow: auto; padding: 5px 20px 5px 2px;
+                    text-align: right">
+                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                        <tr>
+                   <!--
+      
+                            <td align="left">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span><script type="text/javascript">JS_INLAN("servid_mark")</script></span>&nbsp;&nbsp;<select
+                                    id="service_id_sole"><option selected value="OFF">OFF</option>
+                                    <option value="ON">ON</option>
+                                </select>
+                            </td>
+                      -->
+       
+                            <td align="right">
+                                <button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px"id="submit">
+
+                                    <script type="text/javascript">    JS_INCMNLAN("submit")</script>
+
+                                </button>
+                                &nbsp;&nbsp;
+                                <button type="button" onclick='location.reload();' style="width: 80px; height: 25px"
+                                    id="refresh">
+
+                                    <script type="text/javascript">   JS_INCMNLAN("refresh")</script>
+
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem;
+		var s_PIDMapItemMaxNum = 8;
+		var s_PIDMapIDsArray = new Array();
+
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnLoad()
+		{
+			var i;
+			var lItemArray;
+			var lItemInfo;
+
+			JS_ParamInitate();
+
+			lPIDMapSetting = JS_ParamGetPIDMapSetting();
+			s_PIDMapItemMaxNum = lPIDMapSetting.m_MaxItemNum;
+			lPIDMapSetting = null;
+
+
+			s_BitrateListItem = new MyListControl("s_BitrateListItem", 820, 472, "list_target", true);
+			s_BitrateListItem.SetColProperty(0, 80, JS_LANCMN("index"), "center", "center");
+			s_BitrateListItem.SetColProperty(1, 120, JS_LAN("in_ts"), "center", "center");
+			s_BitrateListItem.SetColProperty(2, 150, JS_LAN("in_pid"), "center", "center");
+			s_BitrateListItem.SetColProperty(3, 120, JS_LAN("out_ts"), "center", "center");
+			s_BitrateListItem.SetColProperty(4, 150, JS_LAN("out_pid"), "center", "center");
+			s_BitrateListItem.SetColProperty(5, 80, JS_LAN("mark"), "center", "center");
+			s_BitrateListItem.SetColProperty(6, 60, "", "center", "center");
+			s_BitrateListItem.UpdateListFrame();
+
+			//读取XML参数文件，显示PID MAP表
+			lItemArray = JS_ParamGetPIDMapArray();
+			for (i = 0; i < lItemArray.length; i++)
+			{
+			    lItemInfo = JS_ParamGetPIDMapInfo(lItemArray[i]);
+			    s_PIDMapIDsArray[s_PIDMapIDsArray.length] = lItemInfo.m_IDs;
+			    OnAddPIDMapRow(lItemInfo.m_IDs, lItemInfo.m_InTsIndex + 1, lItemInfo.m_InPID, lItemInfo.m_OutTsIndex + 1, lItemInfo.m_OutPID, lItemInfo.m_Active, false);
+			    lItemInfo = null;
+			}
+
+			if (JS_ParamGetRemuxSystemInfo().m_DisableRemuxMark == "ON")
+			{
+			    $("submit_pidmap").disabled = true;
+			}
+			else
+			{
+			    $("submit_pidmap").disabled = false;
+			}
+
+}
+
+function OnRemovePIDMapRow(){
+    s_BitrateListItem.RemoveSelectedRow();
+    //通过限制添加按钮的方式，回避用户错误！
+    if (s_BitrateListItem.GetRowNumber() < s_PIDMapItemMaxNum)    {
+        JS_UISetDisableByID("add_pidmap", true);
+    }
+}
+
+
+function OnAddPIDMapRow(IDs, InTsIndex, InPID, OutTsIndex, OutPID, Active, bShow){
+    var lHolderNode;
+    var lPIDMapSetting;
+
+
+
+    lHolderNode = document.createElement("input");
+    lHolderNode.type = "text";
+    lHolderNode.style.width = "80px";
+    lHolderNode.style.textAlign = "center";
+    lHolderNode.value = InTsIndex;
+			lHolderNode.defaultValue = lHolderNode.value;
+			JS_RestrctInputInt(lHolderNode);
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "90px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = InPID;
+			lHolderNode.defaultValue = lHolderNode.value;
+			JS_RestrctInputInt(lHolderNode);
+			s_BitrateListItem.SetColValue(2, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "80px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = OutTsIndex;
+			lHolderNode.defaultValue = lHolderNode.value;
+			JS_RestrctInputInt(lHolderNode);
+			s_BitrateListItem.SetColValue(3, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "90px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = OutPID;
+			lHolderNode.defaultValue = lHolderNode.value;
+			JS_RestrctInputInt(lHolderNode);
+			s_BitrateListItem.SetColValue(4, lHolderNode);
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Active, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.name = "active";
+			s_BitrateListItem.SetColValue(5, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "checkbox";
+			lHolderNode.style.width = "40px";
+			s_BitrateListItem.SetColValue(6, lHolderNode);
+
+
+			s_BitrateListItem.AddRowToDom(false, IDs, bShow);
+
+			//通过限制添加按钮的方式，回避用户错误！
+			if (s_BitrateListItem.GetRowNumber() >= s_PIDMapItemMaxNum)
+			{
+				JS_UISetDisableByID("add_pidmap", false);
+			}
+
+		}
+
+		function OnSubmit(Item)
+		{
+			var lTmpVar;
+			var i, k, lRowNum;
+			var lInTsNum, lOutTsNum;
+			var lInTsIndex, lInPID, lOutTsIndex, lOutPID, lMark, lIDs;
+
+			var lHolderNode, lInforNode;
+
+			lInTsNum = JS_ParamGetTsNum(true);
+			lOutTsNum = JS_ParamGetTsNum(false);
+
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+			lRowNum = s_BitrateListItem.GetRowNumber();
+			/*PID值不能超出1-8190，TsIndex不能超出实际值*/
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "pidmap", "");
+
+
+
+			for (i = 0; i < lRowNum; i++)
+			{
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 3);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 4);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 5);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+			}
+
+			lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "add_modify_map_items");
+			for (i = 0; i < lRowNum; i++)
+			{
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 1);
+				lInTsIndex = parseInt(lTmpVar.value, 10) - 1;
+				if (lInTsIndex < 0 || lInTsIndex >= lInTsNum)
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					lXMLDom = null;
+					return;
+				}
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 2);
+				lInPID = parseInt(lTmpVar.value, 10);
+				if (lInPID < 0 || lInPID > 8191)
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					lXMLDom = null;
+					return;
+				}
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 3);
+				lOutTsIndex = parseInt(lTmpVar.value, 10) - 1;
+				if (lOutTsIndex < 0 || lOutTsIndex >= lOutTsNum)
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					lXMLDom = null;
+					return;
+				}
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 4);
+				lOutPID = parseInt(lTmpVar.value, 10);
+				if (lOutPID < 0 || lOutPID > 8191)
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					lXMLDom = null;
+					return;
+				}
+
+				lTmpVar = s_BitrateListItem.GetColNodeByIndex(i, 5);
+				lMark = JS_UISelectGetCurValue(lTmpVar);
+
+				lIDs = s_BitrateListItem.GetRowData(i);
+
+				for (k = 0; k < s_PIDMapIDsArray.length; k++)
+				{
+					if (s_PIDMapIDsArray[k] == lIDs)
+					{
+						s_PIDMapIDsArray.splice(k, 1);
+						break;
+					}
+				}
+
+				lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "map_item");
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "pidmap_ids", lIDs);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "in_ts_index", lInTsIndex);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "in_pid", lInPID);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "out_ts_index", lOutTsIndex);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "out_pid", lOutPID);
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "active_mark", lMark);
+			}
+
+
+			lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "remove_map_items");
+			for (k = 0; k < s_PIDMapIDsArray.length; k++)
+			{
+				lInforNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "map_item");
+				JS_XMLAddTextChild(lXMLDom, lInforNode, "pidmap_ids", s_PIDMapIDsArray[k]);
+			}
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(3, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+    </script>
+</head>
+<body onload="OnLoad()">
+    <table width="850px" border="0" align="center" cellpadding="0" cellspacing="0" >
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="list_target" style="height: 480px;width:820px; overflow: auto; padding:5px 10px 0px 10px;">
+                
+                </div>
+           </td>
+        </tr>
+         <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+       <tr>
+            <td valign="top" align="left" bgcolor="#F5F9FE">
+                <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick='OnAddPIDMapRow(0, 1,8191,1,8191,"OFF", true);' style="width:100px; height:25px" id="add_pidmap" ><script type="text/javascript">JS_INCMNLAN("add")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='OnRemovePIDMapRow();' style="width:100px; height:25px" ><script type="text/javascript">JS_INCMNLAN("remove")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='OnSubmit(this);' style="width:80px; height:25px" id="submit_pidmap"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width:80px; height:25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+           </td>
+        </tr>
+        <tr>
+            <td height="13px"  background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+    
+    <script type="text/javascript" src="/js/edid_settings.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+    	JS_LANInitiate(); //初始化语言脚本组件
+    	JS_EdidSettingsInitiate();
+    	
+    	var s_BitrateListItem;
+    	var s_EdidNum;
+		function OnLoad()
+		{
+			var i;
+			
+			s_EdidNum = JS_DevGetEdidChipNum();
+			s_BitrateListItem = new MyListControl("s_BitrateListItem", 800, 360, "sub_param", false);  
+		    s_BitrateListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+		    s_BitrateListItem.SetColProperty(1, 200, JS_LAN("edid_type"), "center", "center");
+			s_BitrateListItem.UpdateListFrame();
+
+			for (i = 0; i < s_EdidNum; i++)
+			{
+				AddEdidRow(i, JS_DevGetEdidTypeByChn(i));
+			}
+		}
+
+		function AddEdidRow(SubIndex, EdidType)
+		{
+			var lHolderNode;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "35px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = JS_StrLeftPading(SubIndex + 1, 3);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			lHolderNode.name = "index";
+			s_BitrateListItem.SetColValue(0, lHolderNode);
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "DownMix", "DownMix");
+			JS_UISelectAddOption(lHolderNode, "AC3", "AC3");
+			JS_UISelectAddOption(lHolderNode, "NONE", "NONE");
+			JS_UISelectSetCurIndexByValue(lHolderNode, EdidType, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "180px";
+			lHolderNode.id = "edid_type_" + SubIndex;
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+
+			s_BitrateListItem.AddRowToDom(false);
+		}
+        
+        function OnXMLCBEdidStatusGet(XMLDom) 
+        {	    
+            var lTmpVar;
+            var lStr = "";
+        
+		    for (i = 0; i < s_EdidNum; i++)
+			{
+			    lTmpVar = JS_XMLGetTagValue(XMLDom, "edid_status" + i);
+			    lStr += JS_LAN("channel") + " " + (i + 1) + " " + JS_LAN(lTmpVar) + "\r\n"; 
+			}
+			alert(lStr);
+        }
+        
+		function OnSubmit(Item)
+		{
+            var i;
+			var lBodyNode, lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+            if (confirm(JS_LAN("edid_download_alert"))) 
+            {
+            	lBodyNode = JS_XMLParamSetHead(lXMLDom, "edid_cfg", "", "");
+			    for (i = 0; i < s_EdidNum; i++)
+			    {
+				    lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "edid");
+    				
+                    JS_XMLAddTextChild(lXMLDom, lHolderNode, "edid_type", JS_HTMLGetValueByID("edid_type_" + i));
+			    }
+                		    
+			    JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnXMLCBEdidStatusGet, false);
+            }
+		}
+    </script>
+</head>
+<body onload="OnLoad()">
+    <table width="850px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title"><script type="text/javascript">JS_INLAN("title")</script></td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div style="width:820px; height:410px; overflow:hidden;">
+                    <div id="sub_param" style="width:800px; height: 360px; overflow:hidden; padding: 5px 10px 10px 10px;">
+                    </div>
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td height="6px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+       <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

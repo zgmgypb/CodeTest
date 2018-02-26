@@ -1,0 +1,467 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    	.style1
+		{
+			height: 30px;
+		}
+    </style>
+
+
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/js/monitor_setting.js"></script>
+    <script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+    <script type="text/javascript">
+    	var s_CriticalTemp = 90, s_CriticalTempMax = 90, s_CriticalTempMin = 10;
+    	var s_FanTemp = 70, s_FanInv = 5;
+    	var s_NoTemp;
+    	var s_UpdateTimeout;
+    	var s_DetailLogID;
+    	JS_LANInitiate();
+
+    	function OnAjaxStatusCB(XMLDom)
+    	{
+    		var i;
+    		var lTmpValue, lTmpArray;
+    		var lSCSArray, lSCSObj, lCASActive;
+    		
+    		s_UpdateTimeout = 15;
+
+    		if (JS_ISValidObject(XMLDom)) 
+    		{
+    			if (s_NoTemp != "ON")
+    			{
+    			    lTmpValue = parseInt(JS_XMLGetTagValue(XMLDom, "temperature"), 10);
+
+    			    if (lTmpValue < 255)
+    			    {
+    			        $("cur_temp").value = lTmpValue + "/" + parseInt(lTmpValue * 9 / 5 + 32, 10);
+    			        if (lTmpValue > s_CriticalTemp)
+    			        {
+    			            $("cur_temp").style.color = "red";
+    			        }
+    			        else
+    			        {
+    			            $("cur_temp").style.color = "green";
+    			        }
+    			    }
+    			}
+
+//    			lTmpArray = XMLDom.getElementsByTagName("eth_status");
+//    			for(i = 0; i < lTmpArray.length; i++)
+//    			{
+//    			    lTmpValue = JS_XMLGetValueINT(lTmpArray[i], 10);
+//    			    if (lTmpValue == 3)
+//    			    {
+//    			        $("eth" + i + "_status").src = "/graphics/green.gif";
+//    			    }
+//   			    else if ((lTmpValue == 1) || (lTmpValue == 2))
+//    			    {
+//    			        $("eth" + i + "_status").src = "/graphics/yellow.gif";
+//    			    }
+//    			    else
+//    			    {
+//    			        $("eth" + i + "_status").src = "/graphics/red.gif";
+//    			    }
+//    			}
+    			    			
+    			$("ins_bitrate").value = JS_BitrateFormatINT(parseInt(JS_XMLGetTagValue(XMLDom, "ins_bitrate"), 10));
+
+
+    			lTmpValue = parseInt(JS_XMLGetTagValue(XMLDom, "cpu_usage"), 10);
+    			$("cpu_usage").value = lTmpValue + "%";
+
+    			lTmpValue = parseInt(JS_XMLGetTagValue(XMLDom, "mem_usage"), 10);
+    			$("mem_usage").value = lTmpValue + "%";
+
+
+    			
+    			
+    			lTmpValue = parseInt(JS_XMLGetTagValue(XMLDom, "scramble_status"), 10);
+    			if (lTmpValue > 0)
+    			{
+    				$("scramble_status").src = "/graphics/green.gif";
+    			}
+    			else
+    			{
+    				$("scramble_status").src = "/graphics/grey.gif";
+    			}
+    			$("crypto_period_duration").value = parseInt(JS_XMLGetTagValue(XMLDom, "crypto_period_duration"), 10);
+    			$("crypto_period_number").value = parseInt(JS_XMLGetTagValue(XMLDom, "crypto_period_number"), 10);
+    			$("ecm_update").value = JS_XMLGetTagValue(XMLDom, "ecm_update");
+
+
+    			lSCSArray = XMLDom.getElementsByTagName("scs");
+    			if (lSCSArray != null)
+    			{
+    				for (i = 0; i < lSCSArray.length; i++)
+    				{
+    					lSCSObj = lSCSArray[i];
+    					lCASActive = parseInt(JS_XMLGetTagValue(lSCSObj, "active_mark"), 10);
+    					if (lCASActive > 0)
+    					{
+    						lTmpValue = parseInt(JS_XMLGetTagValue(lSCSObj, "emm_status"), 10);
+    						if (lTmpValue > 0)
+    						{
+    							$("emm_status_" + i).src = "/graphics/green.gif";
+    						}
+    						else
+    						{
+    							$("emm_status_" + i).src = "/graphics/red.gif";
+    						}
+
+    						$("emm_bitrate_" + i).value = JS_BitrateFormatINT(parseInt(JS_XMLGetTagValue(lSCSObj, "emm_bitrate"), 10));
+   						
+    						lTmpValue = parseInt(JS_XMLGetTagValue(lSCSObj, "ecm_status"), 10);
+    						if (lTmpValue > 0)
+    						{
+    							$("ecm_status_" + i).src = "/graphics/green.gif";
+    						}
+    						else
+    						{
+    							$("ecm_status_" + i).src = "/graphics/red.gif";
+    						}
+    						
+    					}
+    					else
+    					{
+							$("emm_status_" + i).src = "/graphics/grey.gif";
+							$("ecm_status_" + i).src = "/graphics/grey.gif";
+    						$("emm_bitrate_" + i).value = "-----";
+    					}
+    				}
+    			}
+    			
+     			
+    			if ($("refresh_data").disabled == true)
+    			{
+    				$("refresh_data").disabled = false;
+    			}
+
+    			setTimeout("OnRequestStatusData()", 1000);
+    		}
+    	}
+
+    	function OnRequestStatusData()
+        {
+            var lXMLDom, lBodyNode;
+            s_UpdateTimeout--;
+            if (s_UpdateTimeout < 0)
+            {
+                lXMLDom = JS_XMLCreateDomFromFile(null);
+                lBodyNode = JS_XMLParamSetHead(lXMLDom, "monitor", "status_new", "");
+                JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxStatusCB, false);
+            }
+            else 
+            {
+                //更新页面时间
+                $("time_out_value").innerHTML = JS_StrLeftPading(s_UpdateTimeout, 2);
+                setTimeout("OnRequestStatusData()", 1000);
+            }
+        }
+
+
+        function OnUpdateData(Item)
+        {
+    		s_UpdateTimeout = 1;
+    		$("refresh_data").disabled = true;
+        }
+        
+        function OnSubmitSetting(Item)
+        {
+        	var i, lTmpValue, lHoldVar;
+        	var lIDs, lRowNum, lCriticalTemp, lFanEnaTemp, lFanDisTemp;
+        	var lXMLDom, lBodyNode, lHolderNode, lInfoNode;
+
+        	JS_UISetErrorIndicator($("critical_temp"), true, false);
+
+        	lCriticalTemp = JS_HTMLGetValue($("critical_temp"));
+        	if (lCriticalTemp > s_CriticalTempMax || lCriticalTemp < s_CriticalTempMin)
+        	{
+        		JS_UISetErrorIndicator($("critical_temp"), false, true);
+        		return;
+        	}
+
+        	lXMLDom = JS_XMLCreateDomFromFile(null);
+        	lBodyNode = JS_XMLParamSetHead(lXMLDom, "monitor", "status_settings", "");
+
+        	JS_XMLAddTextChild(lXMLDom, lBodyNode, "global_mark", JS_HTMLGetValue($("global_mark")));
+        	JS_XMLAddTextChild(lXMLDom, lBodyNode, "critical_temp", JS_HTMLGetValue($("critical_temp")));
+
+
+        	JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+        	window.top.document.frames["BottomFrame"].OnShowLoadingWindow(1, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+        }
+        
+    	function OnLoad()
+    	{
+    		var i, lTmpVar;
+    		var lLogArray, lLogObj, lLogInfo;
+
+    		lTmpVar = JS_ArgGetArgs();
+
+    		JS_MONInitiate();
+
+    		lLogInfo = JS_MONGetSystemInfo();
+    		s_NoTemp = lLogInfo.m_NoTemp;
+
+    		s_CriticalTemp = lLogInfo.m_CritcalTemp;
+    		s_FanTemp = lLogInfo.m_FanEnableTemp;
+    		//s_CriticalTempMax = lLogInfo.m_CriticalMax;
+    		//s_CriticalTempMin = lLogInfo.m_CriticalMin;
+
+    		JS_UISelectSetCurIndexByValue($("global_mark"), lLogInfo.m_Active);
+    		
+    		s_FanInv = lLogInfo.m_FanInvTemp;
+    		$("critical_temp").value = lLogInfo.m_CritcalTemp;
+    		$("cur_temp").value = "---/---";
+    		$("cur_temp").style.color = "green";
+    		JS_RestrctInputInt($("critical_temp"));
+
+    		s_UpdateTimeout = 0;
+    		setTimeout("OnRequestStatusData()", 500);
+    	}
+
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td colspan="3" align="center" background="/graphics/boxmenu_850.gif" style=" padding-right:20px" class="style1">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                	<tr>
+                		<td width="150px" align="right"></td>
+                		<td><span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span></td>
+                		<td width="150px" align="right"><span id="time_out_value">00</span>&nbsp;</td>
+                	</tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div style="height:474px; width:360px; overflow: auto; padding: 5px;" >
+                    <table width="100%" border="1px" align="center" cellpadding="10px" cellspacing="2px" style="table-layout: fixed">
+                        <tr>
+                            <td height="20px" align="center" bgcolor="#E4EFF8" colspan="2">
+                                <span><script type="text/javascript">JS_INLAN("scs")</script></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("crypto_period_duration")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<input id="crypto_period_duration" style="width:80px; text-align:center;background-color:transparent;border:0px" value="0"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("crypto_period_number")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<input id="crypto_period_number" style="width:80px; text-align:center;background-color:transparent;border:0px" value="0"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="center" bgcolor="#E4EFF8" colspan="2">
+								<img src="/graphics/grey.gif" id="scramble_status" />&nbsp;&nbsp;&nbsp;
+    							/
+    							<input id="ecm_update" style="width:140px; text-align:right;background-color:transparent;border:0px" value=""/>  
+    							                              
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr>
+                            <td height="15px" align="center" bgcolor="#E4EFAA" colspan="2">
+                                <span>CAS 01</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("scs_status")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="ecm_status_0" /> / <img src="/graphics/grey.gif" id="emm_status_0" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("emm_bitrate")</script> </span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<input id="emm_bitrate_0" style="width:80px; text-align:center;background-color:transparent;border:0px" value="-----"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="15px" align="center" bgcolor="#E4EFBB" colspan="2">
+                                <span>CAS 02</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("scs_status")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="ecm_status_1" /> / <img src="/graphics/grey.gif" id="emm_status_1" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("emm_bitrate")</script> </span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<input id="emm_bitrate_1" style="width:80px; text-align:center;background-color:transparent;border:0px" value="-----"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="15px" align="center" bgcolor="#E4EFCC" colspan="2">
+                                <span>CAS 03</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("scs_status")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="ecm_status_2" /> / <img src="/graphics/grey.gif" id="emm_status_2" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("emm_bitrate")</script> </span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<input id="emm_bitrate_2" style="width:80px; text-align:center;background-color:transparent;border:0px" value="-----"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="15px" align="center" bgcolor="#E4EFDD" colspan="2">
+                                <span>CAS 04</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("scs_status")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<img src="/graphics/grey.gif" id="ecm_status_3" /> / <img src="/graphics/grey.gif" id="emm_status_3" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("emm_bitrate")</script> </span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<input id="emm_bitrate_3" style="width:80px; text-align:center;background-color:transparent;border:0px" value="-----"/>
+                            </td>
+                        </tr>
+
+                        
+                    </table>
+                </div>
+            </td>
+            <td bgcolor="#F5F9FE" style="padding-top:5px; padding-bottom:5px;">
+				<div style="height:460px; width: 1px; background:#666"></div>
+            </td>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div style="height: 182px; width:360px; overflow: auto; padding:5px;" >
+                    <table width="100%" border="1px" align="center" cellpadding="10px" cellspacing="2px" style="table-layout: fixed">
+                        <tr>
+                            <td height="25"  align="left" bgcolor="#E4EFF8" style="padding-left:10px">
+                                <span><script type="text/javascript">JS_INLAN("switch")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+                                <select id="global_mark"><option value="OFF">OFF</option><option value="ON">ON</option></select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25" align="left" style="padding-left:10px">
+                                <span><script type="text/javascript">JS_INLAN("critical_temp")</script></span>
+                            </td>
+                            <td align="center">
+                                <input id="critical_temp" type="text" style="width:80px; text-align:center"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+				<div style="height:1px; width:400px;overflow:hidden; background:#666;border-spacing:5px"></div>
+                <div style="height: 280px; width:360px; overflow: auto; padding:5px;" >
+                    <table width="100%" border="1px" align="center" cellpadding="10px" cellspacing="2px" style="table-layout: fixed">
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("temp")</script><img src="/graphics/cf.gif"> : </span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+                                <input id="cur_temp" type="text" style="width:80px; text-align:center;background-color:transparent;color:green;" value ="--/--" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("cpu_usage")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+                                <input id="cpu_usage" type="text" style="width:80px; text-align:center;background-color:transparent;color:green;" value ="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("mem_usage")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+                                <input id="mem_usage" type="text" style="width:80px; text-align:center;background-color:transparent;color:green;" value ="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="25px" align="left" bgcolor="#E4EFF8">
+                                <span style="padding-left:10px"><script type="text/javascript">JS_INLAN("ins_bitrate")</script></span>
+                            </td>
+                            <td align="center" bgcolor="#E4EFF8">
+								<input id="ins_bitrate" style="width:80px; text-align:center;background-color:transparent;border:0px" value="-----"/>
+                            </td>
+                        </tr>                      
+                    </table>
+                    
+                </div>
+           </td>
+        </tr>
+        <tr>
+            <td colspan="3" bgcolor="#F5F9FE" align="center" >
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+			<td colspan="3" bgcolor="#F5F9FE">
+				<div style="height: 30px; overflow: auto; padding: 5px 25px 7px 25px; text-align: right">
+				    <table width="100%" align="center" cellpadding="0" cellspacing="0">
+						<tr>
+							<td width="50%" align="left">
+								<button type="button" onclick='OnUpdateData(this);' style="width: 100px; height: 25px" id="refresh_data"><script type="text/javascript">JS_INCMNLAN("update_data")</script></button>&nbsp;&nbsp;
+							</td>
+							<td width="50%" align="right">
+								<button type="button" onclick='OnSubmitSetting(this);' style="width:80px; height:25px"id="submit_pidmap" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="3" height="13"  background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

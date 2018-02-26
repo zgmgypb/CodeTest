@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+	<script type="text/javascript" src="/js/device_setting.js"></script>
+
+	<script type="text/javascript">
+		function OnLoad()
+		{
+			var lXMLDoc;
+			lXMLDoc = JS_XMLCreateDomFromFile("/tmp/maintenance.xml");
+			$("pll_freq_offset").value = JS_XMLGetTagValue(lXMLDoc, "pll_freq_offset");
+		}
+
+		function OnSubmit(Item)
+		{
+			var lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+			if (Item.id == "pll_calibration")
+			{
+				lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "pll_calibration", "");
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "pll_freq_offset", $("pll_freq_offset").value);
+				JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			}	
+			
+			else if (Item.id == "direct_reg")
+			{
+				lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "direct_reg", "");
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "ic_id", $("ic_id").value);
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "ic_addr", $("ic_addr").value);
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "ic_value", $("ic_value").value);
+				JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			}
+			else if (Item.id == "direct_p_q")
+			{
+				lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "direct_p_q", "");
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "ad9789_p", $("9789_p").value);
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "ad9789_q", $("9789_q").value);
+				JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			}
+		}
+        
+	</script>
+
+</head>
+<body onload="OnLoad()">
+<div style="padding-bottom:20px">
+</div>
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+				<span>Debug Setting</span>
+			</td>
+		</tr>
+		<tr>
+			<td bgcolor="#F5F9FE">
+				<div style="height: 520px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span>Device Calibration - 设备校正 (FDAC = 2160 MHz)</span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 80%">
+											<span>PLL Offset Frequence - 锁相环偏移频率设置 (Hz):</span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px; text-align:center" id="pll_freq_offset" />
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="pll_calibration" onclick="OnSubmit(this);" style="width:100px" >Submit - 提交</button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span>Device Reg Modification - 设备调试 (AD9789 ICID = 0x01)</span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 80%">
+											<span>IC ID / Addr / Value - 芯片号/地址/值 (HEX):</span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 40px; text-align:center" id="ic_id" value='01' /> - <input type="text" style="width: 40px; text-align:center" id="ic_addr" value='00' /> : <input type="text" style="width: 40px; text-align:center" id="ic_value" value='00'/>
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="direct_reg" onclick="OnSubmit(this);" style="width:100px" >Submit - 提交</button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 80%">
+											<span>P / Q (HEX):</span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 100px; text-align:center" id="9789_p" value='000000' /> - <input type="text" style="width: 100px; text-align:center" id="9789_q" value='000000' />
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="direct_p_q" onclick="OnSubmit(this);" style="width:100px" >Submit - 提交</button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+				
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

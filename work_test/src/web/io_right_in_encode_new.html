@@ -1,0 +1,740 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem = null;
+		var s_Direction = "input";
+		var s_ChannelIndex = null;
+		var s_ChannelType = null;
+		var s_ChannelSubType = null;
+		var s_SubChannelNum = null;
+		var s_ChannelLimitsObj = null;
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		function OnLoad()
+		{
+			var lTmpVar, lChnObj, lSubObj, lChnInfo, lSubInfo;
+			var i;
+
+			lTmpVar = JS_ArgGetArgs();
+			s_Direction = JS_ArgGetValueByName(lTmpVar, "direction");
+			s_ChannelIndex = parseInt(JS_ArgGetValueByName(lTmpVar, "chn_ind"), 10);
+			if (s_ChannelIndex != null)
+			{
+				JS_ParamInitate(); //初始化系统参数处理脚本组件
+				if (s_Direction == "input")
+				{
+				    lChnObj = JS_ParamGetInChannelObject(s_ChannelIndex);
+				}
+
+				s_ChannelType = JS_ParamGetChannelType(lChnObj);
+				s_ChannelSubType = JS_ParamGetChannelSubType(lChnObj);
+				s_SubChannelNum = JS_ParamGetSubChannelNum(lChnObj);
+				s_ChannelLimitsObj = JS_ParamGetChannelInfoEncoderNewLimits(lChnObj);
+
+				$("chn_info").innerHTML = JS_LANCMN(s_Direction) + " " + JS_LANCMN("chan") + " " + JS_StrLeftPading((s_ChannelIndex + 1), 2);
+				$("chn_type").innerHTML = JS_LANCMN(s_ChannelType);
+
+				s_BitrateListItem = new MyListControl("s_BitrateListItem", 1800, 360, "sub_param", false);
+				if (s_Direction == "input")
+				{
+					lTmpSubChannelNumber = JS_ParamGetOutSubChannelNum();
+					if (s_ChannelType == "ENCODER")
+					{
+					    var lCount = 0;
+					    
+					    s_BitrateListItem.SetColProperty(lCount++, 40, JS_LANCMN("index"), "center", "center");
+					    s_BitrateListItem.SetColProperty(lCount++, 60, JS_LANCMN("ts_index"), "center", "center");
+					    s_BitrateListItem.SetColProperty(lCount++, 100, JS_LAN("vi_mode"), "center", "center"); /* 视频输入模式 */
+					    s_BitrateListItem.SetColProperty(lCount++, 100, JS_LAN("vo_mode"), "center", "center"); /* 视频输出模式 */
+					    s_BitrateListItem.SetColProperty(lCount++, 100, JS_LAN("br_mode"), "center", "center"); /* 码率模式 VBR/CBR */
+					    s_BitrateListItem.SetColProperty(lCount++, 120, JS_LAN("enc_mode"), "center", "center"); /* 编码模式 H.264/H.265 */
+					    s_BitrateListItem.SetColProperty(lCount++, 60, JS_LAN("profile"), "center", "center"); /* MP/HP/BP */
+					    s_BitrateListItem.SetColProperty(lCount++, 100, JS_LAN("bitrate"), "center", "center"); /* 码率 */
+					    s_BitrateListItem.SetColProperty(lCount++, 100, JS_LAN("prog_bitrate"), "center", "center"); /* 节目通道码率 */
+					    s_BitrateListItem.SetColProperty(lCount++, 50, JS_LAN("gop"), "center", "center"); 
+					    s_BitrateListItem.SetColProperty(lCount++, 120, JS_LAN("aud_enc_mode"), "center", "center"); /* MPEG-1 L2/AAC */
+					    s_BitrateListItem.SetColProperty(lCount++, 100, JS_LAN("aud_bitrate"), "center", "center"); /* 音频码率 */
+					    s_BitrateListItem.SetColProperty(lCount++, 100, JS_LAN("aud_sample"), "center", "center"); /* 音频采样率 */
+					    s_BitrateListItem.SetColProperty(lCount++, 70, JS_LAN("volume"), "center", "center"); 
+					    s_BitrateListItem.SetColProperty(lCount++, 100, JS_LAN("prog_name"), "center", "center"); /* 节目名 */
+					    s_BitrateListItem.SetColProperty(lCount++, 70, JS_LAN("prog_number"), "center", "center"); /* 节目号 */
+					    s_BitrateListItem.SetColProperty(lCount++, 70, JS_LAN("vid_pid"), "center", "center"); 
+					    s_BitrateListItem.SetColProperty(lCount++, 70, JS_LAN("aud_pid"), "center", "center"); 
+					    s_BitrateListItem.SetColProperty(lCount++, 70, JS_LAN("pcr_pid"), "center", "center"); 
+					    s_BitrateListItem.SetColProperty(lCount++, 70, JS_LAN("pmt_pid"), "center", "center"); 
+						s_BitrateListItem.SetColProperty(lCount++, 70, JS_LAN("active"), "center", "center");
+						s_BitrateListItem.UpdateListFrame();
+
+						for (i = 0; i < s_SubChannelNum; i++)
+						{
+							lSubObj = JS_ParamGetSubChnObj(lChnObj, i);
+							lSubInfo = JS_ParamGetSubChannelInfoEncoderNew(lSubObj);
+
+							AddInEncoderRow(i, lSubInfo);
+
+							lSubInfo = null; //删除对象！
+							lSubObj = null; //删除对象！
+						}
+					}
+				}
+			}
+		}
+
+		function AddInEncoderRow(SubIndex, Obj)
+		{
+			var i;
+			var lHolderNode;
+			var lCount = 0;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "35px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = JS_StrLeftPading(SubIndex + 1, 3);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			lHolderNode.name = "index";
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "55px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = JS_StrLeftPading(Obj.m_TsIndex + 1, 3);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			lHolderNode.name = "ts_index";
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "PAL", "PAL");
+			JS_UISelectAddOption(lHolderNode, "NTSC", "NTSC");
+			JS_UISelectAddOption(lHolderNode, "720P50", "720P50");
+			JS_UISelectAddOption(lHolderNode, "720P5994", "720P59.94");
+			JS_UISelectAddOption(lHolderNode, "720P60", "720P60");
+			JS_UISelectAddOption(lHolderNode, "1080I50", "1080I50");
+			JS_UISelectAddOption(lHolderNode, "1080I5994", "1080I59.94");
+			JS_UISelectAddOption(lHolderNode, "1080I60", "1080I60");
+			JS_UISelectAddOption(lHolderNode, "1080P50", "1080P50");
+			JS_UISelectAddOption(lHolderNode, "1080P5994", "1080P59.94");
+			JS_UISelectAddOption(lHolderNode, "1080P60", "1080P60");
+			JS_UISelectAddOption(lHolderNode, "AUTO", "AUTO");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Obj.m_ViMode, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "90px";
+			lHolderNode.id = "vi_mode_" + SubIndex;
+			lHolderNode.onchange = function () {
+			    OnChange(this);
+			}
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "576P25", "576P25");
+			JS_UISelectAddOption(lHolderNode, "480P2997", "480P29.97");
+			JS_UISelectAddOption(lHolderNode, "720P25", "720P25");
+			JS_UISelectAddOption(lHolderNode, "720P2997", "720P29.97");
+			JS_UISelectAddOption(lHolderNode, "720P30", "720P30");
+			JS_UISelectAddOption(lHolderNode, "1080P25", "1080P25");
+			JS_UISelectAddOption(lHolderNode, "1080P2997", "1080P29.97");
+			JS_UISelectAddOption(lHolderNode, "1080P30", "1080P30");
+			JS_UISelectAddOption(lHolderNode, "AUTO", "AUTO");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Obj.m_VoMode, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "90px";
+			lHolderNode.id = "vo_mode_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "CBR", "CBR");
+			JS_UISelectAddOption(lHolderNode, "VBR", "VBR");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Obj.m_BrMode, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "90px";
+			lHolderNode.id = "br_mode_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "H264", "H264");
+			JS_UISelectAddOption(lHolderNode, "H265", "H265");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Obj.m_EncMode, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "90px";
+			lHolderNode.id = "enc_mode_" + SubIndex;
+			lHolderNode.disabled = true;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "BASE", "BASE");
+			JS_UISelectAddOption(lHolderNode, "MP", "MP");
+			JS_UISelectAddOption(lHolderNode, "HP", "HP");			
+			JS_UISelectSetCurIndexByValue(lHolderNode, Obj.m_Profile, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "50px";
+			lHolderNode.id = "profile_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "90px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_Bitrate;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "bitrate_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "90px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_ProgBitrate;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "prog_bitrate_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "40px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_Gop;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "gop_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "MPEG1-L2", "MPEG1-L2");
+			JS_UISelectAddOption(lHolderNode, "LC-AAC", "LC-AAC");
+			JS_UISelectAddOption(lHolderNode, "AC3", "AC3");
+			JS_UISelectAddOption(lHolderNode, "E-AC3", "E-AC3");			
+			JS_UISelectSetCurIndexByValue(lHolderNode, Obj.m_AudEncMode, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "90px";
+			lHolderNode.id = "aud_enc_mode_" + SubIndex;
+			lHolderNode.onchange = function () {
+			    OnChange(this);
+			}
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "64", "64");
+		    JS_UISelectAddOption(lHolderNode, "96", "96");
+            JS_UISelectAddOption(lHolderNode, "128", "128");
+            JS_UISelectAddOption(lHolderNode, "192", "192");
+            JS_UISelectAddOption(lHolderNode, "256", "256");
+            JS_UISelectAddOption(lHolderNode, "384", "384");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Obj.m_AudBitrate, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "90px";			
+			lHolderNode.id = "aud_bitrate_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = JS_UISelectCreate();
+            JS_UISelectAddOption(lHolderNode, "32", "32");
+            JS_UISelectAddOption(lHolderNode, "44.1", "44.1");
+            JS_UISelectAddOption(lHolderNode, "48", "48");
+            JS_UISelectAddOption(lHolderNode, "AUTO", "AUTO");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Obj.m_AudSample, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "90px";
+			lHolderNode.disabled = true;
+			lHolderNode.id = "aud_sample_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_Volume;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "volume_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "90px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_ProgName;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "prog_name_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_ProgNumber;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "prog_number_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);			
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_VidPid;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "vid_pid_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_AudPid;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "aud_pid_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_PcrPid;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "pcr_pid_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Obj.m_PmtPid;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "pmt_pid_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Obj.m_Active, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "50px";
+			lHolderNode.id = "active_" + SubIndex;
+			s_BitrateListItem.SetColValue(lCount++, lHolderNode);
+
+			s_BitrateListItem.AddRowToDom(false);
+			OnChange($("vi_mode_" + SubIndex));
+			OnChange($("aud_enc_mode_" + SubIndex));
+		}
+
+        function IntRangeCheck(HtmlObj, ValLow, ValHigh) 
+        {
+            var lRegular = /^\s*-?[1-9]\d*\s*$|^\s*0\s*$/; /* 前后可以出现空格，兼容负数 */
+            var lVal;
+            
+		    if (!lRegular.test(JS_HTMLGetValue(HtmlObj))) {
+		        alert(JS_LAN("int_alert"));
+		        HtmlObj.style.borderColor = "#FF0000";
+		        return false;
+		    }
+		    lVal = parseInt(JS_HTMLGetValue(HtmlObj), 10);
+		    if (lVal < ValLow || lVal > ValHigh) {
+		        alert(JS_LAN("range") + ValLow + "~" + ValHigh);
+		        HtmlObj.style.borderColor = "#FF0000";
+		        return false;
+		    }
+		    
+		    return true;
+        }
+        
+        function PidSameCheck(VidPidNode, AudPidNode, PcrPidNode, PmtPidNode) 
+        {
+            var lVidPid = parseInt(JS_HTMLGetValue(VidPidNode), 10);
+            var lAudPid = parseInt(JS_HTMLGetValue(AudPidNode), 10);
+            var lPcrPid = parseInt(JS_HTMLGetValue(PcrPidNode), 10);
+            var lPmtPid = parseInt(JS_HTMLGetValue(PmtPidNode), 10);
+            
+            if (lVidPid == lAudPid) {
+                VidPidNode.style.borderColor = "#FF0000";
+                AudPidNode.style.borderColor = "#FF0000";
+                return false;
+            }
+            
+            if (lVidPid == lPmtPid) {
+                VidPidNode.style.borderColor = "#FF0000";
+                PmtPidNode.style.borderColor = "#FF0000";
+                return false;
+            }
+            
+             if (lAudPid == lPcrPid) {
+                AudPidNode.style.borderColor = "#FF0000";
+                PcrPidNode.style.borderColor = "#FF0000";
+                return false;
+            }
+            
+            if (lAudPid == lPmtPid) {
+                AudPidNode.style.borderColor = "#FF0000";
+                PmtPidNode.style.borderColor = "#FF0000";
+                return false;
+            }
+            
+            if (lPcrPid == lPmtPid) {
+                PcrPidNode.style.borderColor = "#FF0000";
+                PmtPidNode.style.borderColor = "#FF0000";
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function StringLenCheck(HtmlObj, MaxLength) 
+        {   
+            var lString = JS_HTMLGetValueByID(HtmlObj);
+        
+            if (lString.length == 0) {
+                HtmlObj.style.borderColor = "#FF0000";
+                alert(JS_LAN("alert_str_null"));
+                return false;
+            }
+            
+            if (lString.length > MaxLength) {
+                HtmlObj.style.borderColor = "#FF0000";
+                alert(JS_LAN("alert_str_limit_length") + MaxLength);
+                return false;
+            }
+            
+            return true;
+        }
+
+        /* 设置参数检测 */
+        function ParamCheck(Index)
+		{
+		    /* 1. 判断整数和范围 */
+		    if (!IntRangeCheck($("bitrate_" + Index), s_ChannelLimitsObj.m_VidBitrateLimitLow, s_ChannelLimitsObj.m_VidBitrateLimitHigh)) 
+		        return false;
+		        
+		    if (!IntRangeCheck($("prog_bitrate_" + Index), parseInt(JS_HTMLGetValueByID("bitrate_" + Index), 10), s_ChannelLimitsObj.m_ProgBitrateLimitHigh)) 
+		        return false;
+
+		    if (!IntRangeCheck($("gop_" + Index), s_ChannelLimitsObj.m_GopLimitLow, s_ChannelLimitsObj.m_GopLimitHigh)) 
+		        return false;		    
+
+		    if (!IntRangeCheck($("volume_" + Index), s_ChannelLimitsObj.m_VolLimitLow, s_ChannelLimitsObj.m_VolLimitHigh)) 
+		        return false;		
+
+		    if (!IntRangeCheck($("prog_number_" + Index), s_ChannelLimitsObj.m_ProgNumberLimitLow, s_ChannelLimitsObj.m_ProgNumberLimitHigh)) 
+		        return false;
+
+		    if (!IntRangeCheck($("vid_pid_" + Index), s_ChannelLimitsObj.m_PidLimitLow, s_ChannelLimitsObj.m_PidLimitHigh)) 
+		        return false;		
+		        
+		    if (!IntRangeCheck($("aud_pid_" + Index), s_ChannelLimitsObj.m_PidLimitLow, s_ChannelLimitsObj.m_PidLimitHigh)) 
+		        return false;		
+		        
+		    if (!IntRangeCheck($("pcr_pid_" + Index), s_ChannelLimitsObj.m_PidLimitLow, s_ChannelLimitsObj.m_PidLimitHigh)) 
+		        return false;		
+		        
+		    if (!IntRangeCheck($("pmt_pid_" + Index), s_ChannelLimitsObj.m_PidLimitLow, s_ChannelLimitsObj.m_PidLimitHigh)) 
+		        return false;	
+		        
+		    /* 2. 检查 PID 互斥的情况
+		        视频 PID 可以和 PCR PID 相同，其他 PID 互斥
+		     */	
+		    if (!PidSameCheck($("vid_pid_" + Index), $("aud_pid_" + Index), $("pcr_pid_" + Index), $("pmt_pid_" + Index))) {
+		        return false;
+		    }
+		    
+		    /* 3. 节目名长度判断 */
+		    if (!StringLenCheck($("prog_name_" + Index), s_ChannelLimitsObj.m_ProgNameLimitHigh)) {
+		        return false;
+		    }
+
+		    return true;
+		}
+        
+        function OnChange(Item) 
+        {
+            var i;
+            var lVoModeObj;
+            var lChnObj, lSubObj, lSubInfo;
+            var lStr576P25 = ["576P25", "576P25"];
+            var lStr480P2997 = ["480P2997", "480P29.97"];
+            var lStr720P25 = ["720P25", "720P25"];
+            var lStr720P2997 = ["720P2997", "720P29.97"];
+            var lStr720P30 = ["720P30", "720P30"];
+            var lStr720P50 = ["720P50", "720P50"];
+            var lStr720P5994 = ["720P5994", "720P59.94"];
+            var lStr720P60 = ["720P60", "720P60"];
+            var lStr1080P25 = ["1080P25", "1080P25"];
+            var lStr1080P2997 = ["1080P2997", "1080P29.97"];
+            var lStr1080P30 = ["1080P30", "1080P30"];
+            var lStr1080P50 = ["1080P50", "1080P50"];
+            var lStr1080P5994 = ["1080P5994", "1080P59.94"];
+            var lStr1080P60 = ["1080P60", "1080P60"];
+            
+            lChnObj = JS_ParamGetInChannelObject(s_ChannelIndex);
+            for (i = 0; i < s_SubChannelNum; i++) {
+                lSubObj = JS_ParamGetSubChnObj(lChnObj, i);
+                lSubInfo = JS_ParamGetSubChannelInfoEncoderNew(lSubObj);
+                if (Item.id == "vi_mode_" + i) { /* VI 模式变化导致 VO 模式变化 */
+                    lVoModeObj = $("vo_mode_" + i);
+                    JS_UISelectRemoveAll(lVoModeObj);
+                    switch (JS_HTMLGetValueByID($("vi_mode_" + i))) {
+                        case "PAL":
+                            JS_UISelectAddOption(lVoModeObj, lStr576P25[0], lStr576P25[1]);                  
+                            break;  
+                        case "NTSC":
+                            JS_UISelectAddOption(lVoModeObj, lStr480P2997[0], lStr480P2997[1]);                  
+                            break;  
+                        case "720P50":
+                            JS_UISelectAddOption(lVoModeObj, lStr720P25[0], lStr720P25[1]);
+			                JS_UISelectAddOption(lVoModeObj, lStr720P50[0], lStr720P50[1]);                    
+                            break;  
+                        case "720P5994":
+                            JS_UISelectAddOption(lVoModeObj, lStr720P2997[0], lStr720P2997[1]);
+			                JS_UISelectAddOption(lVoModeObj, lStr720P5994[0], lStr720P5994[1]);                    
+                            break;  
+                        case "720P60":
+                            JS_UISelectAddOption(lVoModeObj, lStr720P30[0], lStr720P30[1]);
+			                JS_UISelectAddOption(lVoModeObj, lStr720P60[0], lStr720P60[1]);                   
+                            break;    
+                        case "1080I50":
+                            JS_UISelectAddOption(lVoModeObj, lStr720P25[0], lStr720P25[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr1080P25[0], lStr1080P25[1]);
+                            break;     
+                        case "1080I5994":
+                            JS_UISelectAddOption(lVoModeObj, lStr720P2997[0], lStr720P2997[1]);
+			                JS_UISelectAddOption(lVoModeObj, lStr1080P2997[0], lStr1080P2997[1]);                     
+                            break;  
+                        case "1080I60":
+                            JS_UISelectAddOption(lVoModeObj, lStr720P30[0], lStr720P30[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr1080P30[0], lStr1080P30[1]);
+                            break; 
+                        case "1080P50":
+                            JS_UISelectAddOption(lVoModeObj, lStr720P25[0], lStr720P25[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr720P50[0], lStr720P50[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr1080P25[0], lStr1080P25[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr1080P50[0], lStr1080P50[1]);
+                            break; 
+                        case "1080P5994":
+                            JS_UISelectAddOption(lVoModeObj, lStr720P2997[0], lStr720P2997[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr720P5994[0], lStr720P5994[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr1080P2997[0], lStr1080P2997[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr1080P5994[0], lStr1080P5994[1]);
+                            break; 
+                        case "1080P60":
+                            JS_UISelectAddOption(lVoModeObj, lStr720P30[0], lStr720P30[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr720P60[0], lStr720P60[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr1080P30[0], lStr1080P30[1]);
+                            JS_UISelectAddOption(lVoModeObj, lStr1080P60[0], lStr1080P60[1]);               
+                            break; 
+                        case "AUTO":
+                        default:
+                            break;                                 
+                    }
+                    JS_UISelectAddOption(lVoModeObj, "AUTO", "AUTO");
+                    JS_UISelectSetCurIndexByValue(lVoModeObj, "AUTO", true);
+                    if (lSubInfo.m_ViMode == JS_HTMLGetValueByID($("vi_mode_" + i))) {
+                        JS_UISelectSetCurIndexByValue(lVoModeObj, lSubInfo.m_VoMode, true);
+                    }
+                }
+                else if (Item.id == "aud_enc_mode_" + i) { /* 音频编码模式触发时候可以设置音频码率和音量大小 */
+                    if (JS_HTMLGetValueByID(Item) == "AC3" || JS_HTMLGetValueByID(Item) == "E-AC3") { /* AC3 与 E-AC3 是旁通，所以不设置音频码率和音量大小 */
+                        $("volume_" + i).disabled = true;
+                        $("aud_bitrate_" + i).disabled = true;
+                    }
+                    else {
+                        $("volume_" + i).disabled = false;
+                        $("aud_bitrate_" + i).disabled = false;
+                    }
+                }
+            }
+        }
+        
+        /* 若两组对象有相同的值，返回 false 并且将相同的对象标识出 */
+        function JS_SameElementCheck(Arr1, Arr2) 
+        {         
+            for (var i = 0; i < Arr1.length; i++) {  
+                for (var j = 0; j < Arr2.length; j++) {
+                    Arr1[i].style.borderColor = "#FFFFFF";
+                    Arr2[j].style.borderColor = "#FFFFFF";                    
+                    if (JS_HTMLGetValue(Arr1[i]) == JS_HTMLGetValue(Arr2[j])) {
+                        Arr1[i].style.borderColor = "#FF0000";
+                        Arr2[j].style.borderColor = "#FF0000";
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+        
+        function GroupPidSameCheck(SubChannelNum) {
+            var lObjElement = new Object();
+            var lArrayAll = [];
+            var i, j;
+            
+            for (i = 0; i < SubChannelNum; i++) {
+                var lArraySub = new Array($("vid_pid_" + i), $("aud_pid_" + i), $("pcr_pid_" + i), $("pmt_pid_" + i));
+                lArrayAll.push(lArraySub);
+            }
+            
+            for (i = 0; i < SubChannelNum; i++) {
+                for (j = i + 1; j < SubChannelNum; j++) {
+                    if (JS_SameElementCheck(lArrayAll[i], lArrayAll[j])) {
+                        alert(JS_LAN("alert_same_pid"));
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+        
+        function GroupProgramNumberCheck(SubChannelNum) {
+            var lObjElement = new Object();
+            var lArrayAll = [];
+            var i, j;
+            
+            for (i = 0; i < SubChannelNum; i++) {
+                var lArraySub = new Array($("prog_number_" + i));
+                lArrayAll.push(lArraySub);
+            }
+            
+            for (i = 0; i < SubChannelNum; i++) {
+                for (j = i + 1; j < SubChannelNum; j++) {
+                    if (JS_SameElementCheck(lArrayAll[i], lArrayAll[j])) {
+                        alert(JS_LAN("alert_same_prog_num"));
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+        
+		function OnSubmit(Item)
+		{
+			var i;
+			var lBodyNode, lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "parameters", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "chn_ind", s_ChannelIndex);
+			
+			if (s_Direction == "input")
+			{
+				JS_XMLAddTextChild(lXMLDom, lBodyNode, "direction", "IN");
+				if (s_ChannelType == "ENCODER")
+				{
+					JS_XMLAddTextChild(lXMLDom, lBodyNode, "type", s_ChannelType);
+					JS_XMLAddTextChild(lXMLDom, lBodyNode, "sub_type", s_ChannelSubType);
+					for (i = 0; i < s_SubChannelNum; i++)
+					{
+						lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "sub_channel");
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "sub_ind", i);
+						
+						if (ParamCheck(i)) {
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "vi_mode", JS_HTMLGetValueByID("vi_mode_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "vo_mode", JS_HTMLGetValueByID("vo_mode_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "br_mode", JS_HTMLGetValueByID("br_mode_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "enc_mode", JS_HTMLGetValueByID("enc_mode_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "profile", JS_HTMLGetValueByID("profile_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "bitrate", JS_HTMLGetValueByID("bitrate_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "prog_bitrate", JS_HTMLGetValueByID("prog_bitrate_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "gop", JS_HTMLGetValueByID("gop_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "aud_enc_mode", JS_HTMLGetValueByID("aud_enc_mode_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "aud_bitrate", JS_HTMLGetValueByID("aud_bitrate_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "aud_sample", JS_HTMLGetValueByID("aud_sample_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "volume", JS_HTMLGetValueByID("volume_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "prog_name", JS_HTMLGetValueByID("prog_name_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "prog_number", JS_HTMLGetValueByID("prog_number_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "vid_pid", JS_HTMLGetValueByID("vid_pid_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "aud_pid", JS_HTMLGetValueByID("aud_pid_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "pcr_pid", JS_HTMLGetValueByID("pcr_pid_" + i));
+                            JS_XMLAddTextChild(lXMLDom, lHolderNode, "pmt_pid", JS_HTMLGetValueByID("pmt_pid_" + i));
+						    JS_XMLAddTextChild(lXMLDom, lHolderNode, "active", JS_HTMLGetValueByID("active_" + i));
+						}
+						else {
+						    return;
+						}
+					}
+
+                    if (GroupPidSameCheck(s_SubChannelNum) && GroupProgramNumberCheck(s_SubChannelNum)) {
+					    JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+					    window.top.document.frames["BottomFrame"].OnShowLoadingWindow(5, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+				    }
+				}
+			}
+		}
+
+        
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title"><script type="text/javascript">JS_INLAN("title")</script></td>
+        </tr>
+        <tr>
+            <td height="30px" align="center" bgcolor="#F5F9FE">
+				<div id="head" style="height: 60px; width: 800px; overflow: auto; padding: 10px 20px 0px 10px;">
+					<table width="100%">
+						<tr>
+							<td height="22px" bgcolor="#E4EFF8" width="25%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_info"></span>
+							</td>
+							<td height="20px" bgcolor="#F5F9FE" width="75%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_type"></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="25px" bgcolor="#F5F9FE" width="100%" align="left" style="color: #069; font-size: 10pt;" colspan="2">
+                                <div style="text-align: left">
+                                    &nbsp&nbsp<span><script type="text/javascript">JS_INLAN("enc_parameter")</script></span>
+                                </div>
+							</td>
+						</tr>
+					</table>
+				</div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div style="width:820px; height:410px; overflow:auto;">
+                    <div id="sub_param" style="width:1800px; height: 360px; overflow:hidden; padding: 5px 10px 10px 10px;">
+                    </div>
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td height="6px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+       <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

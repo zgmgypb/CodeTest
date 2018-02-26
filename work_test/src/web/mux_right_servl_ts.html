@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_ServiceListItem = null;
+		var s_CHNIndex, s_SUBIndex;
+		var s_TsIndex;
+
+		JS_LANInitiate(); 
+		function OnLoad()
+		{
+			var lTmpVar, i;
+			var lTsObj, lServArray, lServObj, lServInfo, lServCAArray;
+			var lRouteInfo, lRouteMark;
+
+			lTmpVar = JS_ArgGetArgs();
+			s_CHNIndex = parseInt(JS_ArgGetValueByName(lTmpVar, "chn_ind"), 10);
+			s_SUBIndex = parseInt(JS_ArgGetValueByName(lTmpVar, "sub_ind"), 10);
+
+			if (isNaN(s_CHNIndex)) {
+				s_CHNIndex = 0;
+			}
+
+			if (isNaN(s_SUBIndex)) {
+				s_SUBIndex = 0;
+			}
+
+			s_TsIndex = 0;
+
+			JS_ParamInitate();
+
+
+			document.getElementById("ts_index").value = JS_StrLeftPading(s_TsIndex + 1, 3);
+			s_ServiceListItem = new MyListControl("s_ServiceListItem", 820, 400, "list_target", false);
+			s_ServiceListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_ServiceListItem.SetColProperty(1, 80, JS_LANCMN("service_id"), "center", "center");
+			s_ServiceListItem.SetColProperty(2, 140, JS_LANCMN("service_name"), "center", "center");
+			s_ServiceListItem.SetColProperty(3, 140, JS_LAN("auth_class"), "center", "center");
+			s_ServiceListItem.SetColProperty(4, 180, JS_LAN("lcn"), "center", "center");
+			s_ServiceListItem.SetColProperty(5, 100, JS_LAN("bouquet_id"), "center", "center");
+			s_ServiceListItem.UpdateListFrame();
+
+			lCHNArray = JS_ParamGetChannelArray(false);
+			if (lCHNArray.length > s_CHNIndex) 
+			{
+				lChnObj = lCHNArray[s_CHNIndex];
+				lSUBArray = JS_ParamGetSubChannelArray(lChnObj);
+				if (lSUBArray.length > s_SUBIndex) 
+				{
+					lSubObj = lSUBArray[s_SUBIndex];
+					lSubInfo = JS_ParamGetSubChannelInfo(lSubObj);
+					s_TsIndex = lSubInfo.m_TsIndex;
+					lTsObj = JS_ParamGetTsObject(s_TsIndex, false);
+					lRouteInfo = JS_ParamGetTsRouteInfo(lTsObj);
+					if (lRouteInfo.m_RouteMark == "ON")
+					{
+						lRouteMark = true;
+					}
+					else
+					{
+						lRouteMark = false;
+					}
+					
+					lServArray = JS_ParamGetServArrayByTsIndex(s_TsIndex, false);
+					for (i = 0; i < lServArray.length; i++)
+					{
+						lServObj = lServArray[i];
+						lItemInfo = JS_ParamGetServiceInfo(lServObj, false);
+						OnAddServiceRow(lItemInfo.m_IDs, lItemInfo.m_ServID, lItemInfo.m_ServName, lItemInfo.m_AuthClass, lItemInfo.m_LCN, lItemInfo.m_LCNVisiable, JS_StrLeftPading(lItemInfo.m_BouquetID.toString(16).toUpperCase(), 4), lRouteMark);
+					}
+				}
+			}
+			$("batch_ac").value = 1;
+			$("batch_start").value = lServArray.length?1:0;
+			$("batch_end").value = lServArray.length;
+		}
+
+
+		function OnAddServiceRow(ServIDs, ServID, ServName, AuthClass, LCN, LCNVisiable, BouquetID, DisableMark)
+		{
+			var lHolderNode, lContainer;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.readOnly = true;
+			lHolderNode.value = ServID;
+			lHolderNode.defaultValue = lHolderNode.value;
+			s_ServiceListItem.SetColValue(1, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "130";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = ServName;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			s_ServiceListItem.SetColValue(2, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "130";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = AuthClass;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = false;
+			lHolderNode.disabled = DisableMark;
+			JS_RestrctInputInt(lHolderNode);
+			s_ServiceListItem.SetColValue(3, lHolderNode);
+
+
+			lContainer = document.createElement("div");
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "100px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = LCN;
+			lHolderNode.defaultValue = lHolderNode.value;
+			JS_RestrctInputInt(lHolderNode);
+			lContainer.appendChild(lHolderNode);
+			lHolderNode = document.createElement("span");
+			lHolderNode.innerHTML = "-";
+			lContainer.appendChild(lHolderNode);
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, LCNVisiable, true);
+			lContainer.appendChild(lHolderNode);
+			s_ServiceListItem.SetColValue(4, lContainer);
+
+						
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "70";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = BouquetID;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = false;
+			lHolderNode.disabled = DisableMark;
+			JS_RestrctInputHEX(lHolderNode);
+			s_ServiceListItem.SetColValue(5, lHolderNode);
+			
+			s_ServiceListItem.AddRowToDom(false, ServIDs, false);
+		}
+				
+		function OnSubmit(Item)
+		{
+			var i, lRowNum;
+			var lTmpVar, lCont, llTmpValue, lServIDs, lServObj;
+			var lXMLDom, lBodyNode, lHolderNode;
+
+			lRowNum = s_ServiceListItem.GetRowNumber();
+
+			for (i = 0; i < lRowNum; i++) 
+			{
+				lTmpVar = s_ServiceListItem.GetColNodeByIndex(i, 3);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+				lCont = s_ServiceListItem.GetColNodeByIndex(i, 4);
+				lTmpVar = lCont.getElementsByTagName("input")[0];
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+				lTmpVar = s_ServiceListItem.GetColNodeByIndex(i, 5);
+				JS_UISetErrorIndicator(lTmpVar, true, false);
+			}
+
+			for (i = 0; i < lRowNum; i++) 
+			{
+				lTmpVar = s_ServiceListItem.GetColNodeByIndex(i, 3);
+				lTmpValue = parseInt(lTmpVar.value, 10);
+				if (lTmpValue > 65535 || lTmpValue <= 0 || isNaN(lTmpValue)) {
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					return false;
+				}
+				
+				lCont = s_ServiceListItem.GetColNodeByIndex(i, 4);
+				lTmpVar = lCont.getElementsByTagName("input")[0];
+				lTmpValue = parseInt(lTmpVar.value, 10);
+				if (lTmpValue > 16384 || lTmpValue <= 0 || isNaN(lTmpValue)) 
+				{
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					return false;
+				}
+
+				lTmpVar = s_ServiceListItem.GetColNodeByIndex(i, 3);
+				lTmpValue = parseInt(lTmpVar.value, 16);
+				if (lTmpValue > 65535 || lTmpValue < 0 || isNaN(lTmpValue)) {
+					JS_UISetErrorIndicator(lTmpVar, false, true);
+					return false;
+				}
+			}
+			
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "service_auth", "");
+
+			for (i = 0; i < lRowNum; i++)
+			{
+				lServIDs = s_ServiceListItem.GetRowData(i);
+				lServObj = JS_ParamGetServByIDs(lServIDs);
+				if (lServObj != null) 
+				{
+					lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "service");
+					JS_XMLAddTextChild(lXMLDom, lHolderNode, "serv_ids", lServIDs);
+					lTmpVar = s_ServiceListItem.GetColNodeByIndex(i, 3);
+					JS_XMLAddTextChild(lXMLDom, lHolderNode, "auth_class", parseInt(lTmpVar.value, 10));
+					lCont = s_ServiceListItem.GetColNodeByIndex(i, 4);
+					lTmpVar = lCont.getElementsByTagName("input")[0];
+					JS_XMLAddTextChild(lXMLDom, lHolderNode, "lcn", parseInt(lTmpVar.value, 10));
+					lTmpVar = lCont.getElementsByTagName("select")[0];
+					JS_XMLAddTextChild(lXMLDom, lHolderNode, "lcn_visiable", JS_UISelectGetCurValue(lTmpVar));
+					
+					lTmpVar = s_ServiceListItem.GetColNodeByIndex(i, 5);
+					JS_XMLAddTextChild(lXMLDom, lHolderNode, "bouquet_id", parseInt(lTmpVar.value, 16));
+				}
+			}
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(5, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+
+		function OnBatchApply(Item)
+		{
+			var i;
+			var lTmpValue, lTmpVar;
+			var lIndS, lIndE;
+		
+			
+			JS_UISetErrorIndicatorByID("batch_start", true, false);
+			JS_UISetErrorIndicatorByID("batch_end", true, false);
+
+
+			lIndS = parseInt($("batch_start").value, 10) - 1;
+			lIndE = parseInt($("batch_end").value, 10) - 1;
+
+			if (lIndS > lIndE)
+			{
+				JS_UISetErrorIndicatorByID("batch_start", false, false);
+				JS_UISetErrorIndicatorByID("batch_end", false, false);
+				return;
+			}
+
+			if (lIndS >= s_ServiceListItem.GetRowNumber() || lIndS < 0)
+			{
+				JS_UISetErrorIndicatorByID("batch_start", false, false);
+				return;
+			}
+
+			if (lIndE >= s_ServiceListItem.GetRowNumber() || lIndE < 0)
+			{
+				JS_UISetErrorIndicatorByID("batch_end", false, false);
+				return;
+			}
+
+			if (Item.id == "apply_ac") 
+			{
+				lTmpValue = $("batch_ac").value;
+				for (i = lIndS; i < lIndE + 1; i++) 
+				{
+					lTmpVar = s_ServiceListItem.GetColNodeByIndex(i, 3);
+					lTmpVar.value = lTmpValue;
+				}
+			}
+			
+		}
+
+	</script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                	<tr>
+                		<td width="150px" align="right"></td>
+                		<td><script type="text/javascript">JS_INLAN("title")</script><input id="dev_title" style="width:40px; text-align:center;background-color:transparent;border:0px; " value=""/></td>
+                		<td width="150px" align="right"></td>
+                	</tr>
+                </table>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+				<div style="height: 31px; width: 820px; overflow: auto; padding-left: 20px; padding-top: 10px; text-align: left; border: solid 0px #00FF00;">
+					<span><script type="text/javascript">JS_INCMNLAN("ts");</script></span>&nbsp;&nbsp;<input type="text" style="width: 60px; text-align: center;" id="ts_index" />
+				</div>
+				<div id="list_target" style="height: 403px; width: 820px; overflow: auto; padding: 1px 10px 0px 10px; border: solid 0px #FF0000;">
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+			<td valign="top" align="left" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+                    <input type="text" id="batch_start" style="width:40px; padding-left:5px; text-align:center"/>-<input type="text" id="batch_end" style="width:40px; padding-left:5px; text-align:center"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input id="batch_ac" style="width:40px; text-align:center;" value="1"/>&nbsp;&nbsp;
+                    <button type="button" onclick="OnBatchApply(this);" style="width: 130px; height: 25px" id="apply_ac" ><script type="text/javascript">JS_INLAN("apply_ac")</script></button>&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

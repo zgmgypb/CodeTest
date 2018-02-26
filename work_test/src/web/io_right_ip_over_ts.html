@@ -1,0 +1,503 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+	<script type="text/javascript" src="/js/common_process.js"></script>
+	<script type="text/javascript" src="/js/language.js"></script>
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+	<script type="text/javascript">
+
+	    var s_ListItem;
+
+	    var s_UpdateTimeout;
+
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnLoad()
+		{
+		    var i, lItemInfo, lTmpNode;
+
+			JS_ParamInitate();
+
+			lItemInfo = JS_ParamGetIPoTSInfo();
+
+			$("uplink_freq").value = (lItemInfo.m_UPFreq / 1000000).toFixed(6);
+
+
+			lTmpNode = $("uplink_bandwidth");
+			JS_UISelectAddOption(lTmpNode, 0, "6 MHz");
+			JS_UISelectAddOption(lTmpNode, 1, "7 MHz");
+			JS_UISelectAddOption(lTmpNode, 2, "8 MHz");
+			JS_UISelectAddOption(lTmpNode, 3, "12 MHz");
+			JS_UISelectAddOption(lTmpNode, 4, "14 MHz");
+			JS_UISelectAddOption(lTmpNode, 5, "16 MHz");
+			JS_UISelectAddOption(lTmpNode, 6, "18 MHz");
+			JS_UISelectAddOption(lTmpNode, 7, "21 MHz");
+			JS_UISelectAddOption(lTmpNode, 8, "24 MHz");
+			JS_UISelectAddOption(lTmpNode, 9, "28 MHz");
+			JS_UISelectAddOption(lTmpNode, 10, "32 MHz");
+			JS_UISelectSetCurIndexByValue(lTmpNode, lItemInfo.m_UPBand, true);
+
+			lTmpNode = $("uplink_constellation");
+			JS_UISelectAddOption(lTmpNode, "16QAM", "16QAM");
+			JS_UISelectAddOption(lTmpNode, "32QAM", "32QAM");
+			JS_UISelectAddOption(lTmpNode, "64QAM", "64QAM");
+			JS_UISelectAddOption(lTmpNode, "128QAM", "128QAM");
+			JS_UISelectAddOption(lTmpNode, "256QAM", "256QAM");
+			JS_UISelectSetCurIndexByValue(lTmpNode, lItemInfo.m_UPConstella, true);
+			
+			lTmpNode = $("uplink_gain");
+			for (i = 0; i <= lItemInfo.m_GainLevelMax; i++)
+			{
+			    lTmpValue = i * lItemInfo.m_GainLevelStep;
+			    JS_UISelectAddOption(lTmpNode, i, lTmpValue.toFixed(2));
+			}
+			JS_UISelectSetCurIndexByValue(lTmpNode, lItemInfo.m_UPGain, true);
+
+
+			$("downlink_freq").value = (lItemInfo.m_DownFreq / 1000000).toFixed(6);
+			
+			lTmpNode = $("downlink_bandwidth");
+			JS_UISelectAddOption(lTmpNode, 0, "6 MHz");
+			JS_UISelectAddOption(lTmpNode, 1, "7 MHz");
+			JS_UISelectAddOption(lTmpNode, 2, "8 MHz");
+			JS_UISelectAddOption(lTmpNode, 3, "12 MHz");
+			JS_UISelectAddOption(lTmpNode, 4, "14 MHz");
+			JS_UISelectAddOption(lTmpNode, 5, "16 MHz");
+			JS_UISelectAddOption(lTmpNode, 6, "18 MHz");
+			JS_UISelectAddOption(lTmpNode, 7, "21 MHz");
+			JS_UISelectAddOption(lTmpNode, 8, "24 MHz");
+			JS_UISelectAddOption(lTmpNode, 9, "28 MHz");
+			JS_UISelectAddOption(lTmpNode, 10, "32 MHz");
+			JS_UISelectSetCurIndexByValue(lTmpNode, lItemInfo.m_DownBand, true);
+
+
+			s_ListItem = new MyListControl("s_ListItem", 800, 200, "tuner_list", false);
+			s_ListItem.SetColProperty(0, 30, JS_LANCMN("index"), "center", "center");
+			s_ListItem.SetColProperty(1, 100, JS_LAN("current_bitrate"), "center", "center");
+			s_ListItem.SetColProperty(2, 100, JS_LAN("chn_bitrate"), "center", "center");
+			s_ListItem.SetColProperty(3, 100, JS_LAN("constellation"), "center", "center");
+			s_ListItem.SetColProperty(4, 120, JS_LANCMN("signal_strength"), "center", "center");
+			s_ListItem.SetColProperty(5, 120, JS_LANCMN("signal_quality"), "center", "center");
+			s_ListItem.SetColProperty(6, 120, JS_LAN("ber"), "center", "center");
+			s_ListItem.SetColProperty(7, 70, JS_LAN("lock"), "center", "center");
+			s_ListItem.UpdateListFrame();
+
+
+			for (i = 0; i < lItemInfo.m_DownNUM; i++)
+			{
+			    AddRecvStatusRow(i);
+			}
+
+			s_UpdateTimeout = 0;
+			setTimeout("OnRequestData()", 1000);
+
+        }
+        
+        
+        function AddRecvStatusRow(SubIndex)
+        {
+            var i, lTmpValue;
+            var lHolderNode;
+            var lIndex;
+
+            lIndex = s_ListItem.GetRowNumber();
+
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.width = "85px";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.value = "0.000";
+            lHolderNode.defaultValue = lHolderNode.value;
+            lHolderNode.readOnly = true;
+            s_ListItem.SetColValue(1, lHolderNode);
+
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.width = "85px";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.value = "0.000";
+            lHolderNode.defaultValue = lHolderNode.value;
+            lHolderNode.readOnly = true;
+            s_ListItem.SetColValue(2, lHolderNode);
+
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.width = "85px";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.value = "";
+            lHolderNode.defaultValue = lHolderNode.value;
+            lHolderNode.readOnly = true;
+            lHolderNode.name = "constella";
+            s_ListItem.SetColValue(3, lHolderNode);
+
+
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.width = "100px";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.readOnly = true;
+            lHolderNode.value = "0.000";
+            lHolderNode.defaultValue = lHolderNode.value;
+            lHolderNode.name = "strength";
+            s_ListItem.SetColValue(4, lHolderNode);
+
+
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.width = "100px";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.readOnly = true;
+            lHolderNode.value = "0.000";
+            lHolderNode.defaultValue = lHolderNode.value;
+            lHolderNode.name = "quality";
+            s_ListItem.SetColValue(5, lHolderNode);
+
+            lHolderNode = document.createElement("input");
+            lHolderNode.type = "text";
+            lHolderNode.style.width = "100px";
+            lHolderNode.style.textAlign = "center";
+            lHolderNode.readOnly = true;
+            lHolderNode.value = "";
+            lHolderNode.defaultValue = lHolderNode.value;
+            lHolderNode.name = "ber";
+            s_ListItem.SetColValue(6, lHolderNode);
+
+            lHolderNode = document.createElement("img");
+            lHolderNode.name = "red";
+            lHolderNode.src = "/graphics/red.gif"
+            s_ListItem.SetColValue(7, lHolderNode);
+
+
+            s_ListItem.AddRowToDom(false);
+
+        }
+        
+
+		
+		function OnAjaxCB(XMLDom)
+		{
+		    var i;
+		    var lTmpValue;
+		    var lColVar, lArray, lTmpObj;
+		    var lUpChnTotalBPS, lDownChnTotalBPS;
+
+
+		    if (XMLDom != null)
+		    {
+
+		        $("uplink_cur_constellation").value = JS_XMLGetTagValue(XMLDom, "uplink_constellation");
+		        lUpChnTotalBPS = parseFloat(JS_XMLGetTagValue(XMLDom, "uplink_bandwidth_bps"));
+		        $("uplink_band").value = (lUpChnTotalBPS / 1000000).toFixed(3);
+		        $("uplink_usage").value = (parseInt(JS_XMLGetTagValue(XMLDom, "uplink_cur_bps"), 10) / lUpChnTotalBPS * 100).toFixed(2);
+		        
+		        JS_HTMLSetBitrateUsageBackground($("uplink_usage"), $("uplink_usage").value)
+		        
+		        
+		        $("downlink_cur_constellation").value = JS_XMLGetTagValue(XMLDom, "downlink_constellation"), 10;
+		        lDownChnTotalBPS = parseFloat(JS_XMLGetTagValue(XMLDom, "downlink_bandwidth_bps"));
+		        $("downlink_band").value = (lDownChnTotalBPS / 1000000).toFixed(3);
+		        if (lDownChnTotalBPS == 0)
+		        {
+		            $("downlink_usage").value = 0;
+		        }
+		        else
+		        {
+		            $("downlink_usage").value = (parseInt(JS_XMLGetTagValue(XMLDom, "downlink_cur_bps"), 10) / lDownChnTotalBPS * 100).toFixed(2);
+		        }
+		        
+		        JS_HTMLSetBitrateUsageBackground($("downlink_usage"), $("downlink_usage").value)
+		        
+		        lArray = XMLDom.getElementsByTagName("chn_status");
+		        for (i = 0; i < lArray.length; i++)
+		        {
+		            lTmpObj = lArray[i];
+		            lTmpValue = (parseInt(JS_XMLGetTagValue(lTmpObj, "cur_bps"), 10) / 1000000).toFixed(3);
+		            lColVar = s_ListItem.GetColNodeByIndex(i, 1);
+		            lColVar.value = lTmpValue;
+
+		            lColVar = s_ListItem.GetColNodeByIndex(i, 2);
+		            lColVar.value = (lDownChnTotalBPS / lArray.length / 1000000).toFixed(3);
+
+		            lTmpValue = JS_XMLGetTagValue(lTmpObj, "cur_constella");
+		            lColVar = s_ListItem.GetColNodeByIndex(i, 3);
+		            lColVar.value = lTmpValue;
+
+		            lTmpValue = parseFloat(JS_XMLGetTagValue(lTmpObj, "strength")).toFixed(3);
+		            lColVar = s_ListItem.GetColNodeByIndex(i, 4);
+		            lColVar.value = lTmpValue;
+
+		            lTmpValue = parseFloat(JS_XMLGetTagValue(lTmpObj, "quality")).toFixed(3);
+		            lColVar = s_ListItem.GetColNodeByIndex(i, 5);
+		            lColVar.value = lTmpValue;
+
+		            lTmpValue = JS_XMLGetTagValue(lTmpObj, "ber");
+		            lColVar = s_ListItem.GetColNodeByIndex(i, 6);
+		            lColVar.value = lTmpValue;
+		            
+		            
+		            
+		            lTmpValue = JS_XMLGetTagValue(lTmpObj, "lock");
+		            lColVar = s_ListItem.GetColNodeByIndex(i, 7);
+
+
+		            if ((lTmpValue == "OFF") && (lColVar.name == "green"))
+		            {
+		                lColVar.src = "/graphics/red.gif"
+		                lColVar.name = "red";
+		            }
+		            else if ((lTmpValue == "ON") && (lColVar.name == "red"))
+		            {
+		                lColVar.src = "/graphics/green.gif"
+		                lColVar.name = "green";
+		            }
+		        }
+		        s_UpdateTimeout = 3;
+		        setTimeout("OnRequestData()", 1000);
+		    }
+		}
+
+		function OnRequestData()
+		{
+		    var lXMLDom, lBodyNode;
+		    s_UpdateTimeout--;
+		    if (s_UpdateTimeout < 0)
+		    {
+		        lXMLDom = JS_XMLCreateDomFromFile(null);
+		        lBodyNode = JS_XMLParamSetHead(lXMLDom, "tuners", "ip_over_ts", "recv_status");
+		        JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxCB, false);
+		    }
+		    else
+		    {
+		        //更新页面时间
+//		        $("time_out_value").innerHTML = JS_StrLeftPading(s_UpdateTimeout, 2);
+		        setTimeout("OnRequestData()", 1000);
+		    }
+		}
+		
+		function OnSubmit(Item)
+		{
+			var lTmpValue;
+			var lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			JS_UISetErrorIndicatorByID("uplink_freq", true, false);
+			JS_UISetErrorIndicatorByID("downlink_freq", true, false);
+
+			lTmpValue = parseFloat($("uplink_freq").value);
+			if (lTmpValue < 14 || lTmpValue > 900000000)
+			{
+				JS_UISetErrorIndicatorByID("uplink_freq", false, true);
+				return;
+			}
+			
+			lTmpValue = parseFloat($("downlink_freq").value) ;
+			if (lTmpValue < 14 || lTmpValue > 900)
+			{
+				JS_UISetErrorIndicatorByID("downlink_freq", false, true);
+				return;
+            }
+			
+			
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "ipots_setting", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "uplink_freq", parseInt(JS_HTMLGetValue($("uplink_freq")), 10) * 1000000);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "uplink_bandwidth", JS_HTMLGetValue($("uplink_bandwidth")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "uplink_constellation", JS_HTMLGetValue($("uplink_constellation")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "uplink_gain", JS_HTMLGetValue($("uplink_gain")));
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "downlink_freq", parseInt(JS_HTMLGetValue($("downlink_freq")), 10) * 1000000);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "downlink_bandwidth", JS_HTMLGetValue($("downlink_bandwidth")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "downlink_iq_swapt_mark", JS_HTMLGetValue($("downlink_iq_swapt_mark")));
+
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+        
+    </script>
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+				<span><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td  bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("uplink_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 30%">
+											<span><script type="text/javascript">JS_INLAN("uplink_freq")</script></span>&nbsp;&nbsp;&nbsp;
+											<input type="text" id="uplink_freq" style='width: 80px;text-align:center;' />
+										</td>
+										<td style="text-align: left; width: 20%">
+											<span><script type="text/javascript">JS_INLAN("uplink_bandwidth")</script></span>&nbsp;&nbsp;&nbsp;
+											<select id="uplink_bandwidth">
+											</select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("uplink_constellation")</script></span>&nbsp;&nbsp;&nbsp;
+											<select id="uplink_constellation">
+											</select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("uplink_gain")</script></span>&nbsp;&nbsp;&nbsp;
+											<select id="uplink_gain">
+											</select>&nbsp;&nbsp;&nbsp;
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("downlink_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 30%">
+											<span><script type="text/javascript">JS_INLAN("downlink_freq")</script></span>&nbsp;&nbsp;&nbsp;
+											<input type="text" id="downlink_freq" style='width: 80px;text-align:center;' />
+										</td>
+										<td style="text-align: left; width: 20%">
+											<span><script type="text/javascript">JS_INLAN("downlink_bandwidth")</script></span>&nbsp;&nbsp;&nbsp;
+											<select id="downlink_bandwidth">
+											</select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 25%">
+											<span><script type="text/javascript">JS_INLAN("downlink_iq_swapt_mark")</script></span>&nbsp;&nbsp;&nbsp;
+											<select id="downlink_iq_swapt_mark">
+											    <option value="OFF">OFF</option>
+											    <option value="ON">ON</option>
+											</select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 25%">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("uplink_status")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 33%">
+											<span><script type="text/javascript">JS_INLAN("link_band")</script></span>&nbsp;&nbsp;&nbsp;
+											<input type="text" id="uplink_band" style='width: 100px;text-align:center;' />
+										</td>
+										<td style="text-align: left; width: 33%">
+											<span><script type="text/javascript">JS_INLAN("band_usage")</script></span>&nbsp;&nbsp;&nbsp;
+											<input type="text" id="uplink_usage" style='width: 80px;text-align:center;' />
+										</td>
+										<td style="text-align: left; width: 33%">
+											<span><script type="text/javascript">JS_INLAN("link_constellation")</script></span>&nbsp;&nbsp;&nbsp;
+											<input type="text" id="uplink_cur_constellation" style='width: 80px;text-align:center;' />
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("downlink_status")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 33%">
+											<span><script type="text/javascript">JS_INLAN("link_band")</script></span>&nbsp;&nbsp;&nbsp;
+											<input type="text" id="downlink_band" style='width: 100px;text-align:center;' />
+										</td>
+										<td style="text-align: left; width: 33%">
+											<span><script type="text/javascript">JS_INLAN("band_usage")</script></span>&nbsp;&nbsp;&nbsp;
+											<input type="text" id="downlink_usage" style='width: 80px;text-align:center;' />
+										</td>
+										<td style="text-align: left; width: 33%">
+											<span><script type="text/javascript">JS_INLAN("link_constellation")</script></span>&nbsp;&nbsp;&nbsp;
+											<input type="text" id="downlink_cur_constellation" style='width: 80px;text-align:center;' />
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("receiving_status")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 0px; padding-right:0px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 100%">
+                                            <div id="tuner_list" style="height: 150px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                                            </div>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+            <td colspan="3" height="30px" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

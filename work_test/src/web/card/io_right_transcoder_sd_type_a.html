@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/js/monitor_setting.js"></script>
+    <script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+	<script type="text/javascript" src="/card/card_language.js"></script>
+	<script type="text/javascript" src="/card/card_system.js"></script>
+    <script type="text/javascript">
+    	var s_ModuleInd;
+    	var s_ModuleTag;
+    	
+    	JS_CLANInitiate();
+    	JS_LANInitiate();
+    	JS_CardParamInitiate();
+    	
+    	function OnLoad()
+    	{
+    		var i, lTmpVar;
+    		var lAlarmSystem, lAlarmArray, lAlarmObj;
+
+    		JS_MONInitiate();
+    		JS_CLANInitiate();
+    		
+    		lTmpVar = JS_ArgGetArgs();
+    		
+    		s_ModuleInd = parseInt(JS_ArgGetValueByName(lTmpVar, "module"), 10);
+    		s_ModuleTag = JS_ArgGetValueByName(lTmpVar, "module_tag");
+    		
+    		$("cur_name").innerHTML = JS_LANCMN("module") + "-" + JS_StrLeftPading(s_ModuleInd + 1, 2);
+        }
+
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="30px" colspan="3" align="center" background="/graphics/boxmenu_850.gif">
+                 <table border="0" cellspacing="0" cellpadding="0" width="100%" style="padding-left:20px;padding-right:20px;">
+					<tr>
+						<td width="250px" align="right">
+						</td>
+						<td align="center">
+							<span style="font-weight: bold"><script type="text/javascript" >JS_CINLAN("title")</script></span>
+						</td>
+						<td width="220px" align="right">
+						    <span id="cur_name" ></span>
+						</td>
+						<td width="30px" align="right">
+						</td>
+					</tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="list_target" style="height: 478px;width:820px; overflow: auto; padding:5px 10px 0px 10px;">
+                
+                </div>
+           </td>
+        </tr>
+        <tr>
+            <td colspan="3" bgcolor="#F5F9FE" align="center" >
+				<div style="height:1px; width:800px;overflow:hidden; background:#666;"></div>
+           </td>
+        </tr>
+		<tr>
+			<td colspan="3" bgcolor="#F5F9FE">
+				<div style="height: 30px; overflow: auto; padding: 5px 25px 7px 25px; text-align: right">
+				    <table width="100%" align="center" cellpadding="0" cellspacing="0">
+						<tr>
+							<td width="50%" align="left">
+							</td>
+							<td width="50%" align="right">
+								<button type="button" onclick='OnSubmitSetting(this);' style="width:80px; height:25px"id="submit" disabled><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+							</td>
+						</tr>
+					</table>
+
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="3" height="13"  background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

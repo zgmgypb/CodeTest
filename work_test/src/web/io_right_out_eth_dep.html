@@ -1,0 +1,404 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="js/common_process.js"></script>
+
+	<script type="text/javascript" src="js/language.js"></script>
+
+	<script type="text/javascript" src="js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="components/my_list_control/my_list_control.js"></script>
+    <script type="text/javascript" src="components/my_loading_window/my_loading_window.js"></script>
+
+	<script type="text/javascript">
+		var s_ListItem = null;
+		var s_ChnIndex = null;
+		var s_ChnType = null;
+		var s_SubType = null;
+		var s_SubNum = null;
+		/*IP限制*/
+		var s_PortNumLow = 1000;
+		var s_PortNumHigh = 65535;
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		JS_ParamInitate(); //初始化系统参数处理脚本组件
+		
+		function OnLoad()
+		{
+			var lTmpVar, lChnObj, lSubObj, lChnInfo, lSubInfo;
+			var i;
+
+			lTmpVar = JS_ArgGetArgs();
+			s_ChnIndex = JS_ArgGetValueByName(lTmpVar, "chn_ind");
+			if (s_ChnIndex != null)
+			{
+				s_ChnIndex = parseInt(s_ChnIndex);
+
+				lChnObj = JS_ParamGetOutChannelObjct(s_ChnIndex);
+
+				s_ChnType = JS_ParamGetChannelType(lChnObj);
+				s_SubType = JS_ParamGetChannelSubType(lChnObj);
+				s_SubNum = JS_ParamGetSubChannelNum(lChnObj);
+				
+				lChnInfo = JS_ParamGetChannelInfoETH(lChnObj);
+
+				$("chn_info").innerHTML = JS_LANCON("output") + " " + JS_LANCON("chan") + " " + JS_StrLeftPading((s_ChnIndex + 1), 2);
+				$("chn_type").innerHTML = JS_LANCON(s_ChnType);
+
+				s_ListItem = new MyListControl("s_ListItem", 830, 407, "sub_param", false);
+
+				
+				$("ipv4_batch").value = lChnInfo.m_IPv4Addr;
+				$("port_batch").value = 5000;
+				$("batch_start").value = 1;
+				$("batch_end").value = s_SubNum;
+
+				s_ListItem.SetColProperty(0, 80, JS_LANCON("index"), "center", "center");
+				s_ListItem.SetColProperty(1, 60, JS_LANCON("ts_index"), "center", "center");
+				s_ListItem.SetColProperty(2, 100, JS_LAN("pro_type"), "center", "center");
+				s_ListItem.SetColProperty(3, 180, JS_LAN("dest_addr"), "center", "center");
+				s_ListItem.SetColProperty(4, 290, "", "center", "center");
+				s_ListItem.SetColProperty(5, 60, JS_LANCON("active"), "center", "center");
+				s_ListItem.UpdateListFrame();
+
+
+				for (i = 0; i < s_SubNum; i++)
+				{
+					lSubObj = JS_ParamGetSubChnObj(lChnObj, i);
+					lSubInfo = JS_ParamGetSubChannelInfoETH(lSubObj);
+
+					AddOutETHRow(i, lSubInfo.m_TsIndex, lSubInfo.m_Protocol, lSubInfo.m_IPV4Des, lSubInfo.m_IPV4DesPort,lSubInfo.m_Active, false);
+
+				}
+			}
+			else
+			{
+				$("submit").disabled = true;
+			}
+		}
+
+
+		function AddOutETHRow(SubIndex, TsIndex, Protocol,DestAddr, DestPort,Active, Disabled )
+		{
+			var i;
+			var lHolderNode;
+			var lContainer;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "40px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = JS_StrLeftPading(TsIndex + 1, 3);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			s_ListItem.SetColValue(1, lHolderNode);
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "0", "UDP");
+			JS_UISelectAddOption(lHolderNode, "1", "RTP");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Protocol, true);
+			lHolderNode.style.height = "18px";
+	
+			lHolderNode.id = "protocol_" + SubIndex;
+			lHolderNode.name = "protocol";
+			s_ListItem.SetColValue(2, lHolderNode);
+
+
+			lContainer = document.createElement("div");
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "100px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = DestAddr;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "ipv4_des_addr_" + SubIndex;
+			JS_RestrctInputFloat(lHolderNode);
+			lContainer.appendChild(lHolderNode);
+			lHolderNode = document.createElement("span");
+			lHolderNode.innerHTML = ":";
+			lContainer.appendChild(lHolderNode);
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "40px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = DestPort;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "ipv4_des_port_" + SubIndex;
+			lContainer.appendChild(lHolderNode);
+			s_ListItem.SetColValue(3, lContainer);
+			
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Active, true);
+			lHolderNode.disabled = Disabled;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "active_" + SubIndex;
+			s_ListItem.SetColValue(5, lHolderNode);
+
+			s_ListItem.AddRowToDom(false);
+		}
+
+	
+		function OnValidationOutETH()
+		{
+			var i;
+			var lObj, lTmpValue;
+			
+			for (i = 0; i < s_SubNum; i++)
+			{
+				JS_UISetErrorIndicatorByID("ipv4_des_addr_" + i, true, false);
+				JS_UISetErrorIndicatorByID("ipv4_des_port_" + i, true, false);
+		
+			}
+			
+			for (i = 0; i < s_SubNum; i++)
+			{
+				lObj = $("active_" + i);
+				if (JS_HTMLGetValue(lObj) == "ON")
+				{
+					lObj = $("ipv4_des_addr_" + i);
+					lTmpValue = JS_ValidIPv4(JS_HTMLGetValue(lObj))
+					if (lTmpValue == 0)
+					{
+						JS_UISetErrorIndicator(lObj, false, true);
+						return false;
+					}
+					else if ((lTmpValue == 1))
+					{
+//						if (JS_HTMLGetValue(lObj) != $("ipv4_addr").value)
+//						{
+//							JS_UISetErrorIndicator(lObj, false, true);
+//							return false;
+//						}
+					}
+
+					lObj = $("ipv4_des_port_" + i);
+					if (JS_ValidPort(JS_HTMLGetValue(lObj), s_PortNumLow, s_PortNumHigh) == 0)
+					{
+						JS_UISetErrorIndicator(lObj, false, true);
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		function OnSubmit(Item)
+		{
+			var i;
+			var lBodyNode, lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+			var lTimeout;
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "parameters", "");
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "chn_ind", s_ChnIndex);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "type", s_ChnType);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "sub_type", s_SubType);
+
+			lTimeout = 4;
+			
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "direction", "OUT");
+					/*校验*/
+			if (OnValidationOutETH() != true)
+			{
+				return;
+			}
+			
+			for (i = 0; i < s_SubNum; i++)
+			{
+				lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "sub_channel");
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "sub_ind", i);
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "active_mark", JS_HTMLGetValueByID("active_" + i));
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "ipv4_des_addr", JS_HTMLGetValueByID("ipv4_des_addr_" + i));
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "ipv4_des_port", JS_HTMLGetValueByID("ipv4_des_port_" + i));
+				JS_XMLAddTextChild(lXMLDom, lHolderNode, "protocol", JS_HTMLGetValueByID("protocol_" + i));
+			}
+		    JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+		    window.top.document.frames["BottomFrame"].OnShowLoadingWindow(lTimeout, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+
+		}
+
+		function OnBatchApply(Item)
+		{
+			var i;
+			var lTmpNode;
+			var lIndexS, lIndexE;
+			var lIPv4, lPort;
+
+			if (Item.id == "apply")
+			{
+				JS_UISetErrorIndicatorByID("ipv4_batch", true, false);
+				JS_UISetErrorIndicatorByID("port_batch", true, false);
+				JS_UISetErrorIndicatorByID("batch_start", true, false);
+				JS_UISetErrorIndicatorByID("batch_end", true, false);
+				
+				
+				lIPv4 = $("ipv4_batch").value;
+				lPort = $("port_batch").value;
+				lIndexS = parseInt($("batch_start").value) - 1;
+				lIndexE = parseInt($("batch_end").value) - 1;
+
+				if (JS_ValidIPv4(lIPv4) == 0) 
+				{
+					JS_UISetErrorIndicatorByID("ipv4_batch", false, false);
+					return;
+				}
+
+				if (JS_ValidPort(lPort, s_PortNumLow, s_PortNumHigh) == false) 
+				{
+					JS_UISetErrorIndicatorByID("port_batch", false, false);
+					return;
+				}
+
+				if (lIndexS > lIndexE)
+				{
+					JS_UISetErrorIndicatorByID("batch_start", false, false);
+					JS_UISetErrorIndicatorByID("batch_end", false, false);
+					return;
+				}
+				
+				if (lIndexS >= s_ListItem.GetRowNumber() || lIndexS < 0) 
+				{
+					JS_UISetErrorIndicatorByID("batch_start", false, false);
+					return;
+				}
+				
+				if (lIndexE >= s_ListItem.GetRowNumber() || lIndexE < 0) 
+				{
+					JS_UISetErrorIndicatorByID("batch_end", false, false);
+					return;
+				}
+				
+				if (JS_ValidIPv4(lIPv4) == 2)
+				{
+					var lIPv4Part = new Array();
+					var lCount;
+					for (i = 0; i < 4; i++)
+					{
+						lIPv4Part[i] = JS_IPv4StrToPart(lIPv4, i);
+					}
+					
+					for( i = lIndexS; i <= lIndexE; i++)
+					{
+						if (lIPv4Part[3] > 255)
+						{
+							lIPv4Part[2] += 1;
+							lIPv4Part[3] = 0;
+							if (lIPv4Part[2] > 255)
+							{
+								lIPv4Part[1] += 1;
+								lIPv4Part[2] = 0;
+								if (lIPv4Part[1] > 255)
+								{
+									lIPv4Part[0] += 1;
+									lIPv4Part[1] = 0;
+									if (lIPv4Part[0] > 255)
+									{
+										lIPv4Part[0] = 1;
+									}
+								}
+							}
+						}
+						$("ipv4_des_addr_" + i).value = lIPv4Part[0] + "." + lIPv4Part[1] + "." + lIPv4Part[2] + "." + lIPv4Part[3];
+						$("ipv4_des_port_" + i).value = lPort;
+						JS_UISelectSetCurIndexByValue($("active_" + i), "ON", false);
+						lIPv4Part[3]++;
+					}
+				}
+				else
+				{
+					for (i = lIndexS; i <= lIndexE; i++)
+					{
+						$("ipv4_des_addr_" + i).value = lIPv4;
+						$("ipv4_des_port_" + i).value = lPort;
+						JS_UISelectSetCurIndexByValue($("active_" + i), "ON", false);
+						lPort++;
+					}
+				}
+			}
+			else
+			{
+				for (i = 0; i < s_ListItem.GetRowNumber(); i++)
+				{
+					JS_UISelectSetCurIndexByValue($("active_" + i), "OFF", false);
+				}
+			}
+		}
+	</script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+        <tr>
+            <td height="30" align="center" background="graphics/boxmenu_850.gif" id="setting_title"><script type="text/javascript">JS_INLAN("title")</script></td>
+        </tr>
+        <tr>
+            <td height="30" align="center" bgcolor="#F5F9FE">
+				<div id="head" style="height: 60px; width: 800px; overflow: auto; padding: 10px 20px 0px 10px;">
+					<table width="100%">
+						<tr>
+							<td height="22px" bgcolor="#E4EFF8" width="25%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_info"></span>
+							</td>
+							<td height="20px" bgcolor="#F5F9FE" width="75%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_type"></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="25px" bgcolor="#F5F9FE" width="100%" align="left" style="color: #069; font-size: 10pt;" colspan="2">
+                                <div id="eth_container" style="text-align: left">
+                                    &nbsp&nbsp<span><script type="text/javascript">JS_INLAN("eth_setting")</script></span>
+                                </div>
+							</td>
+						</tr>
+					</table>
+				</div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="sub_param" style="height: 400px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+       <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                    	<tr>
+                    		<td align="left" width="70%">
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span><script type="text/javascript">JS_INLAN("ip_batch")</script></span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="ipv4_batch" style="width:110px; padding-left:5px; text-align:center"/>-<input type="text" id="port_batch" style="width:55px; padding-left:5px; text-align:center"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="batch_start" style="width:40px; padding-left:5px; text-align:center"/>-<input type="text" id="batch_end" style="width:40px; padding-left:5px; text-align:center"/>&nbsp;&nbsp;&nbsp;<button type="button" onclick="OnBatchApply(this);" style="width: 50px; height: 25px" id="apply" ><script type="text/javascript">JS_INCMNLAN("apply")</script></button>&nbsp;&nbsp;<button type="button" onclick="OnBatchApply(this);" style="width: 70px; height: 25px" id="full_disable" ><script type="text/javascript">JS_INLAN("full_disable")</script></button>
+                    		</td>
+                     		<td align="right">
+								<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                     		</td>
+                   		</tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

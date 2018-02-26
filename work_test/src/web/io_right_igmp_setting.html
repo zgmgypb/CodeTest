@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem;
+		var s_IGMPMaxNum = 128;
+		var s_IGMPArray = new Array();
+
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnLoad()
+		{
+			var i;
+			var lItemArray;
+			var lItemInfo;
+
+			JS_ParamInitate();
+
+			lItemInfo = JS_ParamGetIGMPInfo();
+			s_IGMPMaxNum = lItemInfo.m_IGMPGroupMax;
+			$("igmp_repeate_time").value = lItemInfo.m_IGMPRepeateTime;
+			JS_UISelectSetCurIndexByValue($("igmp_repeate_mark"), lItemInfo.m_IGMPRepeateMark);
+			JS_UISelectSetCurIndexByValue($("igmp_version"), lItemInfo.m_IGMPVersion);
+			JS_RestrctInputInt($("igmp_repeate_time"));
+
+			s_BitrateListItem = new MyListControl("s_BitrateListItem", 830, 407, "list_target", true);
+			s_BitrateListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_BitrateListItem.SetColProperty(1, 120, JS_LAN("input_chn"), "center", "center");
+			s_BitrateListItem.SetColProperty(2, 80, "", "center", "center");
+			s_BitrateListItem.SetColProperty(3, 200, JS_LAN("des_addr"), "center", "center");
+			s_BitrateListItem.SetColProperty(4, 240, JS_LAN("src_addr_limit"), "center", "center");
+			s_BitrateListItem.SetColProperty(5, 60, "", "center", "center");
+			s_BitrateListItem.UpdateListFrame();
+
+
+//			lPIDMapSetting = JS_ParamGetPIDMapSetting();
+//			s_IGMPMaxNum = lPIDMapSetting.m_MaxItemNum;
+//			lPIDMapSetting = null;
+
+
+//			s_BitrateListItem = new MyListControl("s_BitrateListItem", 820, 472, "list_target", true);
+//			s_BitrateListItem.SetColProperty(0, 80, JS_LANCMN("index"), "center", "center");
+//			s_BitrateListItem.SetColProperty(1, 120, JS_LAN("in_chn"), "center", "center");
+//			s_BitrateListItem.SetColProperty(2, 150, JS_LAN("des_addr"), "center", "center");
+//			s_BitrateListItem.SetColProperty(3, 120, JS_LAN("src_addr"), "center", "center");
+//			s_BitrateListItem.SetColProperty(5, 80, JS_LAN("src_mark"), "center", "center");
+//			s_BitrateListItem.SetColProperty(6, 60, "", "center", "center");
+//			s_BitrateListItem.UpdateListFrame();
+
+//			//读取XML参数文件，显示PID MAP表
+//			lItemArray = JS_ParamGetPIDMapArray();
+//			for (i = 0; i < lItemArray.length; i++)
+//			{
+//				lItemInfo = JS_ParamGetPIDMapInfo(lItemArray[i]);
+//				s_IGMPArray[s_IGMPArray.length] = lItemInfo.m_IDs;
+//				OnAddIGMPRow(lItemInfo.m_IDs, lItemInfo.m_InTsIndex + 1, lItemInfo.m_InPID, lItemInfo.m_OutTsIndex + 1, lItemInfo.m_OutPID, lItemInfo.m_Active, false);
+//				lItemInfo = null;
+//			}
+		}
+
+		function OnRemoveIGMPRow()
+		{
+			s_BitrateListItem.RemoveSelectedRow();
+			//通过限制添加按钮的方式，回避用户错误！
+			if (s_BitrateListItem.GetRowNumber() < s_IGMPMaxNum)
+			{
+				JS_UISetDisableByID("add_pidmap", true);
+			}
+		}
+
+
+		function OnAddIGMPRow(IDs, InTsIndex, InPID, OutTsIndex, OutPID, Active, bShow)
+		{
+
+		}
+
+		function OnSubmit(Item)
+		{
+			var lValidValue;
+
+			var lHolderNode, lInforNode;
+
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "igmp", "");
+
+			JS_UISetErrorIndicatorByID("igmp_repeate_time", true, false);
+			
+			lValidValue = $("igmp_repeate_time").value;
+			if (lValidValue > 255 || lValidValue < 20)
+			{
+				JS_UISetErrorIndicatorByID("igmp_repeate_time", false, false);
+				return;
+			}
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "igmp_repeate_time", lValidValue);
+			
+		
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "igmp_repeate_mark", JS_UISelectGetCurValue($("igmp_repeate_mark")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "igmp_version", JS_UISelectGetCurValue($("igmp_version")));
+
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+	</script>
+</head>
+<body onload="OnLoad()">
+    <table width="850px" border="0" align="center" cellpadding="0" cellspacing="0" >
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+				<span><script type="text/javascript">JS_INLAN("title")</script></span>
+            </td>
+        </tr>
+        <tr>
+            <td height="25px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 30px; padding-top: 5px;">&nbsp;&nbsp;&nbsp;&nbsp;
+                <span><script type="text/javascript">JS_INLAN("igmp_repeate")</script></span>&nbsp;&nbsp;<span><input type="text" style="text-align: center; width: 70px" id="igmp_repeate_time" /></span>&nbsp;&nbsp;<span><select id="igmp_repeate_mark"><option value="OFF">OFF</option><option value="ON">ON</option></select></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                <span><script type="text/javascript">JS_INLAN("igmp_version")</script></span>&nbsp;<span><select id="igmp_version"><option value="2">2</option><option value="3">3</option></select></span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="list_target" style="height: 450px;width:820px; overflow: auto; padding:5px 10px 0px 10px;">
+                
+                </div>
+           </td>
+        </tr>
+         <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+       <tr>
+            <td valign="top" align="left" bgcolor="#F5F9FE">
+                <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick='OnAddIGMPRow(0, 1,8191,1,8191,"OFF", true);' style="width:100px; height:25px" id="add_pidmap" disabled><script type="text/javascript">JS_INCMNLAN("add")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='OnRemoveIGMPRow();' style="width:100px; height:25px"  disabled><script type="text/javascript">JS_INCMNLAN("remove")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='OnSubmit(this);' style="width:80px; height:25px" id="submit_pidmap"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width:80px; height:25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+           </td>
+        </tr>
+        <tr>
+            <td height="13px"  background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

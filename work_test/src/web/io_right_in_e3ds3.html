@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_BitrateListItem = null;
+		var s_Direction = "input";
+		var s_ChannelIndex = null;
+		var s_ChannelType = null;
+		var s_ChannelSubType = null;
+		var s_SubChannelNum = null;
+		var s_E3DS3ADJNumber = 4;
+
+		JS_LANInitiate(); //初始化语言脚本组件
+		function OnLoad()
+		{
+			var lTmpVar, lChnObj, lSubObj, lChnInfo, lSubInfo;
+			var i;
+
+			lTmpVar = JS_ArgGetArgs();
+			s_Direction = JS_ArgGetValueByName(lTmpVar, "direction");
+			s_ChannelIndex = parseInt(JS_ArgGetValueByName(lTmpVar, "chn_ind"), 10);
+			if (s_ChannelIndex != null)
+			{
+				JS_ParamInitate(); //初始化系统参数处理脚本组件
+				if (s_Direction == "input")
+				{
+				    lChnObj = JS_ParamGetInChannelObject(s_ChannelIndex);
+				}
+
+				s_ChannelType = JS_ParamGetChannelType(lChnObj);
+				s_ChannelSubType = JS_ParamGetChannelSubType(lChnObj);
+				s_SubChannelNum = JS_ParamGetSubChannelNum(lChnObj);
+
+				$("chn_info").innerHTML = JS_LANCMN(s_Direction) + JS_LANCMN("chan") + " " + JS_StrLeftPading((s_ChannelIndex + 1), 2);
+				$("chn_type").innerHTML = JS_LANCMN(s_ChannelType);
+
+				s_BitrateListItem = new MyListControl("s_BitrateListItem", 830, 407, "sub_param", false);
+				if (s_Direction == "input")
+				{
+					lTmpSubChannelNumber = JS_ParamGetOutSubChannelNum();
+					if(s_ChannelType == "E3DS3")
+					{
+					    s_BitrateListItem.SetColProperty(0, 50, JS_LANCMN("index"), "center", "center");
+					    s_BitrateListItem.SetColProperty(1, 50, JS_LANCMN("ts_index"), "center", "center");									   
+						s_BitrateListItem.SetColProperty(2, 70, JS_LAN("e3ds3"), "center", "center");
+						s_BitrateListItem.SetColProperty(3, 80, JS_LAN("bitorder"), "center", "center");
+						s_BitrateListItem.SetColProperty(4, 90, JS_LAN("frame"), "center", "center");
+						s_BitrateListItem.SetColProperty(5, 90, JS_LAN("plength"), "center", "center");
+						s_BitrateListItem.SetColProperty(6, 90, JS_LAN("interw"), "center", "center");
+						s_BitrateListItem.SetColProperty(7, 80, JS_LAN("scr"), "center", "center");
+						s_BitrateListItem.SetColProperty(8, 80, JS_LAN("rs"), "center", "center");
+						s_BitrateListItem.SetColProperty(9, 80, JS_LAN("recover"), "center", "center");
+						s_BitrateListItem.UpdateListFrame();
+
+						for (i = 0; i < s_SubChannelNum; i++)
+						{
+							lSubObj = JS_ParamGetSubChnObj(lChnObj, i);
+							lSubInfo = JS_ParamGetSubChannelInfoE3DS3(lSubObj);
+
+							AddInE3DS3Row(i, lSubInfo.m_TsIndex,lSubInfo.m_E3DS3,lSubInfo.m_BitOrder,lSubInfo.m_FrameFrom,lSubInfo.m_PacketLength,lSubInfo.m_Scramble,
+							lSubInfo.m_RSCoding,lSubInfo.m_InterweaveCoding,lSubInfo.m_CodeRateRecover,lSubInfo.m_Disabled);
+							      
+					 }		
+                   }
+				}
+			}
+		}
+		
+	    function AddInE3DS3Row(SubIndex, TsIndex,E3DS3, BitOrder,FrameForm,PacketLenth,Scramble,RSCoding,
+                                    InterweaveCoding,CodeRateRecover,Disabled)
+		{
+			var i;
+			var lHolderNode;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "40px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = JS_StrLeftPading(TsIndex + 1, 3);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.readOnly = true;
+			lHolderNode.name = "ts_index";
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+			
+			
+		
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "E3", "E3");
+			JS_UISelectAddOption(lHolderNode, "DS3", "DS3");
+			//JS_UISelectAddOption(lHolderNode, "Auto", "Auto");
+			JS_UISelectSetCurIndexByValue(lHolderNode, E3DS3, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "e3ds3_" + SubIndex;
+			lHolderNode.name = "e3ds3";
+			//lHolderNode.disabled = Disabled;
+			s_BitrateListItem.SetColValue(2, lHolderNode);
+
+            
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, " MSB", "MSB");
+			JS_UISelectAddOption(lHolderNode, "LSB", "LSB");
+			JS_UISelectSetCurIndexByValue(lHolderNode, BitOrder, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "bitorder_" + SubIndex;
+			lHolderNode.name = "bitorder";
+			//lHolderNode.disabled = Disabled;
+			s_BitrateListItem.SetColValue(3, lHolderNode);
+			
+
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, " Framed", "Framed");
+			JS_UISelectAddOption(lHolderNode, "No Framed", "No Framed");
+			JS_UISelectSetCurIndexByValue(lHolderNode, FrameForm, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "frame_" + SubIndex;
+			lHolderNode.name = "frame";
+			//lHolderNode.disabled = Disabled;
+			s_BitrateListItem.SetColValue(4, lHolderNode);
+
+
+			lHolderNode = JS_UISelectCreate();
+		    JS_UISelectAddOption(lHolderNode, " Auto", "Auto");
+			//JS_UISelectAddOption(lHolderNode, " 188", "188");
+			//JS_UISelectAddOption(lHolderNode, "204", "204");
+			JS_UISelectSetCurIndexByValue(lHolderNode, PacketLenth, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "plength_" + SubIndex;
+			lHolderNode.name = "plength";
+			//lHolderNode.disabled = Disabled;
+			s_BitrateListItem.SetColValue(5, lHolderNode);
+
+            lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, InterweaveCoding, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "interw_" + SubIndex;
+			lHolderNode.name = "interw";
+			
+			s_BitrateListItem.SetColValue(6, lHolderNode);
+
+            lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Scramble, true);
+			//lHolderNode.disabled = Disabled;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "scr_" + SubIndex;
+			lHolderNode.name = "scr";
+			
+			//lHolderNode.disabled = Disabled;
+			s_BitrateListItem.SetColValue(7, lHolderNode);
+			
+			
+
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, RSCoding, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "rs_" + SubIndex;
+			lHolderNode.name = "rs";
+			//lHolderNode.disabled = Disabled;
+			s_BitrateListItem.SetColValue(8, lHolderNode);
+
+
+			lHolderNode = JS_UISelectCreate();
+			//JS_UISelectAddOption(lHolderNode, " Auto", "Auto");
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, CodeRateRecover, true);
+			lHolderNode.style.height = "18px";
+			//lHolderNode.disabled = Disabled;
+			lHolderNode.id = "recover_" + SubIndex;
+			lHolderNode.name = "recover";
+			s_BitrateListItem.SetColValue(9, lHolderNode);		
+			
+			s_BitrateListItem.AddRowToDom(false);
+		}
+		
+
+
+
+
+
+		function OnSubmit(Item)
+		{
+			var i;
+			var lBodyNode, lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "io_config", "parameters", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "chn_ind", s_ChannelIndex);
+			
+			if (s_Direction == "input")
+			{
+				JS_XMLAddTextChild(lXMLDom, lBodyNode, "direction", "IN");
+				if (s_ChannelType == "E3DS3")
+				{
+					JS_XMLAddTextChild(lXMLDom, lBodyNode, "type", s_ChannelType);
+					JS_XMLAddTextChild(lXMLDom, lBodyNode, "sub_type", s_ChannelSubType);
+					for (i = 0; i < s_SubChannelNum; i++)
+					{
+					    lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "sub_channel");
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "sub_ind", i);						
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "e3ds3_mark", JS_HTMLGetValueByID("e3ds3_" + i));
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "bit_order", JS_HTMLGetValueByID("bitorder_" + i));
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "fream_from", JS_HTMLGetValueByID("frame_" + i));
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "packet_length", JS_HTMLGetValueByID("plength_" + i));
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "interweave_code", JS_HTMLGetValueByID("interw_" + i));
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "scramble_changer", JS_HTMLGetValueByID("scr_" + i));
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "rs_code", JS_HTMLGetValueByID("rs_" + i));						
+						JS_XMLAddTextChild(lXMLDom, lHolderNode, "code_rate_recover", JS_HTMLGetValueByID("recover_" + i));
+					}
+
+					JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+					window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+				}
+			}
+		}
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title"><script type="text/javascript">JS_INLAN("title")</script></td>
+        </tr>
+        <tr>
+            <td height="30px" align="center" bgcolor="#F5F9FE">
+				<div id="head" style="height: 60px; width: 800px; overflow: auto; padding: 10px 20px 0px 10px;">
+					<table width="100%">
+						<tr>
+							<td height="22px" bgcolor="#E4EFF8" width="25%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_info"></span>
+							</td>
+							<td height="20px" bgcolor="#F5F9FE" width="75%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							    <span id="chn_type"></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="25px" bgcolor="#F5F9FE" width="100%" align="left" style="color: #069; font-size: 10pt;" colspan="2">
+                                <div id="e3ds3_container" style="text-align: left">
+                                    &nbsp&nbsp<span><script type="text/javascript">JS_INLAN("e3ds3_setting")</script></span>
+                                </div>
+							</td>
+						</tr>
+					</table>
+				</div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="sub_param" style="height: 400px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+       <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

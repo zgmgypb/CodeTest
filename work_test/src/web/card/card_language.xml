@@ -1,0 +1,399 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <io_right_transcoder_sd_type_a.html>
+    <title>
+      <eng><![CDATA[Module Setting]]></eng>
+      <chn><![CDATA[模块设置]]></chn>
+    </title>
+  </io_right_transcoder_sd_type_a.html>
+  <io_right_transcoder_sd_type_a_ch.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <trans_setting>
+      <eng><![CDATA[Transcoder Setting :]]></eng>
+      <chn><![CDATA[ 参数设置：]]></chn>
+    </trans_setting>
+    <serv_select>
+      <eng><![CDATA[Transcode Service Select]]></eng>
+      <chn><![CDATA[转码节目选择]]></chn>
+    </serv_select>
+    <video_fmt>
+      <eng><![CDATA[Video Format]]></eng>
+      <chn><![CDATA[视频编码格式]]></chn>
+    </video_fmt>
+    <video_pro_level>
+      <eng><![CDATA[Video Profile&Level]]></eng>
+      <chn><![CDATA[编码类型]]></chn>
+    </video_pro_level>
+    <video_res_fr>
+      <eng><![CDATA[Video Frame]]></eng>
+      <chn><![CDATA[帧格式]]></chn>
+    </video_res_fr>
+    <video_rate>
+      <eng><![CDATA[Video Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[视频码率(Mbps)]]></chn>
+    </video_rate>
+    <aud_fmt>
+      <eng><![CDATA[Audio Format]]></eng>
+      <chn><![CDATA[音频编码格式]]></chn>
+    </aud_fmt>
+    <aud_sampl>
+      <eng><![CDATA[Sample]]></eng>
+      <chn><![CDATA[采样]]></chn>
+    </aud_sampl>
+    <aud_rate>
+      <eng><![CDATA[Bitrate]]></eng>
+      <chn><![CDATA[码率]]></chn>
+    </aud_rate>
+    <pid_delay>
+      <eng><![CDATA[Delay(ms)]]></eng>
+      <chn><![CDATA[延迟（ms）]]></chn>
+    </pid_delay>
+    <analyse>
+      <eng><![CDATA[Analyse]]></eng>
+      <chn><![CDATA[分析]]></chn>
+    </analyse>
+    <start>
+      <eng><![CDATA[Start]]></eng>
+      <chn><![CDATA[开始]]></chn>
+    </start>
+    <serv_param>
+      <eng><![CDATA[Service Information]]></eng>
+      <chn><![CDATA[节目信息]]></chn>
+    </serv_param>
+    <video_es_info>
+      <eng><![CDATA[Video Information]]></eng>
+      <chn><![CDATA[视频信息]]></chn>
+    </video_es_info>
+    <alert_select_valid_service>
+      <eng><![CDATA[Please Select A Service]]></eng>
+      <chn><![CDATA[请选择需要分析的节目]]></chn>
+    </alert_select_valid_service>
+    <alert_analyse_failed>
+      <eng><![CDATA[Analyse Failed! Please check input or contact technical support staff!]]></eng>
+      <chn><![CDATA[分析失败，请检查输入是否正确或者联系技术支持人员]]></chn>
+    </alert_analyse_failed>
+    <comb>
+      <eng><![CDATA[PCR]]></eng>
+      <chn><![CDATA[PCR]]></chn>
+    </comb>
+  </io_right_transcoder_sd_type_a_ch.html>
+  <monitor_right_card_alarm.html>
+    <title>
+      <eng><![CDATA[Alarms]]></eng>
+      <chn><![CDATA[报警信息]]></chn>
+    </title>
+    <description>
+      <eng><![CDATA[Description]]></eng>
+      <chn><![CDATA[描述信息]]></chn>
+    </description>
+    <status>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态]]></chn>
+    </status>
+    <log_date>
+      <eng><![CDATA[Log Time]]></eng>
+      <chn><![CDATA[日志时间]]></chn>
+    </log_date>
+    <counter>
+      <eng><![CDATA[Counter]]></eng>
+      <chn><![CDATA[计数器]]></chn>
+    </counter>
+    <detail_title>
+      <eng><![CDATA[Details]]></eng>
+      <chn><![CDATA[信息]]></chn>
+    </detail_title>
+    <detail>
+      <eng><![CDATA[Detail]]></eng>
+      <chn><![CDATA[信息]]></chn>
+    </detail>
+    <detail_info>
+      <eng><![CDATA[Detail Information]]></eng>
+      <chn><![CDATA[详细信息]]></chn>
+    </detail_info>
+    <reset_title>
+      <eng><![CDATA[Reset]]></eng>
+      <chn><![CDATA[重置]]></chn>
+    </reset_title>
+    <reset>
+      <eng><![CDATA[Reset]]></eng>
+      <chn><![CDATA[重置]]></chn>
+    </reset>
+    <trap>
+      <eng><![CDATA[Trap]]></eng>
+      <chn><![CDATA[Trap]]></chn>
+    </trap>
+    <panel>
+      <eng><![CDATA[Panel]]></eng>
+      <chn><![CDATA[面板]]></chn>
+    </panel>
+    <log_level>
+      <eng><![CDATA[Log Level]]></eng>
+      <chn><![CDATA[报警等级]]></chn>
+    </log_level>
+    <disable>
+      <eng><![CDATA[Disable]]></eng>
+      <chn><![CDATA[禁用]]></chn>
+    </disable>
+    <info>
+      <eng><![CDATA[Info]]></eng>
+      <chn><![CDATA[信息]]></chn>
+    </info>
+    <warnning>
+      <eng><![CDATA[Warnning]]></eng>
+      <chn><![CDATA[警告]]></chn>
+    </warnning>
+    <critical>
+      <eng><![CDATA[Critical]]></eng>
+      <chn><![CDATA[错误]]></chn>
+    </critical>
+    <reset_all>
+      <eng><![CDATA[Reset All Counter]]></eng>
+      <chn><![CDATA[重置所有计数器]]></chn>
+    </reset_all>
+    <reset_platform_counter>
+      <eng><![CDATA[Reset Modules Counter]]></eng>
+      <chn><![CDATA[重置所有子板计数器]]></chn>
+    </reset_platform_counter>
+  </monitor_right_card_alarm.html>
+  <monitor_right_card_status_transcoder_sd_type_a.html>
+    <title>
+      <eng><![CDATA[Module Status]]></eng>
+      <chn><![CDATA[模块状态]]></chn>
+    </title>
+    <global_mark>
+      <eng><![CDATA[Alarms General Switch:]]></eng>
+      <chn><![CDATA[报警全局开关：]]></chn>
+    </global_mark>
+    <critical_temp>
+      <eng><![CDATA[Critical Temperature (℃):]]></eng>
+      <chn><![CDATA[极限温度 (℃)：]]></chn>
+    </critical_temp>
+    <temperature>
+      <eng><![CDATA[Temperature]]></eng>
+      <chn><![CDATA[温度]]></chn>
+    </temperature>
+    <board_io_v>
+      <eng><![CDATA[I/O Valid Bitrate(Mbps)]]></eng>
+      <chn><![CDATA[输入输出有效码率(Mbps)]]></chn>
+    </board_io_v>
+    <board_io_t>
+      <eng><![CDATA[I/O Total Bitrate(Mbps)]]></eng>
+      <chn><![CDATA[输入输出总码率(Mbps)]]></chn>
+    </board_io_t>
+
+  </monitor_right_card_status_transcoder_sd_type_a.html>
+  <io_right_sub_flash_burner.html>
+    <title>
+      <eng><![CDATA[Module Sub Flash Burner]]></eng>
+      <chn><![CDATA[模块的FLASH烧写器]]></chn>
+    </title>
+    <burner_info>
+      <eng><![CDATA[Burner Information]]></eng>
+      <chn><![CDATA[烧写器信息]]></chn>
+    </burner_info>
+    <state>
+      <eng><![CDATA[State]]></eng>
+      <chn><![CDATA[状态]]></chn>
+    </state>
+    <progress>
+      <eng><![CDATA[Progress]]></eng>
+      <chn><![CDATA[当前进度]]></chn>
+    </progress>
+    <avg_bandwidth>
+      <eng><![CDATA[AVG Band(MB/S)]]></eng>
+      <chn><![CDATA[平均速率(MB/S)]]></chn>
+    </avg_bandwidth>
+    <cur_bandwidth>
+      <eng><![CDATA[Cur Band(MB/S)]]></eng>
+      <chn><![CDATA[当前速率(MB/S)]]></chn>
+    </cur_bandwidth>
+    <duraion>
+      <eng><![CDATA[Duration(S)]]></eng>
+      <chn><![CDATA[经过时间(S)]]></chn>
+    </duraion>
+    <left_duration>
+      <eng><![CDATA[Time Left(S)]]></eng>
+      <chn><![CDATA[剩余时间(S)]]></chn>
+    </left_duration>
+    <ok_mark>
+      <eng><![CDATA[Result]]></eng>
+      <chn><![CDATA[检测结果]]></chn>
+    </ok_mark>
+    <idle>
+      <eng><![CDATA[IDLE]]></eng>
+      <chn><![CDATA[待机]]></chn>
+    </idle>
+    <programing>
+      <eng><![CDATA[Programing]]></eng>
+      <chn><![CDATA[烧写中]]></chn>
+    </programing>
+    <checking>
+      <eng><![CDATA[Checking]]></eng>
+      <chn><![CDATA[校验中]]></chn>
+    </checking>
+    <complete>
+      <eng><![CDATA[Complete]]></eng>
+      <chn><![CDATA[完成]]></chn>
+    </complete>
+  </io_right_sub_flash_burner.html>
+  <!--不属于特定页面的字符串-->
+  <common_strings>
+    <decode_param>
+      <eng><![CDATA[Decode Parameter]]></eng>
+      <chn><![CDATA[解码参数]]></chn>
+    </decode_param>
+    <encode_param>
+      <eng><![CDATA[Encode Parameter]]></eng>
+      <chn><![CDATA[编码参数]]></chn>
+    </encode_param>
+    
+    <!--模块显示名称-->
+    <module_name>
+      <transcoder_sd_type_a>
+        <eng><![CDATA[6 CH SD TRANS]]></eng>
+        <chn><![CDATA[6路标清转码模块]]></chn>
+      </transcoder_sd_type_a>
+      <sub_flash_burner>
+        <eng><![CDATA[Sub Flash Burner]]></eng>
+        <chn><![CDATA[子板FLASH烧写器]]></chn>
+      </sub_flash_burner>
+    </module_name>
+    <!--通道显示名称-->
+    <chn_name>
+      <transcoder_sd_type_a_ch>
+        <eng><![CDATA[2 CH TRANS]]></eng>
+        <chn><![CDATA[2 通道转码]]></chn>
+      </transcoder_sd_type_a_ch>
+      <asi_in>
+        <eng><![CDATA[ASI IN]]></eng>
+        <chn><![CDATA[异步串行输入]]></chn>
+      </asi_in>
+      <asi_in>
+        <eng><![CDATA[ASI OUT]]></eng>
+        <chn><![CDATA[异步串行输出]]></chn>
+      </asi_in>
+      <cvbs_in>
+        <eng><![CDATA[CVBS IN]]></eng>
+        <chn><![CDATA[模拟输入]]></chn>
+      </cvbs_in>
+      <cvbs_out>
+        <eng><![CDATA[CVBS OUT]]></eng>
+        <chn><![CDATA[模拟输出]]></chn>
+      </cvbs_out>
+      <sdi_in>
+        <eng><![CDATA[SDI IN]]></eng>
+        <chn><![CDATA[串行数字接口输入]]></chn>
+      </sdi_in>
+      <sdi_out>
+        <eng><![CDATA[SDI OUT]]></eng>
+        <chn><![CDATA[串行数字接口输出]]></chn>
+      </sdi_out>
+      <encoder_vixs_pro100>
+        <eng><![CDATA[Encoder - TYPE-A]]></eng>
+        <chn><![CDATA[编码 - 方案A]]></chn>
+      </encoder_vixs_pro100>
+      <demode_atbm8869>
+        <eng><![CDATA[Demod - TYPE-A - DVB-C/DTMB]]></eng>
+        <chn><![CDATA[解调 - 方案A - 欧标有线/国标地面]]></chn>
+      </demode_atbm8869>
+    </chn_name>
+  </common_strings>
+
+
+  <alarms_strings>
+    <!--注意这里的数值都是HEX-->
+    <transcoder_sd_type_a>
+      <log_type_1>
+        <eng><![CDATA[Output Error]]></eng>
+        <chn><![CDATA[转码输出错误]]></chn>
+      </log_type_1>
+      <log_detail_1>
+        <code_0><!--根据不同的Userdata显示不同的细节-->
+          <eng><![CDATA[Channel 1-1 (Service 1) No Output]]></eng>
+          <chn><![CDATA[通道 1-1 （节目1）没有输出]]></chn>
+        </code_0>
+        <code_1>
+          <eng><![CDATA[Channel 1-2 (Service 2) No Output]]></eng>
+          <chn><![CDATA[通道 1-2 （节目2）没有输出]]></chn>
+        </code_1>
+        <code_10>
+          <eng><![CDATA[Channel 2-1 (Service 3) No Output]]></eng>
+          <chn><![CDATA[通道 2-1 （节目3）没有输出]]></chn>
+        </code_10>
+        <code_11>
+          <eng><![CDATA[Channel 2-2 (Service 4) No Output]]></eng>
+          <chn><![CDATA[通道 2-2 （节目4）没有输出]]></chn>
+        </code_11>
+        <code_20>
+          <eng><![CDATA[Channel 3-1 (Service 5) No Output]]></eng>
+          <chn><![CDATA[通道 3-1 （节目5）没有输出]]></chn>
+        </code_20>
+        <code_21>
+          <eng><![CDATA[Channel 3-2 (Service 6) No Output]]></eng>
+          <chn><![CDATA[通道 3-2 （节目6）没有输出]]></chn>
+        </code_21>
+      </log_detail_1>
+      <log_type_2>
+        <eng><![CDATA[Input Error]]></eng>
+        <chn><![CDATA[转码输入错误]]></chn>
+      </log_type_2>
+      <log_detail_2>
+        <code_0>
+          <eng><![CDATA[Channel 1-1 (Service 1) No Input]]></eng>
+          <chn><![CDATA[通道 1-1 （节目1）没有输入]]></chn>
+        </code_0>
+        <code_1>
+          <eng><![CDATA[Channel 1-2 (Service 2) No Input]]></eng>
+          <chn><![CDATA[通道 1-2 （节目2）没有输入]]></chn>
+        </code_1>
+        <code_10>
+          <eng><![CDATA[Channel 2-1 (Service 3) No Input]]></eng>
+          <chn><![CDATA[通道 2-1 （节目3）没有输入]]></chn>
+        </code_10>
+        <code_11>
+          <eng><![CDATA[Channel 2-1 (Service 4) No Input]]></eng>
+          <chn><![CDATA[通道 2-2 （节目4）没有输入]]></chn>
+        </code_11>
+        <code_20>
+          <eng><![CDATA[Channel 3-1 (Service 5) No Input]]></eng>
+          <chn><![CDATA[通道 3-1 （节目5）没有输入]]></chn>
+        </code_20>
+        <code_21>
+          <eng><![CDATA[Channel 3-1 (Service 6) No Input]]></eng>
+          <chn><![CDATA[通道 3-2 （节目6）没有输入]]></chn>
+        </code_21>
+      </log_detail_2>
+      <log_type_3>
+        <eng><![CDATA[COM Error]]></eng>
+        <chn><![CDATA[通讯错误]]></chn>
+      </log_type_3>
+      <log_detail_3>
+        <code_0>
+          <eng><![CDATA[Chip 1 COM Error]]></eng>
+          <chn><![CDATA[芯片 1 通讯错误]]></chn>
+        </code_0>
+        <code_1>
+          <eng><![CDATA[Chip 2 COM Error]]></eng>
+          <chn><![CDATA[芯片 2 通讯错误]]></chn>
+        </code_1>
+        <code_2>
+          <eng><![CDATA[Chip 3 COM Error]]></eng>
+          <chn><![CDATA[芯片 3 通讯错误]]></chn>
+        </code_2>
+      </log_detail_3>
+      <log_type_4>
+        <eng><![CDATA[Overheated]]></eng>
+        <chn><![CDATA[温度过高]]></chn>
+      </log_type_4>
+      <log_detail_4>
+        <code_0>
+          <eng><![CDATA[Module Overheated]]></eng>
+          <chn><![CDATA[模块温度过高]]></chn>
+        </code_0>
+      </log_detail_4>
+    </transcoder_sd_type_a>
+  </alarms_strings>
+</root>

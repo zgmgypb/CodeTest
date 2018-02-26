@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript">
+
+		JS_LANInitiate(); 
+
+		function OnLoad()
+		{
+			var i, lTmpVar, lItemInfo, lTmpStr, lTmpValue, lCharSetArray, lCharSetInfo;
+
+			lTmpVar = JS_ArgGetArgs();
+
+			JS_RestrctInputHEX($("eca_desc_tag"));
+			JS_RestrctInputHEX($("local_id"));
+
+			JS_ParamInitate();
+
+			lTmpVar = JS_ParamGetECA();
+
+			JS_UISelectSetCurIndexByValue($("eca_active_mark"), JS_XMLGetTagValue(lTmpVar, "eca_active_mark"));
+			JS_UISelectSetCurIndexByValue($("eca_encrypt_mark"), JS_XMLGetTagValue(lTmpVar, "eca_encrypt_mark"));
+			$("eca_desc_tag").value = parseInt(JS_XMLGetTagValue(lTmpVar, "eca_desc_tag"), 10);
+			$("local_id").value = JS_XMLGetTagValue(lTmpVar, "local_id");
+			
+		}
+       
+		function OnSubmit(Item)
+		{
+			var lTmpValue;
+			var lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			JS_UISetErrorIndicatorByID("eca_desc_tag", true, false);
+			JS_UISetErrorIndicatorByID("local_id", true, false);
+
+			lTmpValue = parseInt($("eca_desc_tag").value, 10);
+			if (lTmpValue < 0 || lTmpValue > 255)
+			{
+				JS_UISetErrorIndicatorByID("eca_desc_tag", false, true);
+				return;
+			}
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "eca_setting", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "eca_active_mark", JS_UISelectGetCurValue($("eca_active_mark")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "eca_encrypt_mark", JS_UISelectGetCurValue($("eca_encrypt_mark")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "eca_desc_tag", $("eca_desc_tag").value);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "local_id", $("local_id").value);
+
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(5, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+	</script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                	<tr>
+                		<td width="150px" align="right"></td>
+                		<td><script type="text/javascript">JS_INLAN("title")</script></td>
+                		<td width="150px" align="right"></td>
+                	</tr>
+                </table>
+			</td>
+		</tr>
+		<tr>
+			<td  bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("eca_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 20%">
+											<span><script type="text/javascript">JS_INLAN("eca_active_mark")</script></span>&nbsp;&nbsp;&nbsp;<select id="eca_active_mark"><option value="OFF">OFF</option><option value="ON">ON</option></select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 20%">
+											<span><script type="text/javascript">JS_INLAN("eca_encrypt_mark")</script></span>&nbsp;&nbsp;&nbsp;<select id="eca_encrypt_mark"><option value="OFF">OFF</option><option value="ON">ON</option></select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 60%">
+											<span><script type="text/javascript">JS_INLAN("eca_desc_tag")</script></span>&nbsp;&nbsp;&nbsp;<input id="eca_desc_tag" type="text" style="text-align: center; width: 70px" value="00" />&nbsp;&nbsp;&nbsp;
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("local_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 35%">
+											<span><script type="text/javascript">JS_INLAN("local_id")</script></span>&nbsp;&nbsp;&nbsp;<input id="local_id" type="text" style="text-align: center; width: 70px" value="00000000" />&nbsp;&nbsp;&nbsp;
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+            <td colspan="3" height="30px" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

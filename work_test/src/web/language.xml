@@ -1,0 +1,4332 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <top.html>
+    <inforamtion>
+      <eng><![CDATA[Information]]></eng>
+      <chn><![CDATA[设备信息]]></chn>
+    </inforamtion>
+    <monitor>
+      <eng><![CDATA[Monitor]]></eng>
+      <chn><![CDATA[设备监控]]></chn>
+    </monitor>
+    <io_config>
+      <eng><![CDATA[I/O Configuration]]></eng>
+      <chn><![CDATA[输入输出]]></chn>
+    </io_config>
+    <mux_setting>
+      <eng><![CDATA[Mux Setting]]></eng>
+      <chn><![CDATA[节目复用]]></chn>
+    </mux_setting>
+    <scramble_setting>
+      <eng><![CDATA[Scramble Setting]]></eng>
+      <chn><![CDATA[节目加扰]]></chn>
+    </scramble_setting>
+    <system_config>
+      <eng><![CDATA[System Setting]]></eng>
+      <chn><![CDATA[设备设置]]></chn>
+    </system_config>
+    <com_config>
+      <eng><![CDATA[Communication Setting & Monitor]]></eng>
+      <chn><![CDATA[通讯设置和监控]]></chn>
+    </com_config>
+    <user_manage>
+      <eng><![CDATA[User Management]]></eng>
+      <chn><![CDATA[用户管理]]></chn>
+    </user_manage>
+  </top.html>
+
+  <bottom.html>
+    <status>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[设备状态]]></chn>
+    </status>
+    <eject>
+      <eng><![CDATA[Eject]]></eng>
+      <chn><![CDATA[弹出]]></chn>
+    </eject>
+    <reset>
+      <eng><![CDATA[Reset]]></eng>
+      <chn><![CDATA[复位]]></chn>
+    </reset>
+    <connection_lost>
+      <eng><![CDATA[Connection Failed]]></eng>
+      <chn><![CDATA[连接已经断开]]></chn>
+    </connection_lost>
+    <scramble>
+      <eng><![CDATA[Scramble :]]></eng>
+      <chn><![CDATA[加扰状态：]]></chn>
+    </scramble>
+    <ecm_update>
+      <eng><![CDATA[ECM Update :]]></eng>
+      <chn><![CDATA[ECM 更新：]]></chn>
+    </ecm_update>
+    <in>
+      <eng><![CDATA[IN :]]></eng>
+      <chn><![CDATA[输入：]]></chn>
+    </in>
+    <out>
+      <eng><![CDATA[OUT :]]></eng>
+      <chn><![CDATA[输出：]]></chn>
+    </out>
+    <inserter>
+      <eng><![CDATA[INS :]]></eng>
+      <chn><![CDATA[插入：]]></chn>
+    </inserter>
+    <control>
+      <eng><![CDATA[CONTROL :]]></eng>
+      <chn><![CDATA[控制：]]></chn>
+    </control>
+  </bottom.html>
+
+  <information_left.html>
+    <title>
+      <eng><![CDATA[Information]]></eng>
+      <chn><![CDATA[设备信息]]></chn>
+    </title>
+    <info_item>
+      <eng><![CDATA[Information Item]]></eng>
+      <chn><![CDATA[设备信息项目]]></chn>
+    </info_item>
+    <device_model>
+      <eng><![CDATA[Device Model:]]></eng>
+      <chn><![CDATA[设备型号：]]></chn>
+    </device_model>
+    <serial_number>
+      <eng><![CDATA[Serial Number:]]></eng>
+      <chn><![CDATA[序列号：]]></chn>
+    </serial_number>
+    <soft_version>
+      <eng><![CDATA[Soft Version:]]></eng>
+      <chn><![CDATA[软件版本：]]></chn>
+    </soft_version>
+    <hard_version>
+      <eng><![CDATA[Hard Version:]]></eng>
+      <chn><![CDATA[硬件版本：]]></chn>
+    </hard_version>
+    <kernel_release>
+      <eng><![CDATA[Kernel Release:]]></eng>
+      <chn><![CDATA[内核版本：]]></chn>
+    </kernel_release>
+    <soft_release>
+      <eng><![CDATA[Soft Release:]]></eng>
+      <chn><![CDATA[发布日期：]]></chn>
+    </soft_release>
+    <fpga_release>
+      <eng><![CDATA[FPGA Release:]]></eng>
+      <chn><![CDATA[FPGA日期：]]></chn>
+    </fpga_release>
+    <manufacturer>
+      <eng><![CDATA[Manufacturer:]]></eng>
+      <chn><![CDATA[生产商：]]></chn>
+    </manufacturer>
+    <official_website>
+      <eng><![CDATA[Website:]]></eng>
+      <chn><![CDATA[官方网址：]]></chn>
+    </official_website>
+    <user_manual>
+      <eng><![CDATA[User Manual: ]]></eng>
+      <chn><![CDATA[用户手册：]]></chn>
+    </user_manual>
+    <firmware_v>
+      <eng><![CDATA[Internal: ]]></eng>
+      <chn><![CDATA[内部版本：]]></chn>
+    </firmware_v>
+    <fpga_r>
+      <eng><![CDATA[FPGA]]></eng>
+      <chn><![CDATA[FPGA]]></chn>
+    </fpga_r>
+    <date>
+      <eng><![CDATA[ Release:]]></eng>
+      <chn><![CDATA[日期：]]></chn>
+    </date>
+  </information_left.html>
+
+  <information_right.html>
+    <title>
+      <eng><![CDATA[Introduction]]></eng>
+      <chn><![CDATA[介绍信息]]></chn>
+    </title>
+    <auth_info>
+      <eng><![CDATA[License]]></eng>
+      <chn><![CDATA[授权信息]]></chn>
+    </auth_info>
+    <license_status>
+      <eng><![CDATA[License Status:]]></eng>
+      <chn><![CDATA[授权状态 ：]]></chn>
+    </license_status>
+    <license_mode>
+      <eng><![CDATA[License Mode :]]></eng>
+      <chn><![CDATA[授权模式 ：]]></chn>
+    </license_mode>
+    <license_time>
+      <eng><![CDATA[Authorization Time:]]></eng>
+      <chn><![CDATA[授权时间：]]></chn>
+    </license_time>
+    <trail_remain_time>
+      <eng><![CDATA[Remaining Trail Time (s):]]></eng>
+      <chn><![CDATA[剩余试用时间（秒）：]]></chn>
+    </trail_remain_time>
+    <license_application_code>
+      <eng><![CDATA[Application Code:]]></eng>
+      <chn><![CDATA[授权申请码：]]></chn>
+    </license_application_code>
+  </information_right.html>
+
+  <monitor_left.html>
+    <title>
+      <eng><![CDATA[Monitor]]></eng>
+      <chn><![CDATA[设备监控]]></chn>
+    </title>
+    <monitor_items>
+      <eng><![CDATA[Monitor Items]]></eng>
+      <chn><![CDATA[监控选项]]></chn>
+    </monitor_items>
+    <device_monitor>
+      <eng><![CDATA[Main Module]]></eng>
+      <chn><![CDATA[主模块]]></chn>
+    </device_monitor>
+    <status>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态]]></chn>
+    </status>
+    <alarm>
+      <eng><![CDATA[Alarms]]></eng>
+      <chn><![CDATA[报警]]></chn>
+    </alarm>
+    <display>
+      <eng><![CDATA[Display]]></eng>
+      <chn><![CDATA[显示]]></chn>
+    </display>
+    <setting>
+      <eng><![CDATA[Setting]]></eng>
+      <chn><![CDATA[设置]]></chn>
+    </setting>
+    <bitrate>
+      <eng><![CDATA[Bitrate Monitor]]></eng>
+      <chn><![CDATA[码率监控]]></chn>
+    </bitrate>
+    <ip>
+      <eng><![CDATA[IP Monitor]]></eng>
+      <chn><![CDATA[IP协议监控]]></chn>
+    </ip>
+    <input>
+      <eng><![CDATA[Input Channel]]></eng>
+      <chn><![CDATA[输入通道]]></chn>
+    </input>
+    <output>
+      <eng><![CDATA[Output Channel]]></eng>
+      <chn><![CDATA[输出通道]]></chn>
+    </output>
+    <type>
+      <eng><![CDATA[Type]]></eng>
+      <chn><![CDATA[类型]]></chn>
+    </type>
+    <input_monitor>
+      <eng><![CDATA[Input Monitor]]></eng>
+      <chn><![CDATA[输入监控]]></chn>
+    </input_monitor>
+  </monitor_left.html>
+
+  <monitor_right_input_status.html>
+    <title>
+      <eng><![CDATA[Input Status Monitor]]></eng>
+      <chn><![CDATA[输入状态监控]]></chn>
+    </title>
+    <lock>
+      <eng><![CDATA[lock]]></eng>
+      <chn><![CDATA[锁定]]></chn>
+    </lock>
+    <unlock>
+      <eng><![CDATA[unlock]]></eng>
+      <chn><![CDATA[未锁定]]></chn>
+    </unlock>
+    <lock_stat>
+      <eng><![CDATA[Lock Status]]></eng>
+      <chn><![CDATA[锁定状态]]></chn>
+    </lock_stat>
+    <vid_format>
+      <eng><![CDATA[Input Video Format]]></eng>
+      <chn><![CDATA[输入视频格式]]></chn>
+    </vid_format>
+    <aud_sample>
+      <eng><![CDATA[Input Audio Sample(KHz)]]></eng>
+      <chn><![CDATA[输入音频采样率(KHz)]]></chn>
+    </aud_sample>    
+  </monitor_right_input_status.html>
+    
+  <monitor_right_alarm.html>
+    <title>
+      <eng><![CDATA[Alarms]]></eng>
+      <chn><![CDATA[报警信息]]></chn>
+    </title>
+    <description>
+      <eng><![CDATA[Description]]></eng>
+      <chn><![CDATA[描述信息]]></chn>
+    </description>
+    <status>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态]]></chn>
+    </status>
+    <log_date>
+      <eng><![CDATA[Log Time]]></eng>
+      <chn><![CDATA[日志时间]]></chn>
+    </log_date>
+    <counter>
+      <eng><![CDATA[Counter]]></eng>
+      <chn><![CDATA[计数器]]></chn>
+    </counter>
+    <detail_title>
+      <eng><![CDATA[Details]]></eng>
+      <chn><![CDATA[信息]]></chn>
+    </detail_title>
+    <detail>
+      <eng><![CDATA[Detail]]></eng>
+      <chn><![CDATA[信息]]></chn>
+    </detail>
+    <detail_info>
+      <eng><![CDATA[Detail Information]]></eng>
+      <chn><![CDATA[详细信息]]></chn>
+    </detail_info>
+    <reset_title>
+      <eng><![CDATA[Reset]]></eng>
+      <chn><![CDATA[重置]]></chn>
+    </reset_title>
+    <reset>
+      <eng><![CDATA[Reset]]></eng>
+      <chn><![CDATA[重置]]></chn>
+    </reset>
+    <trap>
+      <eng><![CDATA[Trap]]></eng>
+      <chn><![CDATA[Trap]]></chn>
+    </trap>
+    <panel>
+      <eng><![CDATA[Panel]]></eng>
+      <chn><![CDATA[面板]]></chn>
+    </panel>
+    <log_level>
+      <eng><![CDATA[Log Level]]></eng>
+      <chn><![CDATA[报警等级]]></chn>
+    </log_level>
+    <disable>
+      <eng><![CDATA[Disable]]></eng>
+      <chn><![CDATA[禁用]]></chn>
+    </disable>
+    <info>
+      <eng><![CDATA[Info]]></eng>
+      <chn><![CDATA[信息]]></chn>
+    </info>
+    <warnning>
+      <eng><![CDATA[Warnning]]></eng>
+      <chn><![CDATA[警告]]></chn>
+    </warnning>
+    <critical>
+      <eng><![CDATA[Critical]]></eng>
+      <chn><![CDATA[错误]]></chn>
+    </critical>
+    <reset_all>
+      <eng><![CDATA[Reset All Counter]]></eng>
+      <chn><![CDATA[重置所有计数器]]></chn>
+    </reset_all>
+  </monitor_right_alarm.html>
+
+  <monitor_right_bitrate.html>
+    <title>
+      <eng><![CDATA[Bitrate Monitor  /  Bitrate Alarm Setting]]></eng>
+      <chn><![CDATA[码率监控 / 码率报警设置]]></chn>
+    </title>
+    <total_bitrate>
+      <eng><![CDATA[Total Bitrate: ]]></eng>
+      <chn><![CDATA[总码率：]]></chn>
+    </total_bitrate>
+    <sub>
+      <eng><![CDATA[Sub Index]]></eng>
+      <chn><![CDATA[子通道索引]]></chn>
+    </sub>
+    <bitrate>
+      <eng><![CDATA[Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[码率 (Mbps)]]></chn>
+    </bitrate>
+    <low>
+      <eng><![CDATA[Low (Mbps)]]></eng>
+      <chn><![CDATA[下限 (Mbps)]]></chn>
+    </low>
+    <high>
+      <eng><![CDATA[High (Mbps)]]></eng>
+      <chn><![CDATA[上限 (Mbps)]]></chn>
+    </high>
+    <mark>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[开关]]></chn>
+    </mark>
+    <total>
+      <eng><![CDATA[Total]]></eng>
+      <chn><![CDATA[总码率]]></chn>
+    </total>
+  </monitor_right_bitrate.html>
+  <monitor_right_bitrate_pid.html>
+    <title>
+      <eng><![CDATA[PID Bitrate Monitor]]></eng>
+      <chn><![CDATA[PID码率监控]]></chn>
+    </title>
+    <total_bitrate>
+      <eng><![CDATA[Total Bitrate: ]]></eng>
+      <chn><![CDATA[总码率：]]></chn>
+    </total_bitrate>
+    <minbps>
+      <eng><![CDATA[Min Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[最小码率（Mbps）]]></chn>
+    </minbps>
+    <maxbps>
+      <eng><![CDATA[Max Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[最大码率（Mbps）]]></chn>
+    </maxbps>
+    <avgbps>
+      <eng><![CDATA[Avg Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[平均码率（Mbps）]]></chn>
+    </avgbps>
+    <curbps>
+      <eng><![CDATA[Current Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[当前码率（Mbps）]]></chn>
+    </curbps>
+    <total>
+      <eng><![CDATA[Total]]></eng>
+      <chn><![CDATA[总码率]]></chn>
+    </total>
+    <clean>
+      <eng><![CDATA[Clean List]]></eng>
+      <chn><![CDATA[清除列表]]></chn>
+    </clean>
+  </monitor_right_bitrate_pid.html>
+  <monitor_right_status_normal.html>
+    <title>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态信息]]></chn>
+    </title>
+    <temp>
+      <eng><![CDATA[Temperature]]></eng>
+      <chn><![CDATA[温度]]></chn>
+    </temp>
+    <fan_status>
+      <eng><![CDATA[Fan Status :]]></eng>
+      <chn><![CDATA[风扇状态：]]></chn>
+    </fan_status>
+    <cpu_usage>
+      <eng><![CDATA[CPU Usage:]]></eng>
+      <chn><![CDATA[CPU占用率：]]></chn>
+    </cpu_usage>
+    <mem_usage>
+      <eng><![CDATA[Mem Usage:]]></eng>
+      <chn><![CDATA[内存占用率：]]></chn>
+    </mem_usage>
+    <ins_bitrate>
+      <eng><![CDATA[Inserter Bitrate (Mbps) :]]></eng>
+      <chn><![CDATA[插入码率（Mbps）：]]></chn>
+    </ins_bitrate>
+    <eth1_status>
+      <eng><![CDATA[ETH 02 :]]></eng>
+      <chn><![CDATA[以太网接口 02：]]></chn>
+    </eth1_status>
+    <eth0_status>
+      <eng><![CDATA[ETH 01 :]]></eng>
+      <chn><![CDATA[以太网接口 01：]]></chn>
+    </eth0_status>
+    <scs>
+      <eng><![CDATA[Simulcrypt Synchroniser]]></eng>
+      <chn><![CDATA[同密加扰系统]]></chn>
+    </scs>
+    <crypto_period_duration>
+      <eng><![CDATA[Crypto Period Duration(ms) :]]></eng>
+      <chn><![CDATA[加扰周期持续时间（毫秒）：]]></chn>
+    </crypto_period_duration>
+    <crypto_period_number>
+      <eng><![CDATA[Crypto Period Number :]]></eng>
+      <chn><![CDATA[当前加扰周期：]]></chn>
+    </crypto_period_number>
+    <scs_status>
+      <eng><![CDATA[ECM / EMM Status :]]></eng>
+      <chn><![CDATA[ECM / EMM 状态：]]></chn>
+    </scs_status>
+    <emm_bitrate>
+      <eng><![CDATA[EMM Bitrate (Mbps) :]]></eng>
+      <chn><![CDATA[EMM 带宽 (Mbps)：]]></chn>
+    </emm_bitrate>
+
+    <switch>
+      <eng><![CDATA[Alarms General Switch:]]></eng>
+      <chn><![CDATA[报警全局开关：]]></chn>
+    </switch>
+    <critical_temp>
+      <eng><![CDATA[Critical Temperature (℃):]]></eng>
+      <chn><![CDATA[极限温度 (℃)：]]></chn>
+    </critical_temp>
+    <fan_en_temp>
+      <eng><![CDATA[Fan Enable Temperature (℃):]]></eng>
+      <chn><![CDATA[内置风扇启动温度 (℃)：]]></chn>
+    </fan_en_temp>
+    <fan_dis_temp>
+      <eng><![CDATA[Fan Disable Temperature (℃):]]></eng>
+      <chn><![CDATA[内置风扇关限温度 (℃)：]]></chn>
+    </fan_dis_temp>
+    <main_io>
+      <eng><![CDATA[Main Module IO (Mbps) :]]></eng>
+      <chn><![CDATA[主模块输入输出 (Mbps)：]]></chn>
+    </main_io>
+    <icp_io>
+      <eng><![CDATA[ICP (Mbps) :]]></eng>
+      <chn><![CDATA[内部通讯 (Mbps)：]]></chn>
+    </icp_io>
+  </monitor_right_status_normal.html>
+
+  <monitor_right_status_encoder_card_platform.html>
+    <title>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态信息]]></chn>
+    </title>
+    <temp>
+      <eng><![CDATA[Temperature]]></eng>
+      <chn><![CDATA[温度]]></chn>
+    </temp>
+    <fan_status>
+      <eng><![CDATA[Fan Status :]]></eng>
+      <chn><![CDATA[风扇状态：]]></chn>
+    </fan_status>
+    <cpu_usage>
+      <eng><![CDATA[CPU Usage:]]></eng>
+      <chn><![CDATA[CPU占用率：]]></chn>
+    </cpu_usage>
+    <mem_usage>
+      <eng><![CDATA[Mem Usage:]]></eng>
+      <chn><![CDATA[内存占用率：]]></chn>
+    </mem_usage>
+    <ins_bitrate>
+      <eng><![CDATA[Inserter Bitrate (Mbps) :]]></eng>
+      <chn><![CDATA[插入码率（Mbps）：]]></chn>
+    </ins_bitrate>
+    <eth1_status>
+      <eng><![CDATA[ETH 02 :]]></eng>
+      <chn><![CDATA[以太网接口 02：]]></chn>
+    </eth1_status>
+    <eth0_status>
+      <eng><![CDATA[ETH 01 :]]></eng>
+      <chn><![CDATA[以太网接口 01：]]></chn>
+    </eth0_status>
+    <scs>
+      <eng><![CDATA[Simulcrypt Synchroniser]]></eng>
+      <chn><![CDATA[同密加扰系统]]></chn>
+    </scs>
+    <crypto_period_duration>
+      <eng><![CDATA[Crypto Period Duration(ms) :]]></eng>
+      <chn><![CDATA[加扰周期持续时间（毫秒）：]]></chn>
+    </crypto_period_duration>
+    <crypto_period_number>
+      <eng><![CDATA[Crypto Period Number :]]></eng>
+      <chn><![CDATA[当前加扰周期：]]></chn>
+    </crypto_period_number>
+    <scs_status>
+      <eng><![CDATA[ECM / EMM Status :]]></eng>
+      <chn><![CDATA[ECM / EMM 状态：]]></chn>
+    </scs_status>
+    <emm_bitrate>
+      <eng><![CDATA[EMM Bitrate (Mbps) :]]></eng>
+      <chn><![CDATA[EMM 带宽 (Mbps)：]]></chn>
+    </emm_bitrate>
+
+    <switch>
+      <eng><![CDATA[Alarms General Switch:]]></eng>
+      <chn><![CDATA[报警全局开关：]]></chn>
+    </switch>
+    <critical_temp>
+      <eng><![CDATA[Critical Temperature (℃):]]></eng>
+      <chn><![CDATA[极限温度 (℃)：]]></chn>
+    </critical_temp>
+    <fan_en_temp>
+      <eng><![CDATA[Fan Enable Temperature (℃):]]></eng>
+      <chn><![CDATA[内置风扇启动温度 (℃)：]]></chn>
+    </fan_en_temp>
+    <fan_dis_temp>
+      <eng><![CDATA[Fan Disable Temperature (℃):]]></eng>
+      <chn><![CDATA[内置风扇关限温度 (℃)：]]></chn>
+    </fan_dis_temp>
+    <main_io>
+      <eng><![CDATA[Main Module IO (Mbps) :]]></eng>
+      <chn><![CDATA[主模块输入输出 (Mbps)：]]></chn>
+    </main_io>
+    <icp_io>
+      <eng><![CDATA[ICP (Mbps) :]]></eng>
+      <chn><![CDATA[内部通讯 (Mbps)：]]></chn>
+    </icp_io>
+  </monitor_right_status_encoder_card_platform.html>
+
+  <io_left.html>
+    <title>
+      <eng><![CDATA[I/O Configuration]]></eng>
+      <chn><![CDATA[输入输出]]></chn>
+    </title>
+    <io_settings>
+      <eng><![CDATA[I/O Setting]]></eng>
+      <chn><![CDATA[输入输出设置]]></chn>
+    </io_settings>
+    <in_chn>
+      <eng><![CDATA[Input Channel]]></eng>
+      <chn><![CDATA[输入通道]]></chn>
+    </in_chn>
+    <out_chn>
+      <eng><![CDATA[Output Channel]]></eng>
+      <chn><![CDATA[输出通道]]></chn>
+    </out_chn>
+    <igmp_setting>
+      <eng><![CDATA[IGMP Setting]]></eng>
+      <chn><![CDATA[IGMP 设置]]></chn>
+    </igmp_setting>
+    <edid_setting>
+      <eng><![CDATA[EDID Setting]]></eng>
+      <chn><![CDATA[EDID 设置]]></chn>
+    </edid_setting>
+    <sfn_modulator_setting>
+      <eng><![CDATA[SFN Modulator Setting]]></eng>
+      <chn><![CDATA[单频网调制器设置]]></chn>
+    </sfn_modulator_setting>
+    <sfn_adaptor_setting>
+      <eng><![CDATA[SFN Adaptor Setting]]></eng>
+      <chn><![CDATA[单频网适配器设置]]></chn>
+    </sfn_adaptor_setting>
+    <gps_setting>
+      <eng><![CDATA[Satellite System Setting]]></eng>
+      <chn><![CDATA[卫星系统设置]]></chn>
+    </gps_setting>
+    <dpd_setting>
+      <eng><![CDATA[DPD Setting]]></eng>
+      <chn><![CDATA[数字预失真设置]]></chn>
+    </dpd_setting>
+  </io_left.html>
+
+  <io_left_com.html>
+    <title>
+      <eng><![CDATA[Select Items]]></eng>
+      <chn><![CDATA[选择项目]]></chn>
+    </title>
+    <io_settings_and_monitor>
+      <eng><![CDATA[I/O Setting And Monitor]]></eng>
+      <chn><![CDATA[输入输出设置和监控]]></chn>
+    </io_settings_and_monitor>
+    <general_setting>
+      <eng><![CDATA[General Setting]]></eng>
+      <chn><![CDATA[基本设置]]></chn>
+    </general_setting>
+    <alarm>
+      <eng><![CDATA[Alarm]]></eng>
+      <chn><![CDATA[报警]]></chn>
+    </alarm>
+    <display>
+      <eng><![CDATA[Display]]></eng>
+      <chn><![CDATA[显示]]></chn>
+    </display>
+    <setting>
+      <eng><![CDATA[Setting]]></eng>
+      <chn><![CDATA[设置]]></chn>
+    </setting>
+  </io_left_com.html>
+
+  <io_right_igmp_setting.html>
+    <title>
+      <eng><![CDATA[IGMP Setting]]></eng>
+      <chn><![CDATA[IGMP 设置]]></chn>
+    </title>
+
+    <igmp_repeate>
+      <eng><![CDATA[IGMP Auto Repeate Time(s):]]></eng>
+      <chn><![CDATA[IGMP 自动加入间隔（秒）：]]></chn>
+    </igmp_repeate>
+    <igmp_version>
+      <eng><![CDATA[IGMP Version :]]></eng>
+      <chn><![CDATA[IGMP 版本：]]></chn>
+    </igmp_version>
+
+    <input_chn>
+      <eng><![CDATA[Input ETH Channel]]></eng>
+      <chn><![CDATA[输入以太网口]]></chn>
+    </input_chn>
+    <des_addr>
+      <eng><![CDATA[DES Address]]></eng>
+      <chn><![CDATA[目标地址]]></chn>
+    </des_addr>
+    <src_addr_limit>
+      <eng><![CDATA[SRC Address Limit]]></eng>
+      <chn><![CDATA[源地址限制]]></chn>
+    </src_addr_limit>
+  </io_right_igmp_setting.html>
+
+  <io_right_edid_setting.html>
+    <title>
+      <eng><![CDATA[EDID Setting]]></eng>
+      <chn><![CDATA[EDID 设置]]></chn>
+    </title>
+    <edid_type>
+      <eng><![CDATA[EDID Type]]></eng>
+      <chn><![CDATA[EDID 类型]]></chn>     
+    </edid_type>
+    <edid_download_alert>
+      <eng><![CDATA[Notices for configuring HDMI EDID: 1. Please unplug the HDMI connction; 2. The device need Manually reboot after the EDID successfully configured.]]></eng>
+      <chn><![CDATA[配置HDMI EDID注意事项：1、请拔掉所有通道的HDMI连线。2、EDID配置成功后，设备需要手动重启。]]></chn>
+    </edid_download_alert>
+    <channel>
+      <eng><![CDATA[Channel]]></eng>
+      <chn><![CDATA[通道]]></chn>
+    </channel>
+    <download_failed>
+      <eng><![CDATA[Download Failed!]]></eng>
+      <chn><![CDATA[下载失败！]]></chn>
+    </download_failed>
+    <download_success>
+      <eng><![CDATA[Download Success!]]></eng>
+      <chn><![CDATA[下载成功！]]></chn>
+    </download_success>
+  </io_right_edid_setting.html>
+
+  <io_right.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+  </io_right.html>
+
+  <io_right_dpd.html>
+    <title>
+      <eng><![CDATA[DPD Setting & Status]]></eng>
+      <chn><![CDATA[数字预失真设置和状态]]></chn>
+    </title>
+    <module_info>
+      <eng><![CDATA[Module Info]]></eng>
+      <chn><![CDATA[模块信息]]></chn>
+    </module_info>
+    <dpd_setting >
+      <eng><![CDATA[Basic Setting]]></eng>
+      <chn><![CDATA[基本设置]]></chn>
+    </dpd_setting >
+    <board_id>
+      <eng><![CDATA[Board ID]]></eng>
+      <chn><![CDATA[模块序列号]]></chn>
+    </board_id>
+    <board_version>
+      <eng><![CDATA[Board Version]]></eng>
+      <chn><![CDATA[模块版本]]></chn>
+    </board_version>
+    <dpd_mark>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[功能开关：]]></chn>
+    </dpd_mark>
+    <track_reset_mark>
+      <eng><![CDATA[Parameter Reset: ]]></eng>
+      <chn><![CDATA[DPD参数复位：]]></chn>
+    </track_reset_mark>
+    <feedback_select>
+      <eng><![CDATA[Feedback Channel Select: ]]></eng>
+      <chn><![CDATA[反馈通道选择：]]></chn>
+    </feedback_select>
+    <dpd_status_setting>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态]]></chn>
+    </dpd_status_setting>
+    <dpd_status>
+      <eng><![CDATA[PLL Status: ]]></eng>
+      <chn><![CDATA[本振状态：]]></chn>
+    </dpd_status>
+    <dpd_track_status>
+      <eng><![CDATA[DPD Status: ]]></eng>
+      <chn><![CDATA[预失真状态：]]></chn>
+    </dpd_track_status>
+    <dpd_board_temp>
+      <eng><![CDATA[Module Temperature]]></eng>
+      <chn><![CDATA[模块温度]]></chn>
+    </dpd_board_temp>
+    <dpd_feedback_status>
+      <eng><![CDATA[Feedback Status: ]]></eng>
+      <chn><![CDATA[反馈状态：]]></chn>
+    </dpd_feedback_status>
+    <dpd_feedback_level>
+      <eng><![CDATA[Feedback Level(dBμV): ]]></eng>
+      <chn><![CDATA[反馈强度(dBμV)：]]></chn>
+    </dpd_feedback_level>
+    <dpd_feedback_dsn>
+      <eng><![CDATA[SDN(dBc): ]]></eng>
+      <chn><![CDATA[带肩比(dBc)：]]></chn>
+    </dpd_feedback_dsn>
+
+
+  </io_right_dpd.html>
+
+  <io_right_gns.html>
+    <title>
+      <eng><![CDATA[Satellite System Setting]]></eng>
+      <chn><![CDATA[卫星系统设置]]></chn>
+    </title>
+    <gns_setting>
+      <eng><![CDATA[System Setting]]></eng>
+      <chn><![CDATA[系统设置]]></chn>
+    </gns_setting>
+    <gns_mark>
+      <eng><![CDATA[Enable :]]></eng>
+      <chn><![CDATA[开关：]]></chn>
+    </gns_mark>
+    <gns_sys_type>
+      <eng><![CDATA[System Select :]]></eng>
+      <chn><![CDATA[系统选择(S)：]]></chn>
+    </gns_sys_type>
+    <gps>
+      <eng><![CDATA[GPS]]></eng>
+      <chn><![CDATA[GPS]]></chn>
+    </gps>
+    <bds>
+      <eng><![CDATA[BDS]]></eng>
+      <chn><![CDATA[北斗]]></chn>
+    </bds>
+    <gps_bds>
+      <eng><![CDATA[GPS/BDS]]></eng>
+      <chn><![CDATA[GPS/北斗]]></chn>
+    </gps_bds>
+
+    <gns_set_time>
+      <eng><![CDATA[Timing Setting(S) :]]></eng>
+      <chn><![CDATA[授时设置(S)：]]></chn>
+    </gns_set_time>
+
+    <gns_status>
+      <eng><![CDATA[System Status]]></eng>
+      <chn><![CDATA[系统状态]]></chn>
+    </gns_status>
+    <gns_sys_type>
+      <eng><![CDATA[System Type: ]]></eng>
+      <chn><![CDATA[系统类型：]]></chn>
+    </gns_sys_type>
+    <gns_lock>
+      <eng><![CDATA[Lock Status: ]]></eng>
+      <chn><![CDATA[锁定状态：]]></chn>
+    </gns_lock>
+    <gns_pos_type>
+      <eng><![CDATA[Positon Type: ]]></eng>
+      <chn><![CDATA[定位类型：]]></chn>
+    </gns_pos_type>
+    <gns_h_accuracy>
+      <eng><![CDATA[H Accuracy: ]]></eng>
+      <chn><![CDATA[水平精度：]]></chn>
+    </gns_h_accuracy>
+    <gns_v_accuracy>
+      <eng><![CDATA[V Accuracy: ]]></eng>
+      <chn><![CDATA[垂直精度：]]></chn>
+    </gns_v_accuracy>
+    <gns_p_accuracy>
+      <eng><![CDATA[P Accuracy: ]]></eng>
+      <chn><![CDATA[综合精度：]]></chn>
+    </gns_p_accuracy>
+
+    <gns_position>
+      <eng><![CDATA[Postion/Time]]></eng>
+      <chn><![CDATA[定位/时间]]></chn>
+    </gns_position>
+    <gns_time>
+      <eng><![CDATA[Time: ]]></eng>
+      <chn><![CDATA[时间：]]></chn>
+    </gns_time>
+    <gns_latitude>
+      <eng><![CDATA[Latitude: ]]></eng>
+      <chn><![CDATA[纬度：]]></chn>
+    </gns_latitude>
+    <gns_longitude>
+      <eng><![CDATA[Longitude: ]]></eng>
+      <chn><![CDATA[经度：]]></chn>
+    </gns_longitude>
+    <gns_altitude>
+      <eng><![CDATA[Altitude(M): ]]></eng>
+      <chn><![CDATA[高程(M)：]]></chn>
+    </gns_altitude>
+
+    <gns_sat>
+      <eng><![CDATA[Satellite Information]]></eng>
+      <chn><![CDATA[卫星信息]]></chn>
+    </gns_sat>
+
+    <gns_sat_total>
+      <eng><![CDATA[Total Usable Satellite :]]></eng>
+      <chn><![CDATA[全部可用卫星：]]></chn>
+    </gns_sat_total>
+    <gns_sat_used>
+      <eng><![CDATA[Current Used Satellite :]]></eng>
+      <chn><![CDATA[当前使用卫星：]]></chn>
+    </gns_sat_used>
+  </io_right_gns.html>
+
+  <io_right_ip_over_ts.html>
+    <title>
+      <eng><![CDATA[General Setting]]></eng>
+      <chn><![CDATA[基本设置]]></chn>
+    </title>
+    <uplink_setting>
+      <eng><![CDATA[Uplink Setting: ]]></eng>
+      <chn><![CDATA[上行参数设置：]]></chn>
+    </uplink_setting>
+    <uplink_freq>
+      <eng><![CDATA[Frequency (MHz): ]]></eng>
+      <chn><![CDATA[频率(MHz)：]]></chn>
+    </uplink_freq>
+    <uplink_bandwidth>
+      <eng><![CDATA[Bandwidh: ]]></eng>
+      <chn><![CDATA[带宽：]]></chn>
+    </uplink_bandwidth>
+    <uplink_constellation>
+      <eng><![CDATA[Constellation: ]]></eng>
+      <chn><![CDATA[星座调制：]]></chn>
+    </uplink_constellation>
+    <uplink_gain>
+      <eng><![CDATA[Gain Control(dB): ]]></eng>
+      <chn><![CDATA[增益控制(dB)：]]></chn>
+    </uplink_gain>
+    <downlink_setting>
+      <eng><![CDATA[Downlink Setting: ]]></eng>
+      <chn><![CDATA[下行参数设置：]]></chn>
+    </downlink_setting>
+    <downlink_freq>
+      <eng><![CDATA[Frequency (MHz): ]]></eng>
+      <chn><![CDATA[频率(MHz)：]]></chn>
+    </downlink_freq>
+    <downlink_bandwidth>
+      <eng><![CDATA[Bandwidh: ]]></eng>
+      <chn><![CDATA[带宽：]]></chn>
+    </downlink_bandwidth>
+    <downlink_constellation>
+      <eng><![CDATA[Constellation: ]]></eng>
+      <chn><![CDATA[星座调制：]]></chn>
+    </downlink_constellation>
+    <downlink_iq_swapt_mark>
+      <eng><![CDATA[IQ SWAPT: ]]></eng>
+      <chn><![CDATA[频谱倒置：]]></chn>
+    </downlink_iq_swapt_mark>
+    <uplink_status>
+      <eng><![CDATA[Uplink Status]]></eng>
+      <chn><![CDATA[上行连接状态]]></chn>
+    </uplink_status>
+    <downlink_status>
+      <eng><![CDATA[Downlink Status]]></eng>
+      <chn><![CDATA[下行连接状态]]></chn>
+    </downlink_status>
+    <link_band>
+      <eng><![CDATA[Bandwidth(Mbps): ]]></eng>
+      <chn><![CDATA[带宽(Mbps)：]]></chn>
+    </link_band>
+    <band_usage>
+      <eng><![CDATA[Band Usage: ]]></eng>
+      <chn><![CDATA[带宽使用率：]]></chn>
+    </band_usage>
+    <receiving_status>
+      <eng><![CDATA[Receivering Status]]></eng>
+      <chn><![CDATA[接收状态]]></chn>
+    </receiving_status>
+    <link_constellation>
+      <eng><![CDATA[Current Constellation: ]]></eng>
+      <chn><![CDATA[当前星座：]]></chn>
+    </link_constellation>
+
+    <current_bitrate>
+      <eng><![CDATA[Bitrate(Mbps)]]></eng>
+      <chn><![CDATA[当前码率(Mbps)]]></chn>
+    </current_bitrate>
+    <chn_bitrate>
+      <eng><![CDATA[Bandwidth(Mbps)]]></eng>
+      <chn><![CDATA[带宽(Mbps)]]></chn>
+    </chn_bitrate>
+    <constellation>
+      <eng><![CDATA[Constellation]]></eng>
+      <chn><![CDATA[当前星座]]></chn>
+    </constellation>
+    <ber>
+      <eng><![CDATA[BER]]></eng>
+      <chn><![CDATA[误码率]]></chn>
+    </ber>
+    <lock>
+      <eng><![CDATA[Lock]]></eng>
+      <chn><![CDATA[锁定]]></chn>
+    </lock>
+  </io_right_ip_over_ts.html>
+
+
+  <io_right_in_asi.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <asi_setting>
+      <eng><![CDATA[ASI Setting: ]]></eng>
+      <chn><![CDATA[ASI参数：]]></chn>
+    </asi_setting>
+    <bitrate>
+      <eng><![CDATA[Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[码率 (Mbps)]]></chn>
+    </bitrate>
+  </io_right_in_asi.html>
+
+  <io_right_in_e3ds3.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <e3ds3_setting>
+      <eng><![CDATA[E3DS3 Setting: ]]></eng>
+      <chn><![CDATA[E3DS3参数：]]></chn>
+    </e3ds3_setting>
+    <e3ds3>
+      <eng><![CDATA[E3/DS3]]></eng>
+      <chn><![CDATA[E3/DS3]]></chn>
+    </e3ds3>
+    <bitorder>
+      <eng><![CDATA[Date Format]]></eng>
+      <chn><![CDATA[比特顺序]]></chn>
+    </bitorder>
+    <frame>
+      <eng><![CDATA[Frame Type ]]></eng>
+      <chn><![CDATA[帧格式]]></chn>
+    </frame>
+    <plength>
+      <eng><![CDATA[Packet Length]]></eng>
+      <chn><![CDATA[TS包长]]></chn>
+    </plength>
+    <scr>
+      <eng><![CDATA[Scramble]]></eng>
+      <chn><![CDATA[加扰]]></chn>
+    </scr>
+    <rs>
+      <eng><![CDATA[RS Encoder]]></eng>
+      <chn><![CDATA[RS编码]]></chn>
+    </rs>
+    <interw>
+      <eng><![CDATA[Interweave]]></eng>
+      <chn><![CDATA[交织编码]]></chn>
+    </interw>
+    <recover>
+      <eng><![CDATA[Rate Recover]]></eng>
+      <chn><![CDATA[码率恢复]]></chn>
+    </recover>
+    <bitrate>
+      <eng><![CDATA[Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[码率 (Mbps)]]></chn>
+    </bitrate>
+  </io_right_in_e3ds3.html>
+
+  <io_right_out_e3ds3.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <e3ds3_setting>
+      <eng><![CDATA[E3DS3 Setting: ]]></eng>
+      <chn><![CDATA[E3DS3参数：]]></chn>
+    </e3ds3_setting>
+    <e3ds3>
+      <eng><![CDATA[E3/DS3]]></eng>
+      <chn><![CDATA[E3/DS3]]></chn>
+    </e3ds3>
+    <bitorder>
+      <eng><![CDATA[Date Format]]></eng>
+      <chn><![CDATA[比特顺序]]></chn>
+    </bitorder>
+    <frame>
+      <eng><![CDATA[Frame Type ]]></eng>
+      <chn><![CDATA[帧格式]]></chn>
+    </frame>
+    <plength>
+      <eng><![CDATA[Packet Length]]></eng>
+      <chn><![CDATA[TS包长]]></chn>
+    </plength>
+    <scr>
+      <eng><![CDATA[Scramble]]></eng>
+      <chn><![CDATA[加扰]]></chn>
+    </scr>
+    <rs>
+      <eng><![CDATA[RS Encoder]]></eng>
+      <chn><![CDATA[RS编码]]></chn>
+    </rs>
+    <interw>
+      <eng><![CDATA[InterWave]]></eng>
+      <chn><![CDATA[交织编码]]></chn>
+    </interw>
+    <recover>
+      <eng><![CDATA[Rate Recover]]></eng>
+      <chn><![CDATA[码率恢复]]></chn>
+    </recover>
+    <bitrate>
+      <eng><![CDATA[Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[码率 (Mbps)]]></chn>
+    </bitrate>
+  </io_right_out_e3ds3.html>
+
+  <io_right_in_eth.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <eth_setting>
+      <eng><![CDATA[ETH Setting: ]]></eng>
+      <chn><![CDATA[以太网参数：]]></chn>
+    </eth_setting>
+
+    <src_addr>
+      <eng><![CDATA[Src Address]]></eng>
+      <chn><![CDATA[源地址]]></chn>
+    </src_addr>
+
+    <des_addr>
+      <eng><![CDATA[DES Address]]></eng>
+      <chn><![CDATA[目标地址]]></chn>
+    </des_addr>
+
+    <src_addr_limit>
+      <eng><![CDATA[SRC Address Limit]]></eng>
+      <chn><![CDATA[源地址限制]]></chn>
+    </src_addr_limit>
+
+    <protocol>
+      <eng><![CDATA[Protocol]]></eng>
+      <chn><![CDATA[协议]]></chn>
+    </protocol>
+
+    <bitrate>
+      <eng><![CDATA[Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[码率 (Mbps)]]></chn>
+    </bitrate>
+    <ip_batch>
+      <eng><![CDATA[Batch Set :]]></eng>
+      <chn><![CDATA[批量设置：]]></chn>
+    </ip_batch>
+    <full_disable>
+      <eng><![CDATA[Batch OFF]]></eng>
+      <chn><![CDATA[批量关闭]]></chn>
+    </full_disable>
+  </io_right_in_eth.html>
+
+  <io_right_in_demod_s.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <tuner_setting>
+      <eng><![CDATA[Tuner Setting:        DVB-S/S2]]></eng>
+      <chn><![CDATA[Tuner参数：           DVB-S/S2]]></chn>
+    </tuner_setting>
+    <input_freq>
+      <eng><![CDATA[Input Freq(MHz)]]></eng>
+      <chn><![CDATA[输入频率(MHz)]]></chn>
+    </input_freq>
+    <loacl_freq>
+      <eng><![CDATA[Local Freq(MHz)]]></eng>
+      <chn><![CDATA[本振频率(MHz)]]></chn>
+    </loacl_freq>
+    <symbol_rate>
+      <eng><![CDATA[SR(MBaud)]]></eng>
+      <chn><![CDATA[符号率(MBaud)]]></chn>
+    </symbol_rate>
+    <polar>
+      <eng><![CDATA[Polar Method]]></eng>
+      <chn><![CDATA[极化方式]]></chn>
+    </polar>
+    <switch_22k>
+      <eng><![CDATA[22K Switch]]></eng>
+      <chn><![CDATA[22K 开关]]></chn>
+    </switch_22k>
+    <specinv>
+      <eng><![CDATA[Spect Inv]]></eng>
+      <chn><![CDATA[频谱翻转]]></chn>
+    </specinv>
+    <lock>
+      <eng><![CDATA[Lock]]></eng>
+      <chn><![CDATA[锁状态]]></chn>
+    </lock>
+  </io_right_in_demod_s.html>
+  <io_right_in_demod_c.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <tuner_setting>
+      <eng><![CDATA[Tuner Setting:   DVB-C]]></eng>
+      <chn><![CDATA[Tuner参数：      DVB-C]]></chn>
+    </tuner_setting>
+    <input_freq>
+      <eng><![CDATA[Frequency(MHz)]]></eng>
+      <chn><![CDATA[频率(MHz)]]></chn>
+    </input_freq>
+    <symbol_rate>
+      <eng><![CDATA[SR(MBaud)]]></eng>
+      <chn><![CDATA[符号率(MBaud)]]></chn>
+    </symbol_rate>
+    <qam_mode>
+      <eng><![CDATA[QAM Mode]]></eng>
+      <chn><![CDATA[调制模式]]></chn>
+    </qam_mode>
+    <req_type>
+      <eng><![CDATA[ITU Coding]]></eng>
+      <chn>
+        <![CDATA[ITU 编码]]>
+      </chn>
+    </req_type>
+    <specinv>
+      <eng><![CDATA[Spect Inv]]></eng>
+      <chn><![CDATA[频谱翻转]]></chn>
+    </specinv>
+    <lock>
+      <eng><![CDATA[Lock]]></eng>
+      <chn><![CDATA[锁状态]]></chn>
+    </lock>
+  </io_right_in_demod_c.html>
+  <io_right_in_demod_t.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <tuner_setting>
+      <eng><![CDATA[Tuner Setting:   DVB-T]]></eng>
+      <chn><![CDATA[Tuner参数：      DVB-T]]></chn>
+    </tuner_setting>
+    <input_freq>
+      <eng><![CDATA[Frequency(MHz)]]></eng>
+      <chn><![CDATA[频率(MHz)]]></chn>
+    </input_freq>
+
+    <polar>
+      <eng><![CDATA[Polar Method]]></eng>
+      <chn><![CDATA[极化方式]]></chn>
+    </polar>
+    <lock>
+      <eng><![CDATA[Lock]]></eng>
+      <chn><![CDATA[锁状态]]></chn>
+    </lock>
+  </io_right_in_demod_t.html>
+  <io_right_in_demod_dtmb.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <input_freq>
+      <eng><![CDATA[Frequency(MHz)]]></eng>
+      <chn><![CDATA[频率(MHz)]]></chn>
+    </input_freq>
+    <specinv>
+      <eng><![CDATA[Spect Inv]]></eng>
+      <chn><![CDATA[频谱翻转]]></chn>
+    </specinv>
+
+
+    <lock>
+      <eng><![CDATA[Lock]]></eng>
+      <chn><![CDATA[锁状态]]></chn>
+    </lock>
+  </io_right_in_demod_dtmb.html>
+
+  <io_right_in_encode_new.html>
+    <title>
+      <eng><![CDATA[Encode Settings]]></eng>
+      <chn><![CDATA[编码设置]]></chn>
+    </title>
+    <enc_parameter>
+      <eng><![CDATA[Encode Parameters]]></eng>
+      <chn><![CDATA[编码参数]]></chn>
+    </enc_parameter>
+    <vi_mode>
+      <eng><![CDATA[Video Input Mode]]></eng>
+      <chn><![CDATA[视频输入模式]]></chn>
+    </vi_mode>
+    <vo_mode>
+      <eng><![CDATA[Video Output Mode]]></eng>
+      <chn><![CDATA[视频输出模式]]></chn>
+    </vo_mode>
+    <br_mode>
+      <eng><![CDATA[Video Bitrate Mode]]></eng>
+      <chn><![CDATA[视频码流输出模式]]></chn>
+    </br_mode>
+    <enc_mode>
+      <eng><![CDATA[Video Encode Mode]]></eng>
+      <chn><![CDATA[视频编码模式]]></chn>
+    </enc_mode>
+    <profile>
+      <eng><![CDATA[Profile]]></eng>
+      <chn><![CDATA[视频类型]]></chn>
+    </profile>
+    <bitrate>
+      <eng><![CDATA[Video Bitrate(Kbps)]]></eng>
+      <chn><![CDATA[视频输出码率(Kbps)]]></chn>
+    </bitrate>
+    <prog_bitrate>
+      <eng><![CDATA[Program Bitrate(Kbps)]]></eng>
+      <chn><![CDATA[节目码率(Kbps)]]></chn>
+    </prog_bitrate>
+    <gop>
+      <eng><![CDATA[GOP]]></eng>
+      <chn><![CDATA[GOP]]></chn>
+    </gop>
+    <aud_enc_mode>
+      <eng><![CDATA[Audio Encode Mode]]></eng>
+      <chn><![CDATA[音频编码模式]]></chn>
+    </aud_enc_mode>
+    <aud_bitrate>
+      <eng><![CDATA[Audio Bitrate(Kbps)]]></eng>
+      <chn><![CDATA[音频码率(Kbps)]]></chn>
+    </aud_bitrate>
+    <volume>
+      <eng><![CDATA[Volume (dB)]]></eng>
+      <chn><![CDATA[音量控制(dB)]]></chn>
+    </volume>
+    <prog_name>
+      <eng><![CDATA[Program Name]]></eng>
+      <chn><![CDATA[节目名称]]></chn>
+    </prog_name>
+    <prog_number>
+      <eng><![CDATA[Program Number]]></eng>
+      <chn><![CDATA[节目号]]></chn>
+    </prog_number>
+    <aud_sample>
+      <eng><![CDATA[Audio Sample(KHz)]]></eng>
+      <chn><![CDATA[音频采样率(KHz)]]></chn>
+    </aud_sample>
+    <vid_pid>
+      <eng><![CDATA[Video PID]]></eng>
+      <chn><![CDATA[视频PID]]></chn>
+    </vid_pid>
+    <aud_pid>
+      <eng><![CDATA[Audio PID]]></eng>
+      <chn><![CDATA[音频PID]]></chn>
+    </aud_pid>
+    <pcr_pid>
+      <eng><![CDATA[PCR PID]]></eng>
+      <chn><![CDATA[PCR PID]]></chn>
+    </pcr_pid>
+    <pmt_pid>
+      <eng><![CDATA[PMT PID]]></eng>
+      <chn><![CDATA[PMT PID]]></chn>
+    </pmt_pid>
+    <active>
+      <eng><![CDATA[Work Status]]></eng>
+      <chn><![CDATA[工作状态]]></chn>
+    </active>
+    <video_high_profile>
+      <eng><![CDATA[High Profile]]></eng>
+      <chn><![CDATA[高端类型]]></chn>
+    </video_high_profile>
+    <video_main_profile>
+      <eng><![CDATA[Main Profile]]></eng>
+      <chn><![CDATA[主要类型]]></chn>
+    </video_main_profile>
+    <submit>
+      <eng><![CDATA[Submit]]></eng>
+      <chn><![CDATA[提交]]></chn>
+    </submit>
+    <channel>
+      <eng><![CDATA[Channel]]></eng>
+      <chn><![CDATA[通道]]></chn>
+    </channel>
+    <work_mode_encode>
+      <eng><![CDATA[Encode]]></eng>
+      <chn><![CDATA[编码]]></chn>
+    </work_mode_encode>
+    <work_mode_free>
+      <eng><![CDATA[Free]]></eng>
+      <chn><![CDATA[空闲]]></chn>
+    </work_mode_free>
+    <alert_str_null>
+      <eng><![CDATA[String is NULL!]]></eng>
+      <chn><![CDATA[字符串不能为空！]]></chn>
+    </alert_str_null>
+    <alert_str_limit_length>
+      <eng><![CDATA[String Max Length: ]]></eng>
+      <chn><![CDATA[字符串最大长度: ]]></chn>
+    </alert_str_limit_length>
+    <alert_audio_mode_different1>
+      <eng><![CDATA[The Audio Encode Formate Of CH1 And CH2 Is Different]]></eng>
+      <chn><![CDATA[通道1和2的音频编码格式不一致]]></chn>
+    </alert_audio_mode_different1>
+    <alert_audio_mode_different2>
+      <eng><![CDATA[The Audio Encode Formate Of CH3 And CH4 Is Different]]></eng>
+      <chn><![CDATA[通道3和4的音频编码格式不一致]]></chn>
+    </alert_audio_mode_different2>
+    <range>
+      <eng><![CDATA[Range: ]]></eng>
+      <chn><![CDATA[范围: ]]></chn>
+    </range>
+    <int_alert>
+      <eng><![CDATA[Please Input Integer(chars: [-,0-9])]]></eng>
+      <chn><![CDATA[请输入整数(字符[-, 0-9]])]]></chn>
+    </int_alert>
+    <alert_same_pid>
+      <eng><![CDATA[Please Input Different PID Value!]]></eng>
+      <chn><![CDATA[请输入不同的 PID]]></chn>
+    </alert_same_pid>
+    <alert_same_prog_num>
+      <eng><![CDATA[Please Input Different Program Number!]]></eng>
+      <chn><![CDATA[请输入不同的节目号]]></chn>
+    </alert_same_prog_num>
+  </io_right_in_encode_new.html>
+  
+  <io_right_in_encode.html>
+    <encoder_web_title>
+      <eng><![CDATA[Encode Parameters]]></eng>
+      <chn><![CDATA[编码参数]]></chn>
+    </encoder_web_title>
+    <work_mod>
+      <eng><![CDATA[Working Mode]]></eng>
+      <chn><![CDATA[工作模式]]></chn>
+    </work_mod>
+    <video_format>
+      <eng><![CDATA[Video Format]]></eng>
+      <chn><![CDATA[视频制式]]></chn>
+    </video_format>
+    <video_resolution>
+      <eng><![CDATA[Video Resolution]]></eng>
+      <chn><![CDATA[视频解像度]]></chn>
+    </video_resolution>
+    <frame_rate>
+      <eng><![CDATA[Video Output Frame(fps）]]></eng>
+      <chn><![CDATA[帧频]]></chn>
+    </frame_rate>
+    <out_bit_rate_mode>
+      <eng><![CDATA[Video Bitrate Mode]]></eng>
+      <chn><![CDATA[视频码流输出模式]]></chn>
+    </out_bit_rate_mode>
+    <video_encode_mode>
+      <eng><![CDATA[Video Encode Mode]]></eng>
+      <chn><![CDATA[视频编码模式]]></chn>
+    </video_encode_mode>
+    <video_profile>
+      <eng><![CDATA[Profile Mode]]></eng>
+      <chn><![CDATA[视频类型]]></chn>
+    </video_profile>
+    <video_aspect>
+      <eng><![CDATA[Video Aspect Rate]]></eng>
+      <chn><![CDATA[视频宽高比]]></chn>
+    </video_aspect>
+    <video_bit_rate>
+      <eng><![CDATA[Video Bitrate(Kbps)]]></eng>
+      <chn><![CDATA[视频输出码率]]></chn>
+    </video_bit_rate>
+    <image_horizontal_offset>
+      <eng><![CDATA[Image Horizontal Offset]]></eng>
+      <chn><![CDATA[图像水平位置]]></chn>
+    </image_horizontal_offset>
+    <brightness>
+      <eng><![CDATA[Brightness]]></eng>
+      <chn><![CDATA[亮度]]></chn>
+    </brightness>
+    <contrast>
+      <eng><![CDATA[Contrast]]></eng>
+      <chn><![CDATA[对比度]]></chn>
+    </contrast>
+    <saturation>
+      <eng><![CDATA[Saturation]]></eng>
+      <chn><![CDATA[饱和度]]></chn>
+    </saturation>
+    <hue>
+      <eng><![CDATA[Hue]]></eng>
+      <chn><![CDATA[色调]]></chn>
+    </hue>
+    <audio_encode_mode>
+      <eng><![CDATA[Audio Encode Mode]]></eng>
+      <chn><![CDATA[音频编码模式]]></chn>
+    </audio_encode_mode>
+    <audio_rate>
+      <eng><![CDATA[Audio Bitrate(Kbps)]]></eng>
+      <chn><![CDATA[音频码率(Kbps)]]></chn>
+    </audio_rate>
+    <audio_embed>
+      <eng><![CDATA[Audio Embed]]></eng>
+      <chn><![CDATA[音频嵌入]]></chn>
+    </audio_embed>
+    <volume>
+      <eng><![CDATA[Volume (dB)]]></eng>
+      <chn><![CDATA[音量控制]]></chn>
+    </volume>
+    <audio_sample>
+      <eng><![CDATA[Audio Sample Frequency(KHz)]]></eng>
+      <chn><![CDATA[音频采样率]]></chn>
+    </audio_sample>
+    <video_pid>
+      <eng><![CDATA[Video PID]]></eng>
+      <chn><![CDATA[视频PID]]></chn>
+    </video_pid>
+    <audio_pid>
+      <eng><![CDATA[Audio PID]]></eng>
+      <chn><![CDATA[音频PID]]></chn>
+    </audio_pid>
+    <PCR_pid>
+      <eng><![CDATA[PCR PID]]></eng>
+      <chn><![CDATA[PCR PID]]></chn>
+    </PCR_pid>
+    <PMT_pid>
+      <eng><![CDATA[PMT PID]]></eng>
+      <chn><![CDATA[PMT PID]]></chn>
+    </PMT_pid>
+    <PID_equal_switch>
+      <eng><![CDATA[Video Pid Equal Pcr Pid Switch]]></eng>
+      <chn><![CDATA[Video Pid / Pcr Pid 相同开关]]></chn>
+    </PID_equal_switch>
+    <video_high_profile>
+      <eng><![CDATA[High Profile]]></eng>
+      <chn><![CDATA[高端类型]]></chn>
+    </video_high_profile>
+    <video_main_profile>
+      <eng><![CDATA[Main Profile]]></eng>
+      <chn><![CDATA[主要类型]]></chn>
+    </video_main_profile>
+    <submit>
+      <eng><![CDATA[Submit]]></eng>
+      <chn><![CDATA[提交]]></chn>
+    </submit>
+    <channel>
+      <eng><![CDATA[Channel]]></eng>
+      <chn><![CDATA[通道]]></chn>
+    </channel>
+    <work_mode_encode>
+      <eng><![CDATA[Encode]]></eng>
+      <chn><![CDATA[编码]]></chn>
+    </work_mode_encode>
+    <work_mode_free>
+      <eng><![CDATA[Free]]></eng>
+      <chn><![CDATA[空闲]]></chn>
+    </work_mode_free>
+    <alert_audio_mode_different1>
+      <eng><![CDATA[The Audio Encode Formate Of CH1 And CH2 Is Different]]></eng>
+      <chn><![CDATA[通道1和2的音频编码格式不一致]]></chn>
+    </alert_audio_mode_different1>
+    <alert_audio_mode_different2>
+      <eng><![CDATA[The Audio Encode Formate Of CH3 And CH4 Is Different]]></eng>
+      <chn><![CDATA[通道3和4的音频编码格式不一致]]></chn>
+    </alert_audio_mode_different2>
+  </io_right_in_encode.html>
+  <io_right_in_encode_GM8398Q.html>
+    <encoder_web_title>
+      <eng><![CDATA[Encode Parameters]]></eng>
+      <chn><![CDATA[编码参数]]></chn>
+    </encoder_web_title>
+    <work_mod>
+      <eng><![CDATA[Working Mode]]></eng>
+      <chn><![CDATA[工作模式]]></chn>
+    </work_mod>
+    <video_format>
+      <eng><![CDATA[Video Format]]></eng>
+      <chn><![CDATA[视频制式]]></chn>
+    </video_format>
+    <video_resolution>
+      <eng><![CDATA[Video Resolution]]></eng>
+      <chn><![CDATA[视频解像度]]></chn>
+    </video_resolution>
+    <frame_rate>
+      <eng><![CDATA[Video Output Frame(fps）]]></eng>
+      <chn><![CDATA[帧频]]></chn>
+    </frame_rate>
+    <out_bit_rate_mode>
+      <eng><![CDATA[Video Bitrate Mode]]></eng>
+      <chn><![CDATA[视频码流输出模式]]></chn>
+    </out_bit_rate_mode>
+    <video_encode_mode>
+      <eng><![CDATA[Video Encode Mode]]></eng>
+      <chn><![CDATA[视频编码模式]]></chn>
+    </video_encode_mode>
+    <video_profile>
+      <eng><![CDATA[Profile Mode]]></eng>
+      <chn><![CDATA[视频类型]]></chn>
+    </video_profile>
+    <video_aspect>
+      <eng><![CDATA[Video Aspect Rate]]></eng>
+      <chn><![CDATA[视频宽高比]]></chn>
+    </video_aspect>
+    <video_bit_rate>
+      <eng><![CDATA[Video Bitrate(Kbps)]]></eng>
+      <chn><![CDATA[视频输出码率]]></chn>
+    </video_bit_rate>
+    <image_horizontal_offset>
+      <eng><![CDATA[Image Horizontal Offset]]></eng>
+      <chn><![CDATA[图像水平位置]]></chn>
+    </image_horizontal_offset>
+    <brightness>
+      <eng><![CDATA[Brightness]]></eng>
+      <chn><![CDATA[亮度]]></chn>
+    </brightness>
+    <contrast>
+      <eng><![CDATA[Contrast]]></eng>
+      <chn><![CDATA[对比度]]></chn>
+    </contrast>
+    <saturation>
+      <eng><![CDATA[Saturation]]></eng>
+      <chn><![CDATA[饱和度]]></chn>
+    </saturation>
+    <hue>
+      <eng><![CDATA[Hue]]></eng>
+      <chn><![CDATA[色调]]></chn>
+    </hue>
+    <audio_encode_mode>
+      <eng><![CDATA[Audio Encode Mode]]></eng>
+      <chn><![CDATA[音频编码模式]]></chn>
+    </audio_encode_mode>
+    <audio_rate>
+      <eng><![CDATA[Audio Bitrate(Kbps)]]></eng>
+      <chn><![CDATA[音频码率(Kbps)]]></chn>
+    </audio_rate>
+    <audio_embed>
+      <eng><![CDATA[Audio Embed]]></eng>
+      <chn><![CDATA[音频嵌入]]></chn>
+    </audio_embed>
+    <volume>
+      <eng><![CDATA[Volume (dB)]]></eng>
+      <chn><![CDATA[音量控制]]></chn>
+    </volume>
+    <audio_sample>
+      <eng><![CDATA[Audio Sample Frequency(KHz)]]></eng>
+      <chn><![CDATA[音频采样率]]></chn>
+    </audio_sample>
+    <video_pid>
+      <eng><![CDATA[Video PID]]></eng>
+      <chn><![CDATA[视频PID]]></chn>
+    </video_pid>
+    <audio_pid>
+      <eng><![CDATA[Audio PID]]></eng>
+      <chn><![CDATA[音频PID]]></chn>
+    </audio_pid>
+    <pcr_pid>
+      <eng><![CDATA[PCR PID]]></eng>
+      <chn><![CDATA[PCR PID]]></chn>
+    </pcr_pid>
+    <pmt_pid>
+      <eng><![CDATA[PMT PID]]></eng>
+      <chn><![CDATA[PMT PID]]></chn>
+    </pmt_pid>
+    <pid_equal_switch>
+      <eng><![CDATA[Video Pid Equal Pcr Pid Switch]]></eng>
+      <chn><![CDATA[Video Pid / Pcr Pid 相同开关]]></chn>
+    </pid_equal_switch>
+    <video_high_profile>
+      <eng><![CDATA[High Profile]]></eng>
+      <chn><![CDATA[高端类型]]></chn>
+    </video_high_profile>
+    <video_main_profile>
+      <eng><![CDATA[Main Profile]]></eng>
+      <chn><![CDATA[主要类型]]></chn>
+    </video_main_profile>
+    <submit>
+      <eng><![CDATA[Submit]]></eng>
+      <chn><![CDATA[提交]]></chn>
+    </submit>
+    <channel>
+      <eng><![CDATA[Channel]]></eng>
+      <chn><![CDATA[通道]]></chn>
+    </channel>
+    <work_mode_encode>
+      <eng><![CDATA[Encode]]></eng>
+      <chn><![CDATA[编码]]></chn>
+    </work_mode_encode>
+    <work_mode_free>
+      <eng><![CDATA[Free]]></eng>
+      <chn><![CDATA[空闲]]></chn>
+    </work_mode_free>
+    <alert_audio_mode_different1>
+      <eng><![CDATA[The Audio Encode Formate Of CH1 And CH2 Is Different]]></eng>
+      <chn><![CDATA[通道1和2的音频编码格式不一致]]></chn>
+    </alert_audio_mode_different1>
+    <alert_audio_mode_different2>
+      <eng><![CDATA[The Audio Encode Formate Of CH3 And CH4 Is Different]]></eng>
+      <chn><![CDATA[通道3和4的音频编码格式不一致]]></chn>
+    </alert_audio_mode_different2>
+  </io_right_in_encode_GM8398Q.html>
+
+  <io_right_out_qam.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <qam_setting>
+      <eng><![CDATA[QAM Setting: Attenuator (dB) ]]></eng>
+      <chn><![CDATA[调制器参数： 衰减器(dB)]]></chn>
+    </qam_setting>
+    <des_addr>
+      <eng><![CDATA[DES Address]]></eng>
+      <chn><![CDATA[目标地址]]></chn>
+    </des_addr>
+    <src_addr_limit>
+      <eng><![CDATA[SRC Address Limit]]></eng>
+      <chn><![CDATA[源地址限制]]></chn>
+    </src_addr_limit>
+    <protocol>
+      <eng><![CDATA[Protocol]]></eng>
+      <chn><![CDATA[协议]]></chn>
+    </protocol>
+    <bitrate>
+      <eng><![CDATA[Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[码率 (Mbps)]]></chn>
+    </bitrate>
+    <itu>
+      <eng><![CDATA[ITU Coding]]></eng>
+      <chn><![CDATA[ITU 编码]]></chn>
+    </itu>
+    <bw>
+      <eng><![CDATA[BW]]></eng>
+      <chn><![CDATA[带宽]]></chn>
+    </bw>
+    <freq>
+      <eng><![CDATA[Frequnce (MHz)]]></eng>
+      <chn><![CDATA[频率 (MHz)]]></chn>
+    </freq>
+    <qam_mode>
+      <eng><![CDATA[QAM Mode]]></eng>
+      <chn><![CDATA[调制模式]]></chn>
+    </qam_mode>
+    <sr>
+      <eng><![CDATA[SR (MBaud)]]></eng>
+      <chn><![CDATA[符号率(MBaud)]]></chn>
+    </sr>
+    <inv>
+      <eng><![CDATA[Spect Inv]]></eng>
+      <chn><![CDATA[频谱翻转]]></chn>
+    </inv>
+    <modulation>
+      <eng><![CDATA[Modulation]]></eng>
+      <chn><![CDATA[调制开关]]></chn>
+    </modulation>
+    <gain>
+      <eng><![CDATA[Gain (dB)]]></eng>
+      <chn><![CDATA[增益 (dB)]]></chn>
+    </gain>
+    <rf>
+      <eng><![CDATA[RF]]></eng>
+      <chn><![CDATA[射频开关]]></chn>
+    </rf>
+  </io_right_out_qam.html>
+
+
+  <io_right_out_qpsk.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <qam_setting>
+      <eng><![CDATA[QAM Setting: Attenuator (dB) ]]></eng>
+      <chn><![CDATA[调制器参数： 衰减器(dB)]]></chn>
+    </qam_setting>
+    <itu>
+      <eng><![CDATA[ITU Coding]]></eng>
+      <chn><![CDATA[ITU 编码]]></chn>
+    </itu>
+    <bw>
+      <eng><![CDATA[BW]]></eng>
+      <chn><![CDATA[带宽]]></chn>
+    </bw>
+    <freq>
+      <eng><![CDATA[Frequnce (MHz)]]></eng>
+      <chn><![CDATA[频率 (MHz)]]></chn>
+    </freq>
+
+    <fec_encode>
+      <eng><![CDATA[FEC]]></eng>
+      <chn><![CDATA[FEC]]></chn>
+    </fec_encode>
+
+    <level_attenuation>
+      <eng><![CDATA[Attenuation]]></eng>
+      <chn><![CDATA[衰减]]></chn>
+    </level_attenuation>
+
+    <sr>
+      <eng><![CDATA[SR (MBaud)]]></eng>
+      <chn><![CDATA[符号率(MBaud)]]></chn>
+    </sr>
+    <inv>
+      <eng><![CDATA[Spect Inv]]></eng>
+      <chn><![CDATA[频谱翻转]]></chn>
+    </inv>
+    <modulation>
+      <eng><![CDATA[Modulation]]></eng>
+      <chn><![CDATA[调制开关]]></chn>
+    </modulation>
+    <gain>
+      <eng><![CDATA[Gain (dB)]]></eng>
+      <chn><![CDATA[增益 (dB)]]></chn>
+    </gain>
+    <rf>
+      <eng><![CDATA[RF]]></eng>
+      <chn><![CDATA[射频开关]]></chn>
+    </rf>
+    <max_bitrate>
+      <eng><![CDATA[Max Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[最大码率(Mbps)]]></chn>
+    </max_bitrate>
+  </io_right_out_qpsk.html>
+
+  <io_right_out_dtmb.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <freq_adj>
+      <eng><![CDATA[Freq Adjust: ]]></eng>
+      <chn><![CDATA[频率微调：]]></chn>
+    </freq_adj>
+    <freq>
+      <eng><![CDATA[Frequnce (MHz)]]></eng>
+      <chn><![CDATA[频率 (MHz)]]></chn>
+    </freq>
+    <qam_mode>
+      <eng><![CDATA[QAM Mode]]></eng>
+      <chn><![CDATA[调制模式]]></chn>
+    </qam_mode>
+    <carrier>
+      <eng><![CDATA[Carrier]]></eng>
+      <chn><![CDATA[载波]]></chn>
+    </carrier>
+    <pn_mode>
+      <eng><![CDATA[PN]]></eng>
+      <chn><![CDATA[帧头]]></chn>
+    </pn_mode>
+    <code_rate>
+      <eng><![CDATA[LDPC]]></eng>
+      <chn><![CDATA[码率]]></chn>
+    </code_rate>
+    <time_interleaver>
+      <eng><![CDATA[Interleaver]]></eng>
+      <chn><![CDATA[时域交织]]></chn>
+    </time_interleaver>
+    <double_pilot>
+      <eng><![CDATA[Pilot]]></eng>
+      <chn><![CDATA[导频]]></chn>
+    </double_pilot>
+    <inv>
+      <eng><![CDATA[Spect Inv]]></eng>
+      <chn><![CDATA[频谱翻转]]></chn>
+    </inv>
+    <modulation>
+      <eng><![CDATA[Tone]]></eng>
+      <chn><![CDATA[单音]]></chn>
+    </modulation>
+    <gain>
+      <eng><![CDATA[Gain (dB)]]></eng>
+      <chn><![CDATA[增益 (dB)]]></chn>
+    </gain>
+    <gain_alc>
+      <eng><![CDATA[Gain(dBm)]]></eng>
+      <chn><![CDATA[增益(dBm)]]></chn>
+    </gain_alc>
+    <rf>
+      <eng><![CDATA[RF]]></eng>
+      <chn><![CDATA[射频开关]]></chn>
+    </rf>
+    <dpd_mark>
+      <eng><![CDATA[DPD: ]]></eng>
+      <chn><![CDATA[预失真：]]></chn>
+    </dpd_mark>
+    <alc_mark>
+      <eng><![CDATA[ALC: ]]></eng>
+      <chn><![CDATA[ALC：]]></chn>
+    </alc_mark>
+    <ex_att_level>
+      <eng><![CDATA[Tune (dB): ]]></eng>
+      <chn><![CDATA[微调(dB)：]]></chn>
+    </ex_att_level>
+    <max_bitrate>
+      <eng><![CDATA[Max Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[最大码率(Mbps)]]></chn>
+    </max_bitrate>
+
+  </io_right_out_dtmb.html>
+
+  <io_right_out_eth.html>
+    <title>
+      <eng><![CDATA[Channel Setting]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <eth_setting>
+      <eng><![CDATA[ETH Setting: ]]></eng>
+      <chn><![CDATA[以太网参数：]]></chn>
+    </eth_setting>
+
+    <src_addr>
+      <eng><![CDATA[Src Address]]></eng>
+      <chn><![CDATA[源地址]]></chn>
+    </src_addr>
+
+    <dest_addr>
+      <eng><![CDATA[DES Address]]></eng>
+      <chn><![CDATA[目标地址]]></chn>
+    </dest_addr>
+
+    <src_addr_limit>
+      <eng><![CDATA[SRC Address Limit]]></eng>
+      <chn><![CDATA[源地址限制]]></chn>
+    </src_addr_limit>
+
+    <pro_type>
+      <eng><![CDATA[Protocol]]></eng>
+      <chn><![CDATA[协议]]></chn>
+    </pro_type>
+
+    <bitrate>
+      <eng><![CDATA[Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[码率 (Mbps)]]></chn>
+    </bitrate>
+
+    <vod_sub>
+      <eng><![CDATA[QAM Channel]]></eng>
+      <chn><![CDATA[输出调制通道]]></chn>
+    </vod_sub>
+    <vod_prog>
+      <eng><![CDATA[Program Num]]></eng>
+      <chn><![CDATA[输出节目好]]></chn>
+    </vod_prog>
+    <ip_batch>
+      <eng><![CDATA[Batch Set :]]></eng>
+      <chn><![CDATA[批量设置：]]></chn>
+    </ip_batch>
+    <full_disable>
+      <eng><![CDATA[Batch OFF]]></eng>
+      <chn><![CDATA[批量关闭]]></chn>
+    </full_disable>
+  </io_right_out_eth.html>
+
+  <io_right_out_asi.html>
+    <title>
+      <eng><![CDATA[Channel Settings]]></eng>
+      <chn><![CDATA[通道设置]]></chn>
+    </title>
+    <io_type>
+      <eng><![CDATA[Channel Type: ]]></eng>
+      <chn><![CDATA[通道类型：]]></chn>
+    </io_type>
+    <sub_type>
+      <eng><![CDATA[Sub Type: ]]></eng>
+      <chn><![CDATA[子通道类型：]]></chn>
+    </sub_type>
+    <asi_setting>
+      <eng><![CDATA[ASI Settings: ]]></eng>
+      <chn><![CDATA[ASI参数：]]></chn>
+    </asi_setting>
+    <bitrate>
+      <eng><![CDATA[Bitrate (Mbps)]]></eng>
+      <chn><![CDATA[码率 (Mbps)]]></chn>
+    </bitrate>
+  </io_right_out_asi.html>
+
+  <io_right_sfn_modulator.html>
+    <title>
+      <eng><![CDATA[SFN Settings]]></eng>
+      <chn><![CDATA[单频网设置]]></chn>
+    </title>
+    <sfn_general>
+      <eng><![CDATA[SFN General Setting]]></eng>
+      <chn><![CDATA[单频网基本设置]]></chn>
+    </sfn_general>
+    <sfn_mark>
+      <eng><![CDATA[Mode: ]]></eng>
+      <chn><![CDATA[模式：]]></chn>
+    </sfn_mark>
+    <sfn>
+      <eng><![CDATA[SFN]]></eng>
+      <chn><![CDATA[单频网]]></chn>
+    </sfn>
+    <mfn>
+      <eng><![CDATA[MFN]]></eng>
+      <chn><![CDATA[多频网]]></chn>
+    </mfn>
+    <sfn_clock_src>
+      <eng><![CDATA[Clock Reference: ]]></eng>
+      <chn><![CDATA[时钟参考源选择：]]></chn>
+    </sfn_clock_src>
+    <sfn_1pps_src>
+      <eng><![CDATA[1PPS Reference: ]]></eng>
+      <chn><![CDATA[1PPS 选择：]]></chn>
+    </sfn_1pps_src>
+    <internal_10m>
+      <eng><![CDATA[Int 10M]]></eng>
+      <chn><![CDATA[内部 10M]]></chn>
+    </internal_10m>
+    <external_10m>
+      <eng><![CDATA[Ext 10M]]></eng>
+      <chn><![CDATA[外部 10M]]></chn>
+    </external_10m>
+    <a1pps_source>
+      <eng><![CDATA[1PPS Src]]></eng>
+      <chn><![CDATA[1PPS 源]]></chn>
+    </a1pps_source>
+    <internal_1pps>
+      <eng><![CDATA[Int 1PPS]]></eng>
+      <chn><![CDATA[内部 秒脉冲]]></chn>
+    </internal_1pps>
+    <external_1pps>
+      <eng><![CDATA[Ext 1PPS]]></eng>
+      <chn><![CDATA[外部 秒脉冲]]></chn>
+    </external_1pps>
+    <sfn_add_delay_100ns>
+      <eng><![CDATA[Add Delay(us): ]]></eng>
+      <chn><![CDATA[附加延时(us)：]]></chn>
+    </sfn_add_delay_100ns>
+    <sfn_sip_del_mark>
+      <eng><![CDATA[SIP DEL: ]]></eng>
+      <chn><![CDATA[SIP 包删除：]]></chn>
+    </sfn_sip_del_mark>
+
+    <sfn_addr_id>
+      <eng><![CDATA[TX ID(HEX): ]]></eng>
+      <chn><![CDATA[设备地址(HEX)：]]></chn>
+    </sfn_addr_id>
+    <sfn_use_indv_mark>
+      <eng><![CDATA[Individual Addressing: ]]></eng>
+      <chn><![CDATA[使用单独寻址：]]></chn>
+    </sfn_use_indv_mark>
+    <sfn_use_cmn_mark>
+      <eng><![CDATA[Force SI SIP: ]]></eng>
+      <chn><![CDATA[强制 SI SIP：]]></chn>
+    </sfn_use_cmn_mark>
+
+    <sfn_status>
+      <eng><![CDATA[SIP Common Info]]></eng>
+      <chn><![CDATA[SIP 一般信息]]></chn>
+    </sfn_status>
+    <sfn_int10m_status>
+      <eng><![CDATA[Int 10M]]></eng>
+      <chn><![CDATA[内部10M]]></chn>
+    </sfn_int10m_status>
+    <sfn_int1pps_status>
+      <eng><![CDATA[In 1PPS]]></eng>
+      <chn><![CDATA[内部秒脉冲]]></chn>
+    </sfn_int1pps_status>
+    <sfn_ext10m_status>
+      <eng><![CDATA[Ext 10M]]></eng>
+      <chn><![CDATA[外部10M]]></chn>
+    </sfn_ext10m_status>
+    <sfn_ext1pps_status>
+      <eng><![CDATA[Ext 1PPS]]></eng>
+      <chn><![CDATA[外部秒脉冲]]></chn>
+    </sfn_ext1pps_status>
+    <sfn_si_sip_info>
+      <eng><![CDATA[SFN Info :]]></eng>
+      <chn><![CDATA[单频网信息：]]></chn>
+    </sfn_si_sip_info>
+    <sfn_max_delay_100ns>
+      <eng><![CDATA[Max Delay(us) :]]></eng>
+      <chn><![CDATA[最大延迟(us)：]]></chn>
+    </sfn_max_delay_100ns>
+    <sfn_net_delay_100ns>
+      <eng><![CDATA[Network Delay(us) :]]></eng>
+      <chn><![CDATA[网络延迟(us)：]]></chn>
+    </sfn_net_delay_100ns>
+
+    <sfn_indv_sip_info>
+      <eng><![CDATA[SIP Addressing Info]]></eng>
+      <chn><![CDATA[SIP 寻址信息]]></chn>
+    </sfn_indv_sip_info>
+
+    <sfn_cur_addr>
+      <eng><![CDATA[TX ID(HEX) :]]></eng>
+      <chn><![CDATA[地址(HEX)：]]></chn>
+    </sfn_cur_addr>
+
+    <sfn_cur_addr_delay>
+      <eng><![CDATA[Add Delay(us) :]]></eng>
+      <chn><![CDATA[附加时延(us)：]]></chn>
+    </sfn_cur_addr_delay>
+
+    <sfn_cur_freqoffset>
+      <eng><![CDATA[Freq Offset(Hz) :]]></eng>
+      <chn><![CDATA[频偏(Hz)：]]></chn>
+    </sfn_cur_freqoffset>
+
+    <sfn_cur_pow>
+      <eng><![CDATA[Power Control(dBm) :]]></eng>
+      <chn><![CDATA[功率控制(dBm)：]]></chn>
+    </sfn_cur_pow>
+
+    <sfn_device>
+      <eng><![CDATA[SFN Advance Setting]]></eng>
+      <chn><![CDATA[单频网高级设置]]></chn>
+    </sfn_device>
+    <sfn_input_asi_mod>
+      <eng><![CDATA[ASI Select :]]></eng>
+      <chn><![CDATA[ASI 选择：]]></chn>
+    </sfn_input_asi_mod>
+    <sfn_freq>
+      <eng><![CDATA[Freq(MHz) :]]></eng>
+      <chn><![CDATA[频率(MHz)：]]></chn>
+    </sfn_freq>
+    <sfn_gain>
+      <eng><![CDATA[Gain(dB) :]]></eng>
+      <chn><![CDATA[增益(dB)：]]></chn>
+    </sfn_gain>
+    <sfn_inv>
+      <eng><![CDATA[Spect Inv :]]></eng>
+      <chn><![CDATA[频谱翻转：]]></chn>
+    </sfn_inv>
+    <sfn_sat>
+      <eng><![CDATA[SAT SFN]]></eng>
+      <chn><![CDATA[卫星单频网]]></chn>
+    </sfn_sat>
+    <sfn_sat_mark>
+      <eng><![CDATA[Mark :]]></eng>
+      <chn><![CDATA[功能启动：]]></chn>
+    </sfn_sat_mark>
+    <sfn_sat_crc_checkmark>
+      <eng><![CDATA[CRC32 Check :]]></eng>
+      <chn><![CDATA[CRC32 校验：]]></chn>
+    </sfn_sat_crc_checkmark>
+    <sfn_sat_null_pid>
+      <eng><![CDATA[Null Packet PID :]]></eng>
+      <chn><![CDATA[空包PID：]]></chn>
+    </sfn_sat_null_pid>
+
+    <input_status>
+      <eng><![CDATA[Input Status]]></eng>
+      <chn><![CDATA[输入状态]]></chn>
+    </input_status>
+
+    <asi0_status>
+      <eng><![CDATA[ASI 1]]></eng>
+      <chn><![CDATA[ASI 1]]></chn>
+    </asi0_status>
+
+    <asi1_status>
+      <eng><![CDATA[ASI 2]]></eng>
+      <chn><![CDATA[ASI 2]]></chn>
+    </asi1_status>
+
+    <sfn_sip_status>
+      <eng><![CDATA[SIP]]></eng>
+      <chn><![CDATA[SIP]]></chn>
+    </sfn_sip_status>
+
+    <sfn_10m_lock_status>
+      <eng><![CDATA[10M SYNC]]></eng>
+      <chn><![CDATA[10M SYNC]]></chn>
+    </sfn_10m_lock_status>
+
+    <sfn_mute>
+      <eng><![CDATA[SFN RF Mute Condition]]></eng>
+      <chn><![CDATA[单频网 RF 关闭调试]]></chn>
+    </sfn_mute>
+    <sfn_ts_mute_mark>
+      <eng><![CDATA[Input TS Error]]></eng>
+      <chn><![CDATA[输入 TS 错误]]></chn>
+    </sfn_ts_mute_mark>
+    <sfn_ref_mute_mark>
+      <eng><![CDATA[Ref CLK Error]]></eng>
+      <chn><![CDATA[参考时钟 错误]]></chn>
+    </sfn_ref_mute_mark>
+    <sfn_1pps_mute_mark>
+      <eng><![CDATA[1PPS Error]]></eng>
+      <chn><![CDATA[1PPS 错误]]></chn>
+    </sfn_1pps_mute_mark>
+    <sfn_sip_mute_mark>
+      <eng><![CDATA[SIP Error]]></eng>
+      <chn><![CDATA[SIP 错误]]></chn>
+    </sfn_sip_mute_mark>
+    <sfn_rf_mute_status>
+      <eng><![CDATA[RF Mute Status]]></eng>
+      <chn><![CDATA[RF 静音 状态]]></chn>
+    </sfn_rf_mute_status>
+
+
+  </io_right_sfn_modulator.html>
+
+  <io_right_sfn_adaptor.html>
+    <title>
+      <eng><![CDATA[SFN Settings]]></eng>
+      <chn><![CDATA[单频网设置]]></chn>
+    </title>
+
+    <sfn_setting>
+      <eng><![CDATA[SFN Setting]]></eng>
+      <chn><![CDATA[单频网设置]]></chn>
+    </sfn_setting>
+    <sfn_max_bitrate>
+      <eng><![CDATA[Max Bitrate :]]></eng>
+      <chn><![CDATA[最大码率：]]></chn>
+    </sfn_max_bitrate>
+    <sfn_input_asi_mod>
+      <eng><![CDATA[ASI Select :]]></eng>
+      <chn><![CDATA[ASI 选择：]]></chn>
+    </sfn_input_asi_mod>
+
+    <sfn_clock_ref>
+      <eng><![CDATA[Clock Reference & 1PPS Reference]]></eng>
+      <chn><![CDATA[参考时钟&1PPS设置]]></chn>
+    </sfn_clock_ref>
+    <sfn_10m_sel>
+      <eng><![CDATA[Clock Reference: ]]></eng>
+      <chn><![CDATA[时钟参考源选择：]]></chn>
+    </sfn_10m_sel>
+    <sfn_ex1pps_mark>
+      <eng><![CDATA[1PPS Reference: ]]></eng>
+      <chn><![CDATA[秒脉冲 选择：]]></chn>
+    </sfn_ex1pps_mark>
+
+    <internal_10m>
+      <eng><![CDATA[Int 10M]]></eng>
+      <chn><![CDATA[内部 10M]]></chn>
+    </internal_10m>
+    <external_10m>
+      <eng><![CDATA[Ext 10M]]></eng>
+      <chn><![CDATA[外部 10M]]></chn>
+    </external_10m>
+    <a1pps_source>
+      <eng><![CDATA[1PPS Ref]]></eng>
+      <chn><![CDATA[秒脉冲 参考源]]></chn>
+    </a1pps_source>
+    <internal_1pps>
+      <eng><![CDATA[Int 1PPS]]></eng>
+      <chn><![CDATA[内部 秒脉冲]]></chn>
+    </internal_1pps>
+    <external_1pps>
+      <eng><![CDATA[Ext 1PPS]]></eng>
+      <chn><![CDATA[外部 秒脉冲]]></chn>
+    </external_1pps>
+
+    <sfn_status>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态]]></chn>
+    </sfn_status>
+    <sfn_int10m_status>
+      <eng><![CDATA[Int 10M]]></eng>
+      <chn><![CDATA[内部10M]]></chn>
+    </sfn_int10m_status>
+    <sfn_int1pps_status>
+      <eng><![CDATA[Int 1PPS]]></eng>
+      <chn><![CDATA[内部 秒脉冲]]></chn>
+    </sfn_int1pps_status>
+    <sfn_ext10m_status>
+      <eng><![CDATA[Ext 10M]]></eng>
+      <chn><![CDATA[外部10M]]></chn>
+    </sfn_ext10m_status>
+    <sfn_ext1pps_status>
+      <eng><![CDATA[Ext 1PPS]]></eng>
+      <chn><![CDATA[外部秒脉冲]]></chn>
+    </sfn_ext1pps_status>
+
+
+
+
+
+    <input_status>
+      <eng><![CDATA[Input Status]]></eng>
+      <chn><![CDATA[输入状态]]></chn>
+    </input_status>
+
+    <asi0_status>
+      <eng><![CDATA[ASI 1]]></eng>
+      <chn><![CDATA[ASI 1]]></chn>
+    </asi0_status>
+
+    <asi1_status>
+      <eng><![CDATA[ASI 2]]></eng>
+      <chn><![CDATA[ASI 2]]></chn>
+    </asi1_status>
+
+    <sfn_10m_lock_status>
+      <eng><![CDATA[10M SYNC]]></eng>
+      <chn><![CDATA[10M SYNC]]></chn>
+    </sfn_10m_lock_status>
+
+    <sfn_sat>
+      <eng><![CDATA[SAT SFN]]></eng>
+      <chn><![CDATA[卫星单频网]]></chn>
+    </sfn_sat>
+    <sfn_sat_mark>
+      <eng><![CDATA[Mark :]]></eng>
+      <chn><![CDATA[功能启动：]]></chn>
+    </sfn_sat_mark>
+    <sfn_sat_null_pid>
+      <eng><![CDATA[Null Packet PID :]]></eng>
+      <chn><![CDATA[空包PID：]]></chn>
+    </sfn_sat_null_pid>
+
+    <sfn_indv_sip_info>
+      <eng><![CDATA[SIP Addressing Info]]></eng>
+      <chn><![CDATA[SIP 寻址信息]]></chn>
+    </sfn_indv_sip_info>
+
+    <sfn_max_delay_100ns>
+      <eng><![CDATA[Max Delay(us)]]></eng>
+      <chn><![CDATA[最大延迟(us)]]></chn>
+    </sfn_max_delay_100ns>
+    <indv_addr>
+      <eng><![CDATA[TX ID(HEX)]]></eng>
+      <chn><![CDATA[地址(HEX)]]></chn>
+    </indv_addr>
+
+    <indv_delay>
+      <eng><![CDATA[Add Delay(us)]]></eng>
+      <chn><![CDATA[附加时延(us)]]></chn>
+    </indv_delay>
+
+    <indv_freq_offset_hz>
+      <eng><![CDATA[Freq Offset(Hz)]]></eng>
+      <chn><![CDATA[频偏(Hz)]]></chn>
+    </indv_freq_offset_hz>
+
+    <indv_power>
+      <eng><![CDATA[Power Control(dBm)]]></eng>
+      <chn><![CDATA[功率控制(dBm)]]></chn>
+    </indv_power>
+
+    <mark>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[开关]]></chn>
+    </mark>
+  </io_right_sfn_adaptor.html>
+
+
+  <mux_left.html>
+    <title>
+      <eng><![CDATA[Mux Setting]]></eng>
+      <chn><![CDATA[节目复用]]></chn>
+    </title>
+    <mux_settings>
+      <eng><![CDATA[Multiplexer Configuration]]></eng>
+      <chn><![CDATA[复用参数配置]]></chn>
+    </mux_settings>
+    <setting>
+      <eng><![CDATA[General Setting]]></eng>
+      <chn><![CDATA[基本设置]]></chn>
+    </setting>
+    <manual_pid>
+      <eng><![CDATA[Manual PID Map]]></eng>
+      <chn><![CDATA[自定义 PID 映射]]></chn>
+    </manual_pid>
+    <manual_inserter>
+      <eng><![CDATA[Manual PSI Inserter]]></eng>
+      <chn><![CDATA[自定义 PSI 插入]]></chn>
+    </manual_inserter>
+    <nit_edit>
+      <eng><![CDATA[NIT Edit]]></eng>
+      <chn><![CDATA[NIT 编辑]]></chn>
+    </nit_edit>
+    <eca_setting>
+      <eng><![CDATA[ANTI-COPY System Setting]]></eng>
+      <chn><![CDATA[防拷贝系统设置]]></chn>
+    </eca_setting>
+    <servl_setting>
+      <eng><![CDATA[Output Service Category Edit]]></eng>
+      <chn><![CDATA[输出节目分类编辑]]></chn>
+    </servl_setting>
+    <in_serv>
+      <eng><![CDATA[Input Service]]></eng>
+      <chn><![CDATA[输入节目]]></chn>
+    </in_serv>
+    <out_serv>
+      <eng><![CDATA[Output Service]]></eng>
+      <chn><![CDATA[输出节目]]></chn>
+    </out_serv>
+    <batch_mux>
+      <eng><![CDATA[Batch Service Edit]]></eng>
+      <chn><![CDATA[批量节目设置]]></chn>
+    </batch_mux>
+    <mosiac>
+      <eng><![CDATA[MOSIAC Setting]]></eng>
+      <chn><![CDATA[马赛克设置]]></chn>
+    </mosiac>
+    <ts_backup>
+      <eng><![CDATA[TS Backup Setting]]></eng>
+      <chn><![CDATA[TS 备份设置]]></chn>
+    </ts_backup>
+  </mux_left.html>
+
+  <mux_right_setting.html>
+    <title>
+      <eng><![CDATA[General Setting]]></eng>
+      <chn><![CDATA[基本设置]]></chn>
+    </title>
+    <def_charset>
+      <eng><![CDATA[Default Input/Output Charset]]></eng>
+      <chn><![CDATA[默认输入/输出 字符集]]></chn>
+    </def_charset>
+    <in_charset>
+      <eng><![CDATA[Input Charset :]]></eng>
+      <chn><![CDATA[输入字符集：]]></chn>
+    </in_charset>
+    <out_charset>
+      <eng><![CDATA[Output Charset :]]></eng>
+      <chn><![CDATA[输出字符集：]]></chn>
+    </out_charset>
+    <out_charset_marker>
+      <eng><![CDATA[Output Charset Marker :]]></eng>
+      <chn><![CDATA[输出字符集标识码：]]></chn>
+    </out_charset_marker>
+    <tz>
+      <eng><![CDATA[Time Zone]]></eng>
+      <chn><![CDATA[时区]]></chn>
+    </tz>
+    <ts_sel>
+      <eng><![CDATA[Select Time Zone :]]></eng>
+      <chn><![CDATA[请选择时区：]]></chn>
+    </ts_sel>
+    <tdt>
+      <eng><![CDATA[TDT TOT Setting]]></eng>
+      <chn><![CDATA[TDT TOT 设置]]></chn>
+    </tdt>
+    <tdt_cycle>
+      <eng><![CDATA[Update Cycle (s) :]]></eng>
+      <chn><![CDATA[更新周期（秒）：]]></chn>
+    </tdt_cycle>
+    <tdt_mark>
+      <eng><![CDATA[TOT Enable :]]></eng>
+      <chn><![CDATA[TOT 发送开关：]]></chn>
+    </tdt_mark>
+    <pcr_correction>
+      <eng><![CDATA[PCR Correction Setting]]></eng>
+      <chn><![CDATA[PCR 校验设置]]></chn>
+    </pcr_correction>
+    <pcrc_pos>
+      <eng><![CDATA[Positive Limit]]></eng>
+      <chn><![CDATA[校验上限]]></chn>
+    </pcrc_pos>
+    <pcrc_neg>
+      <eng><![CDATA[Negitive Limit]]></eng>
+      <chn><![CDATA[校验下限]]></chn>
+    </pcrc_neg>
+    <pcrc_mark>
+      <eng><![CDATA[Correct Mark]]></eng>
+      <chn><![CDATA[校验开关]]></chn>
+    </pcrc_mark>
+    <other_setting>
+      <eng><![CDATA[Other Settings]]></eng>
+      <chn><![CDATA[其它设置]]></chn>
+    </other_setting>
+    <country_code>
+      <eng><![CDATA[Country Code: ]]></eng>
+      <chn><![CDATA[国家代码：]]></chn>
+    </country_code>
+    <auto_inc>
+      <eng><![CDATA[Version AUTO Increament: ]]></eng>
+      <chn><![CDATA[版本号自动增长：]]></chn>
+    </auto_inc>
+    <spts_sdt_mark>
+      <eng><![CDATA[SPTS SDT: ]]></eng>
+      <chn><![CDATA[SPTS SDT：]]></chn>
+    </spts_sdt_mark>
+  </mux_right_setting.html>
+
+  <mux_right_pid_map.html>
+    <title>
+      <eng><![CDATA[Manual PID Map]]></eng>
+      <chn><![CDATA[自定义 PID 映射]]></chn>
+    </title>
+    <in_ts>
+      <eng><![CDATA[Input TS Index]]></eng>
+      <chn><![CDATA[输入TS索引]]></chn>
+    </in_ts>
+    <out_ts>
+      <eng><![CDATA[Output TS Index]]></eng>
+      <chn><![CDATA[输出TS索引]]></chn>
+    </out_ts>
+    <in_pid>
+      <eng><![CDATA[Input PID]]></eng>
+      <chn><![CDATA[输入PID]]></chn>
+    </in_pid>
+    <out_pid>
+      <eng><![CDATA[Output PID]]></eng>
+      <chn><![CDATA[输出PID]]></chn>
+    </out_pid>
+    <mark>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[开关]]></chn>
+    </mark>
+  </mux_right_pid_map.html>
+  <mux_right_batch_mux.html>
+    <title>
+      <eng><![CDATA[Batch Service Edit]]></eng>
+      <chn><![CDATA[批量节目设置]]></chn>
+    </title>
+    <out_ts>
+      <eng><![CDATA[Output Ts Index]]></eng>
+      <chn><![CDATA[输出TS索引]]></chn>
+    </out_ts>
+    <in_ts>
+      <eng><![CDATA[Input Ts Index]]></eng>
+      <chn><![CDATA[输入TS索引]]></chn>
+    </in_ts>
+    <service_name>
+      <eng><![CDATA[Service Name]]></eng>
+      <chn><![CDATA[节目名]]></chn>
+    </service_name>
+    <service_id>
+      <eng><![CDATA[Service ID]]></eng>
+      <chn><![CDATA[节目号]]></chn>
+    </service_id>
+    <out_port>
+      <eng><![CDATA[Output Port]]></eng>
+      <chn><![CDATA[输出端口]]></chn>
+    </out_port>
+    <mark>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[开关]]></chn>
+    </mark>
+    <servid_mark>
+      <eng><![CDATA[System ServiceID Checkout / Ts ServiceID Checkout :]]></eng>
+      <chn><![CDATA[系统节目号校验/Ts节目号校验：]]></chn>
+    </servid_mark>
+    <anay_timeout>
+      <eng><![CDATA[Analyse Timeout (ms): ]]></eng>
+      <chn><![CDATA[搜索超时（毫秒）：]]></chn>
+    </anay_timeout>
+    <batch_analyze>
+      <eng><![CDATA[Analyse All Valid TS]]></eng>
+      <chn><![CDATA[批量搜索所有有效的TS]]></chn>
+    </batch_analyze>
+    <anay_charset>
+      <eng><![CDATA[Default Charset: ]]></eng>
+      <chn><![CDATA[默认输入字符集：]]></chn>
+    </anay_charset>
+    <clear_when_failed>
+      <eng><![CDATA[Keep Services When Failed: ]]></eng>
+      <chn><![CDATA[搜索失败时保留当前信息：]]></chn>
+    </clear_when_failed>
+    <startanalyse>
+      <eng><![CDATA[Service Analyse]]></eng>
+      <chn><![CDATA[开始搜索]]></chn>
+    </startanalyse>
+    <remux_service>
+      <eng>
+        <![CDATA[Multiplex:]]>
+      </eng>
+      <chn><![CDATA[复用:]]></chn>
+    </remux_service>
+  </mux_right_batch_mux.html>
+
+  <mux_right_backup_in_ts.html>
+    <title>
+      <eng><![CDATA[Input TS Backup Setting]]></eng>
+      <chn><![CDATA[输入 TS 备份设置]]></chn>
+    </title>
+    <backup_ts>
+      <eng><![CDATA[Backup Ts Index]]></eng>
+      <chn><![CDATA[备份TS 索引]]></chn>
+    </backup_ts>
+    <low>
+      <eng><![CDATA[Low (Mbps)]]></eng>
+      <chn><![CDATA[下限 (Mbps)]]></chn>
+    </low>
+    <high>
+      <eng><![CDATA[High (Mbps)]]></eng>
+      <chn><![CDATA[上限 (Mbps)]]></chn>
+    </high>
+    <status>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态]]></chn>
+    </status>
+    <main>
+      <eng><![CDATA[FORCE MAIN]]></eng>
+      <chn><![CDATA[强制主路]]></chn>
+    </main>
+    <backup>
+      <eng><![CDATA[FORCE BACKUP]]></eng>
+      <chn><![CDATA[强制备份]]></chn>
+    </backup>
+    <auto_repeat>
+      <eng><![CDATA[AUTO-REPEAT]]></eng>
+      <chn><![CDATA[自动-恢复]]></chn>
+    </auto_repeat>
+    <auto_once>
+      <eng><![CDATA[AUTO-ONCE]]></eng>
+      <chn><![CDATA[自动-不恢复]]></chn>
+    </auto_once>
+    <mode>
+      <eng><![CDATA[Mode]]></eng>
+      <chn><![CDATA[模式]]></chn>
+    </mode>
+  </mux_right_backup_in_ts.html>
+
+  <mux_right_backup_out_ts.html>
+    <title>
+      <eng><![CDATA[Output TS Backup Setting]]></eng>
+      <chn><![CDATA[输出 TS 备份设置]]></chn>
+    </title>
+    <backup_ts>
+      <eng><![CDATA[Backup Ts Index]]></eng>
+      <chn><![CDATA[备份TS 索引]]></chn>
+    </backup_ts>
+    <status>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态]]></chn>
+    </status>
+    <main>
+      <eng><![CDATA[FORCE MAIN]]></eng>
+      <chn><![CDATA[强制主路]]></chn>
+    </main>
+    <backup>
+      <eng><![CDATA[FORCE BACKUP]]></eng>
+      <chn><![CDATA[强制备份]]></chn>
+    </backup>
+    <remote>
+      <eng><![CDATA[REMOTE]]></eng>
+      <chn><![CDATA[远程控制]]></chn>
+    </remote>
+    <mode>
+      <eng><![CDATA[Mode]]></eng>
+      <chn><![CDATA[模式]]></chn>
+    </mode>
+  </mux_right_backup_out_ts.html>
+
+  <mux_right_pid_map.html>
+    <title>
+      <eng><![CDATA[Manual PID Map]]></eng>
+      <chn><![CDATA[自定义 PID 映射]]></chn>
+    </title>
+    <in_ts>
+      <eng><![CDATA[Input TS Index]]></eng>
+      <chn><![CDATA[输入TS索引]]></chn>
+    </in_ts>
+    <out_ts>
+      <eng><![CDATA[Output TS Index]]></eng>
+      <chn><![CDATA[输出TS索引]]></chn>
+    </out_ts>
+    <in_pid>
+      <eng><![CDATA[Input PID]]></eng>
+      <chn><![CDATA[输入PID]]></chn>
+    </in_pid>
+    <out_pid>
+      <eng><![CDATA[Output PID]]></eng>
+      <chn><![CDATA[输出PID]]></chn>
+    </out_pid>
+    <mark>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[开关]]></chn>
+    </mark>
+  </mux_right_pid_map.html>
+
+  <mux_right_inserter.html>
+    <title>
+      <eng><![CDATA[Manual PSI Inserter]]></eng>
+      <chn><![CDATA[自定义 PSI 插入]]></chn>
+    </title>
+    <space>
+      <eng><![CDATA[Used/Total Space (KBytes): ]]></eng>
+      <chn><![CDATA[占用空间/总空间 (KBytes)：]]></chn>
+    </space>
+    <total_bitrate>
+      <eng><![CDATA[Used/Total Bitrate (Kbps): ]]></eng>
+      <chn><![CDATA[占用带宽/总带宽(Kbps)：]]></chn>
+    </total_bitrate>
+    <description>
+      <eng><![CDATA[Description]]></eng>
+      <chn><![CDATA[描述]]></chn>
+    </description>
+    <size>
+      <eng><![CDATA[Size (Bytes)]]></eng>
+      <chn><![CDATA[文件大小  (Bytes)]]></chn>
+    </size>
+    <out_ts>
+      <eng><![CDATA[Output TS Index]]></eng>
+      <chn><![CDATA[输出 TS 索引]]></chn>
+    </out_ts>
+    <bitrate>
+      <eng><![CDATA[Bitrate (Kbps)]]></eng>
+      <chn><![CDATA[码率 (Kbps)]]></chn>
+    </bitrate>
+    <mark>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[开关]]></chn>
+    </mark>
+  </mux_right_inserter.html>
+
+  <mux_right_nit.html>
+    <title>
+      <eng><![CDATA[Network Inforamtion Editor]]></eng>
+      <chn><![CDATA[网络信息编辑]]></chn>
+    </title>
+    <net_id>
+      <eng><![CDATA[Network ID: ]]></eng>
+      <chn><![CDATA[网络ID：]]></chn>
+    </net_id>
+    <net_name>
+      <eng><![CDATA[Network Name: ]]></eng>
+      <chn><![CDATA[网络名称：]]></chn>
+    </net_name>
+    <nit_v>
+      <eng><![CDATA[NIT Version: ]]></eng>
+      <chn><![CDATA[NIT 版本：]]></chn>
+    </nit_v>
+    <nit_mark>
+      <eng><![CDATA[Enable: ]]></eng>
+      <chn><![CDATA[全局开关：]]></chn>
+    </nit_mark>
+    <nit_desc>
+      <eng><![CDATA[Descriptor Edit]]></eng>
+      <chn><![CDATA[NIT 描述编辑]]></chn>
+    </nit_desc>
+
+
+    <ts_id>
+      <eng><![CDATA[TS ID]]></eng>
+      <chn><![CDATA[TS ID]]></chn>
+    </ts_id>
+    <on_id>
+      <eng><![CDATA[ON ID]]></eng>
+      <chn><![CDATA[ON ID]]></chn>
+    </on_id>
+    <freq>
+      <eng><![CDATA[Freq (MHz)]]></eng>
+      <chn><![CDATA[频率 (MHz)]]></chn>
+    </freq>
+    <mode>
+      <eng><![CDATA[QAM Mode]]></eng>
+      <chn><![CDATA[调制模式]]></chn>
+    </mode>
+    <sr>
+      <eng><![CDATA[SR (MBaud)]]></eng>
+      <chn><![CDATA[SR (MBaud)]]></chn>
+    </sr>
+    <fec_in>
+      <eng><![CDATA[FEC Inner]]></eng>
+      <chn><![CDATA[FEC Inner]]></chn>
+    </fec_in>
+    <fec_out>
+      <eng><![CDATA[FEC Outer]]></eng>
+      <chn><![CDATA[FEC Outer]]></chn>
+    </fec_out>
+    <ts_desc>
+      <eng><![CDATA[Descriptor]]></eng>
+      <chn><![CDATA[描述符]]></chn>
+    </ts_desc>
+    <edit>
+      <eng><![CDATA[Edit]]></eng>
+      <chn><![CDATA[编辑]]></chn>
+    </edit>
+
+  </mux_right_nit.html>
+
+  <mux_right_descriptor.html>
+    <desc_type>
+      <eng><![CDATA[Descriptor Type: ]]></eng>
+      <chn><![CDATA[描述符类型：]]></chn>
+    </desc_type>
+    <desc_content>
+      <eng><![CDATA[Descriptor Data (HEX)]]></eng>
+      <chn><![CDATA[描述符数据 (HEX)]]></chn>
+    </desc_content>
+    <mark>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[开关]]></chn>
+    </mark>
+  </mux_right_descriptor.html>
+
+  <mux_right_input_ts.html>
+    <title>
+      <eng><![CDATA[Input TS Information]]></eng>
+      <chn><![CDATA[输入TS节目信息]]></chn>
+    </title>
+    <sel_out>
+      <eng><![CDATA[Batch Select Services Output TS: ]]></eng>
+      <chn><![CDATA[批量选择节目的输出位置：]]></chn>
+    </sel_out>
+    <anay_timeout>
+      <eng><![CDATA[Timeout (ms): ]]></eng>
+      <chn><![CDATA[超时（毫秒）：]]></chn>
+    </anay_timeout>
+    <anay_charset>
+      <eng><![CDATA[Charset: ]]></eng>
+      <chn><![CDATA[字符集：]]></chn>
+    </anay_charset>
+    <clear_when_failed>
+      <eng><![CDATA[Keep Services : ]]></eng>
+      <chn><![CDATA[保留信息：]]></chn>
+    </clear_when_failed>
+    <auto_map>
+      <eng><![CDATA[AUTO MAP : ]]></eng>
+      <chn><![CDATA[自动复用：]]></chn>
+    </auto_map>
+    <start>
+      <eng><![CDATA[Start Analyse]]></eng>
+      <chn><![CDATA[开始搜索]]></chn>
+    </start>
+    <clean_in_ts>
+      <eng><![CDATA[Clean Input TS]]></eng>
+      <chn><![CDATA[删除输入TS]]></chn>
+    </clean_in_ts>
+    <confirm_clean>
+      <eng><![CDATA[Clean all informations? It will cause the output to change. Proceed anyway?]]></eng>
+      <chn><![CDATA[是否清空当前输入TS的信息，将可能导致输出节目发生变化！]]></chn>
+    </confirm_clean>
+    <ts_setting>
+      <eng><![CDATA[Input TS Setting]]></eng>
+      <chn><![CDATA[输入TS节目信息]]></chn>
+    </ts_setting>
+
+  </mux_right_input_ts.html>
+
+  <mux_right_encrypt.html>
+    <title>
+      <eng><![CDATA[ANTI-COPY System Setting]]></eng>
+      <chn><![CDATA[防拷贝系统设置]]></chn>
+    </title>
+    <eca_setting>
+      <eng><![CDATA[ANTI-COPY Setting]]></eng>
+      <chn><![CDATA[防拷贝设置]]></chn>
+    </eca_setting>
+    <eca_active_mark>
+      <eng><![CDATA[System: ]]></eng>
+      <chn><![CDATA[系统：]]></chn>
+    </eca_active_mark>
+    <eca_encrypt_mark>
+      <eng><![CDATA[Encryption: ]]></eng>
+      <chn><![CDATA[加密：]]></chn>
+    </eca_encrypt_mark>
+    <eca_desc_tag>
+      <eng><![CDATA[Encryption Descriptor Tag: ]]></eng>
+      <chn><![CDATA[加密描述符 TAG：]]></chn>
+    </eca_desc_tag>
+    <local_setting>
+      <eng><![CDATA[Location Setting]]></eng>
+      <chn><![CDATA[区域设置]]></chn>
+    </local_setting>
+    <local_id>
+      <eng><![CDATA[Location ID(HEX): ]]></eng>
+      <chn><![CDATA[区域号(HEX)：]]></chn>
+    </local_id>
+  </mux_right_encrypt.html>
+
+  <mux_right_servl.html>
+    <title>
+      <eng><![CDATA[Output Service Category Edit]]></eng>
+      <chn><![CDATA[输出节目分类编辑]]></chn>
+    </title>
+    <servl_setting>
+      <eng><![CDATA[Private Service List Parameter]]></eng>
+      <chn><![CDATA[私有节目表设置]]></chn>
+    </servl_setting>
+    <serv_active_mark>
+      <eng><![CDATA[System :]]></eng>
+      <chn><![CDATA[系统：]]></chn>
+    </serv_active_mark>
+    <serv_encrypt_mark>
+      <eng><![CDATA[Encryption: ]]></eng>
+      <chn><![CDATA[加密：]]></chn>
+    </serv_encrypt_mark>
+    <serv_cat_mark>
+      <eng><![CDATA[Add Descriptor To CAT: ]]></eng>
+      <chn><![CDATA[将描述符添加到CAT当中：]]></chn>
+    </serv_cat_mark>
+    <servl_pid>
+      <eng><![CDATA[Service List PID :]]></eng>
+      <chn><![CDATA[节目列表PID：]]></chn>
+    </servl_pid>
+    <servl_table_id>
+      <eng><![CDATA[TableID(HEX): ]]></eng>
+      <chn><![CDATA[TableID(HEX)：]]></chn>
+    </servl_table_id>
+    <servl_desc_tag>
+      <eng><![CDATA[Descriptor Tag(HEX): ]]></eng>
+      <chn><![CDATA[描述符 TAG(HEX)：]]></chn>
+    </servl_desc_tag>
+    <servl_desc_content>
+      <eng><![CDATA[Private Descriptor Content: ]]></eng>
+      <chn><![CDATA[私有描述符内容：]]></chn>
+    </servl_desc_content>
+    <servl_bps>
+      <eng><![CDATA[Bitrate(Kbps): ]]></eng>
+      <chn><![CDATA[码率(Kbps)：]]></chn>
+    </servl_bps>
+
+    <local_setting>
+      <eng><![CDATA[Location Setting]]></eng>
+      <chn><![CDATA[区域设置]]></chn>
+    </local_setting>
+    <local_id>
+      <eng><![CDATA[Location ID(HEX) :]]></eng>
+      <chn><![CDATA[区域号(HEX)：]]></chn>
+    </local_id>
+  </mux_right_servl.html>
+  <mux_right_servl_ts.html>
+    <title>
+      <eng><![CDATA[Service Category List]]></eng>
+      <chn><![CDATA[节目分类设置]]></chn>
+    </title>
+    <auth_class>
+      <eng><![CDATA[Authorization Class]]></eng>
+      <chn><![CDATA[授权类别]]></chn>
+    </auth_class>
+    <lcn>
+      <eng><![CDATA[LCN]]></eng>
+      <chn><![CDATA[逻辑频道号]]></chn>
+    </lcn>
+    <bouquet_id>
+      <eng><![CDATA[Bouquet ID(HEX)]]></eng>
+      <chn><![CDATA[Bouquet ID(HEX)]]></chn>
+    </bouquet_id>
+    <apply_ac>
+      <eng><![CDATA[Class Batch Set]]></eng>
+      <chn><![CDATA[类别批量设置]]></chn>
+    </apply_ac>
+  </mux_right_servl_ts.html>
+
+  <mux_right_output_ts.html>
+    <title>
+      <eng><![CDATA[Output TS Information]]></eng>
+      <chn><![CDATA[输出TS节目信息]]></chn>
+    </title>
+    <sel_all>
+      <eng><![CDATA[Select All: ]]></eng>
+      <chn><![CDATA[全选：]]></chn>
+    </sel_all>
+    <remove_mark>
+      <eng><![CDATA[Remove Mark]]></eng>
+      <chn><![CDATA[删除标志]]></chn>
+    </remove_mark>
+    <ts_setting>
+      <eng><![CDATA[Output TS Setting]]></eng>
+      <chn><![CDATA[输出TS节目信息]]></chn>
+    </ts_setting>
+    <interval>
+      <eng><![CDATA[Interval (ms)]]></eng>
+      <chn><![CDATA[间隔 (毫秒)]]></chn>
+    </interval>
+
+    <remove_null_packet>
+      <eng><![CDATA[Remove Null]]></eng>
+      <chn><![CDATA[删除空包]]></chn>
+    </remove_null_packet>
+    <keep_null_packet>
+      <eng><![CDATA[Keep Null]]></eng>
+      <chn><![CDATA[保留空包]]></chn>
+    </keep_null_packet>
+    <pcr_correct_off>
+      <eng><![CDATA[PCR Correct OFF]]></eng>
+      <chn><![CDATA[关闭PCR校验]]></chn>
+    </pcr_correct_off>
+    <pcr_correct_on>
+      <eng><![CDATA[PCR Correct ON]]></eng>
+      <chn><![CDATA[打开PCR校验]]></chn>
+    </pcr_correct_on>
+
+
+
+  </mux_right_output_ts.html>
+
+  <mux_right_mosiac.html>
+    <title>
+      <eng><![CDATA[MOSIAC Setting]]></eng>
+      <chn><![CDATA[马赛克设置]]></chn>
+    </title>
+    <offset>
+      <eng><![CDATA[Offset]]></eng>
+      <chn><![CDATA[偏移]]></chn>
+    </offset>
+    <ori_service_id>
+      <eng><![CDATA[Ori ServiceID]]></eng>
+      <chn><![CDATA[原始 ServiceID]]></chn>
+    </ori_service_id>
+    <ori_ts_id>
+      <eng><![CDATA[Ori TSID]]></eng>
+      <chn><![CDATA[原始 TSID]]></chn>
+    </ori_ts_id>
+  </mux_right_mosiac.html>
+
+  <scramble_left.html>
+    <title>
+      <eng><![CDATA[Scramble Setting]]></eng>
+      <chn><![CDATA[节目加扰]]></chn>
+    </title>
+    <head>
+      <eng><![CDATA[Scramble Configuration]]></eng>
+      <chn><![CDATA[加扰参数配置]]></chn>
+    </head>
+    <general_setting>
+      <eng><![CDATA[General Setting]]></eng>
+      <chn><![CDATA[基本设置]]></chn>
+    </general_setting>
+    <cas_setting>
+      <eng><![CDATA[CAS Configuration]]></eng>
+      <chn><![CDATA[条件接收系统参数配置]]></chn>
+    </cas_setting>
+    <serv_setting>
+      <eng><![CDATA[Services Scramble Setting]]></eng>
+      <chn><![CDATA[节目加扰参数配置]]></chn>
+    </serv_setting>
+    <advance_setting>
+      <eng><![CDATA[Advance Setting]]></eng>
+      <chn><![CDATA[高级设置]]></chn>
+    </advance_setting>
+  </scramble_left.html>
+
+  <scramble_right_setting.html>
+    <title>
+      <eng><![CDATA[General Scramble Setting]]></eng>
+      <chn><![CDATA[加扰系统基本参数]]></chn>
+    </title>
+    <default_cp>
+      <eng><![CDATA[Default Crypto Period]]></eng>
+      <chn><![CDATA[默认加扰周期]]></chn>
+    </default_cp>
+    <network_delay>
+      <eng><![CDATA[Network Delay(ms): ]]></eng>
+      <chn><![CDATA[网络延时（毫秒）：]]></chn>
+    </network_delay>
+    <cp>
+      <eng><![CDATA[CP Duration (ms): ]]></eng>
+      <chn><![CDATA[加扰周期（毫秒）：]]></chn>
+    </cp>
+    <fixed_cw>
+      <eng><![CDATA[Fixed CW]]></eng>
+      <chn><![CDATA[固定控制字]]></chn>
+    </fixed_cw>
+    <cw>
+      <eng><![CDATA[CW (HEX): ]]></eng>
+      <chn><![CDATA[控制字(HEX)：]]></chn>
+    </cw>
+    <ca_sys>
+      <eng><![CDATA[Basic Scramble System Setting]]></eng>
+      <chn><![CDATA[简单加扰系统设置]]></chn>
+    </ca_sys>
+    <key>
+      <eng><![CDATA[User ID (HEX):]]></eng>
+      <chn><![CDATA[用户ID(HEX)：]]></chn>
+    </key>
+    <sw>
+      <eng><![CDATA[SW (HEX): ]]></eng>
+      <chn><![CDATA[SW(HEX)：]]></chn>
+    </sw>
+    <supercas_id>
+      <eng><![CDATA[Super CAS ID (HEX): ]]></eng>
+      <chn><![CDATA[Super CAS ID (HEX)：]]></chn>
+    </supercas_id>
+  </scramble_right_setting.html>
+
+  <scramble_right_advance_setting.html>
+    <title>
+      <eng><![CDATA[Advance Setting]]></eng>
+      <chn><![CDATA[高级设置]]></chn>
+    </title>
+    <es_scramble_set>
+      <eng><![CDATA[ES Scramble Setting]]></eng>
+      <chn><![CDATA[基础流加扰设置]]></chn>
+    </es_scramble_set>
+    <es_type>
+      <eng><![CDATA[ES Type]]></eng>
+      <chn><![CDATA[基础流类型]]></chn>
+    </es_type>
+    <es_type_value>
+      <eng><![CDATA[ES Type Value]]></eng>
+      <chn><![CDATA[基础流类型值]]></chn>
+    </es_type_value>
+    <scramble>
+      <eng><![CDATA[Scramble]]></eng>
+      <chn><![CDATA[加扰]]></chn>
+    </scramble>
+  </scramble_right_advance_setting.html>
+
+  <scramble_right_cas.html>
+    <title>
+      <eng><![CDATA[CAS ]]></eng>
+      <chn><![CDATA[条件接收系统]]></chn>
+    </title>
+    <cas_name>
+      <eng><![CDATA[CAS Name:]]></eng>
+      <chn><![CDATA[CAS 名称：]]></chn>
+    </cas_name>
+    <cas_mark>
+      <eng><![CDATA[CAS Enable: ]]></eng>
+      <chn><![CDATA[CAS 开关：]]></chn>
+    </cas_mark>
+    <supercasid>
+      <eng><![CDATA[Super CAS ID (HEX): ]]></eng>
+      <chn><![CDATA[Super CAS ID (HEX)：]]></chn>
+    </supercasid>
+    <emmg_port>
+      <eng><![CDATA[EMMG Port: ]]></eng>
+      <chn><![CDATA[EMMG 端口：]]></chn>
+    </emmg_port>
+    <ecmg_ip>
+      <eng><![CDATA[ECMG IP: ]]></eng>
+      <chn><![CDATA[ECMG 地址：]]></chn>
+    </ecmg_ip>
+    <ecmg_port>
+      <eng><![CDATA[ECMG Port: ]]></eng>
+      <chn><![CDATA[ECMG 端口：]]></chn>
+    </ecmg_port>
+    <ecm_chn_id>
+      <eng><![CDATA[ECM Channel ID (HEX): ]]></eng>
+      <chn><![CDATA[ECM通道号 (HEX)：]]></chn>
+    </ecm_chn_id>
+    <ac_name>
+      <eng><![CDATA[NAME]]></eng>
+      <chn><![CDATA[名称]]></chn>
+    </ac_name>
+    <ac_content>
+      <eng><![CDATA[Content (HEX)]]></eng>
+      <chn><![CDATA[内容 (HEX)]]></chn>
+    </ac_content>
+  </scramble_right_cas.html>
+
+  <scramble_right_services.html>
+    <title>
+      <eng><![CDATA[Service Scramble Configuration]]></eng>
+      <chn><![CDATA[节目加扰参数设置]]></chn>
+    </title>
+    <ac_sel>
+      <eng><![CDATA[AC Selection]]></eng>
+      <chn><![CDATA[AC 选择]]></chn>
+    </ac_sel>
+    <scramble>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[加扰]]></chn>
+    </scramble>
+    <apply_ac>
+      <eng><![CDATA[Batch Set]]></eng>
+      <chn><![CDATA[批量设置]]></chn>
+    </apply_ac>
+    <apply_mark>
+      <eng><![CDATA[Scramble Set]]></eng>
+      <chn><![CDATA[加扰设置]]></chn>
+    </apply_mark>
+  </scramble_right_services.html>
+
+  <system_config_left.asp>
+    <title>
+      <eng><![CDATA[System Setting]]></eng>
+      <chn><![CDATA[设备设置]]></chn>
+    </title>
+    <head>
+      <eng><![CDATA[System Setting]]></eng>
+      <chn><![CDATA[系统参数项目]]></chn>
+    </head>
+    <basic>
+      <eng><![CDATA[Basic Setting]]></eng>
+      <chn><![CDATA[基本设置]]></chn>
+    </basic>
+    <adv>
+      <eng><![CDATA[Advanced Setting]]></eng>
+      <chn><![CDATA[高级设置]]></chn>
+    </adv>
+    <usr>
+      <eng><![CDATA[User Management]]></eng>
+      <chn><![CDATA[用户管理]]></chn>
+    </usr>
+    <snmp>
+      <eng><![CDATA[SNMP]]></eng>
+      <chn><![CDATA[简单网络管理协议]]></chn>
+    </snmp>
+    <syslog>
+      <eng><![CDATA[Syslog]]></eng>
+      <chn><![CDATA[系统日志]]></chn>
+    </syslog>
+    <module_files>
+      <eng><![CDATA[Module Firmware]]></eng>
+      <chn><![CDATA[模块固件]]></chn>
+    </module_files>
+  </system_config_left.asp>
+
+  <system_config_right_basic.html>
+    <title>
+      <eng><![CDATA[System Basic Setting]]></eng>
+      <chn><![CDATA[系统基本设置]]></chn>
+    </title>
+    <ip_setting>
+      <eng><![CDATA[IP Setting]]></eng>
+      <chn><![CDATA[IP 设置]]></chn>
+    </ip_setting>
+    <ip_addr>
+      <eng><![CDATA[IPv4 Address: ]]></eng>
+      <chn><![CDATA[IP地址：]]></chn>
+    </ip_addr>
+    <ip_mask>
+      <eng><![CDATA[Mask: ]]></eng>
+      <chn><![CDATA[掩码：]]></chn>
+    </ip_mask>
+    <ip_gate>
+      <eng><![CDATA[Gate: ]]></eng>
+      <chn><![CDATA[网关：]]></chn>
+    </ip_gate>
+    <data_ip_setting>
+      <eng><![CDATA[Second IP Setting]]></eng>
+      <chn><![CDATA[数据 IP 设置]]></chn>
+    </data_ip_setting>
+    <mac_setting>
+      <eng><![CDATA[MAC Setting]]></eng>
+      <chn><![CDATA[MAC 设置]]></chn>
+    </mac_setting>
+    <mac_addr>
+      <eng><![CDATA[MAC Address: ]]></eng>
+      <chn><![CDATA[MAC 地址：]]></chn>
+    </mac_addr>
+    <output_setting>
+      <eng><![CDATA[IP Output Setting]]></eng>
+      <chn><![CDATA[IP 输出设置]]></chn>
+    </output_setting>
+    <output_type>
+      <eng><![CDATA[Output Type:]]></eng>
+      <chn><![CDATA[输出类型：]]></chn>
+    </output_type>
+    <data_mac_setting>
+      <eng><![CDATA[Second MAC Setting]]></eng>
+      <chn><![CDATA[数据 MAC 设置]]></chn>
+    </data_mac_setting>
+    <ntp_setting>
+      <eng><![CDATA[NTP Setting]]></eng>
+      <chn><![CDATA[时间同步协议 设置]]></chn>
+    </ntp_setting>
+    <ntp_addr>
+      <eng><![CDATA[Server Address: ]]></eng>
+      <chn><![CDATA[时间同步服务器 地址：]]></chn>
+    </ntp_addr>
+    <ntp_interval>
+      <eng><![CDATA[Auto Sync Interval (s): ]]></eng>
+      <chn><![CDATA[自动同步间隔（秒）：]]></chn>
+    </ntp_interval>
+    <ntp_mark>
+      <eng><![CDATA[Enable Auto Sync: ]]></eng>
+      <chn><![CDATA[自动同步开关：]]></chn>
+    </ntp_mark>
+    <td_setting>
+      <eng><![CDATA[Time / Date (UTC)]]></eng>
+      <chn><![CDATA[时间 / 日期（UTC）]]></chn>
+    </td_setting>
+    <get_utc>
+      <eng><![CDATA[Get Browser UTC Time]]></eng>
+      <chn><![CDATA[得到浏览器UTC时间]]></chn>
+    </get_utc>
+    <ping_setting>
+      <eng><![CDATA[PING]]></eng>
+      <chn><![CDATA[PING]]></chn>
+    </ping_setting>
+    <ping_target>
+      <eng><![CDATA[IPv4 Target: ]]></eng>
+      <chn><![CDATA[目标地址：]]></chn>
+    </ping_target>
+    <ping_size>
+      <eng><![CDATA[Diagram Size(Byte): ]]></eng>
+      <chn><![CDATA[报文长度（字节）：]]></chn>
+    </ping_size>
+    <ping_timeout>
+      <eng><![CDATA[Timeout(ms): ]]></eng>
+      <chn><![CDATA[超时（毫秒）：]]></chn>
+    </ping_timeout>
+    <ping_send>
+      <eng><![CDATA[Send]]></eng>
+      <chn><![CDATA[发送]]></chn>
+    </ping_send>
+    <ping_anw>
+      <eng><![CDATA[Answer]]></eng>
+      <chn><![CDATA[应答：]]></chn>
+    </ping_anw>
+    <scs_sp>
+      <eng><![CDATA[EMM Enhance Mode Setting]]></eng>
+      <chn><![CDATA[EMM增强模式设置]]></chn>
+    </scs_sp>
+    <out_charset>
+      <eng><![CDATA[Output Charset :]]></eng>
+      <chn><![CDATA[输出字符集：]]></chn>
+    </out_charset>
+  </system_config_right_basic.html>
+
+  <system_config_right_module_files.html >
+    <title>
+      <eng><![CDATA[Module Firmware]]></eng>
+      <chn><![CDATA[模块固件]]></chn>
+    </title>
+    <module_type>
+      <eng><![CDATA[Type]]></eng>
+      <chn><![CDATA[类型]]></chn>
+    </module_type>
+    <module_name>
+      <eng><![CDATA[Name]]></eng>
+      <chn><![CDATA[名称]]></chn>
+    </module_name>
+    <module_version>
+      <eng><![CDATA[Firmware]]></eng>
+      <chn><![CDATA[固件版本]]></chn>
+    </module_version>
+    <control_version>
+      <eng><![CDATA[Control Version]]></eng>
+      <chn><![CDATA[控制版本]]></chn>
+    </control_version>
+    <module_size>
+      <eng><![CDATA[Firmware Size]]></eng>
+      <chn><![CDATA[固件大小]]></chn>
+    </module_size>
+    <mark>
+      <eng><![CDATA[Remove]]></eng>
+      <chn><![CDATA[删除]]></chn>
+    </mark>
+    <space>
+      <eng><![CDATA[Available Sapce (MByte)]]></eng>
+      <chn><![CDATA[剩余空间(MByte)]]></chn>
+    </space>
+    <total_data>
+      <eng><![CDATA[Total Size (MByte)]]></eng>
+      <chn><![CDATA[总大小(MByte)]]></chn>
+    </total_data>
+    <confirm_remove>
+      <eng><![CDATA[Selected firmware will be removed. This operation cannot be recovered! Proceed any way ?]]></eng>
+      <chn><![CDATA[即将删除被选中的固件文件。本操作不可恢复，是否继续？]]></chn>
+    </confirm_remove>
+    <alert_remove>
+      <eng><![CDATA[Please at least select one itme!]]></eng>
+      <chn><![CDATA[请至少选中一个项目！]]></chn>
+    </alert_remove>
+
+
+
+  </system_config_right_module_files.html >
+
+  <system_config_right_advance.html>
+    <title>
+      <eng><![CDATA[System Advance Setting]]></eng>
+      <chn><![CDATA[系统高级设置]]></chn>
+    </title>
+    <param_io>
+      <eng><![CDATA[Parameter Import / Export / Reset]]></eng>
+      <chn><![CDATA[参数导入/导出/重置]]></chn>
+    </param_io>
+    <param_br>
+      <eng><![CDATA[Parameter Backup/Restore]]></eng>
+      <chn><![CDATA[参数备份/恢复]]></chn>
+    </param_br>
+    <enter_desc>
+      <eng><![CDATA[Enter Descriptions: ]]></eng>
+      <chn><![CDATA[输入参数描述信息：]]></chn>
+    </enter_desc>
+    <cur_desc>
+      <eng><![CDATA[Current Backup Descriptions: ]]></eng>
+      <chn><![CDATA[当前备份描述：]]></chn>
+    </cur_desc>
+    <soft_upgrade>
+      <eng><![CDATA[Software Upgrade/Export]]></eng>
+      <chn><![CDATA[软件升级/备份]]></chn>
+    </soft_upgrade>
+    <license>
+      <eng><![CDATA[License]]></eng>
+      <chn><![CDATA[授权]]></chn>
+    </license>
+    <app_code>
+      <eng><![CDATA[License Application Code]]></eng>
+      <chn><![CDATA[授权申请码]]></chn>
+    </app_code>
+    <device_control>
+      <eng><![CDATA[Device Control]]></eng>
+      <chn><![CDATA[设备控制]]></chn>
+    </device_control>
+    <reboot>
+      <eng><![CDATA[Reboot]]></eng>
+      <chn><![CDATA[重启]]></chn>
+    </reboot>
+    <confirm_backup>
+      <eng><![CDATA[Generate new backup parameter, Current backup parameter will be overwrited! Proceed any way ?]]></eng>
+      <chn><![CDATA[生成新的参数备份，当前备份将被覆盖！是否继续操作？]]></chn>
+    </confirm_backup>
+    <confirm_restore>
+      <eng><![CDATA[Overwrite current parameters from backup! Proceed any way ?]]></eng>
+      <chn><![CDATA[当前参数将被备份参数所覆盖！是否继续操作？]]></chn>
+    </confirm_restore>
+    <confirm_reset>
+      <eng><![CDATA[Parameters will be Set Default! Proceed any way ?]]></eng>
+      <chn><![CDATA[参数将被设置成默认状态！是否继续操作？]]></chn>
+    </confirm_reset>
+    <confirm_mode_change>
+      <eng><![CDATA[Device will change working mode! All parameters will be reseted! Proceed any way ?]]></eng>
+      <chn><![CDATA[设备即将切换工作模式，模式切换后参数会被重置，是否继续？]]></chn>
+    </confirm_mode_change>
+    <confirm_file>
+      <eng><![CDATA[Please select updatefile!]]></eng>
+      <chn><![CDATA[请选择上传文件！]]></chn>
+    </confirm_file>
+    <mode_change>
+      <eng><![CDATA[Work Mode Change]]></eng>
+      <chn><![CDATA[工作模式切换]]></chn>
+    </mode_change>
+    <mode_dvb>
+      <eng><![CDATA[DVB Mode]]></eng>
+      <chn><![CDATA[DVB模式]]></chn>
+    </mode_dvb>
+    <mode_vod>
+      <eng><![CDATA[VOD Mode]]></eng>
+      <chn><![CDATA[VOD模式]]></chn>
+    </mode_vod>
+  </system_config_right_advance.html>
+
+  <system_config_right_usermanage.html>
+    <title>
+      <eng><![CDATA[User Management]]></eng>
+      <chn><![CDATA[用户管理]]></chn>
+    </title>
+    <add_usr>
+      <eng><![CDATA[Add New User]]></eng>
+      <chn><![CDATA[添加用户]]></chn>
+    </add_usr>
+    <usr_name>
+      <eng><![CDATA[User Name :]]></eng>
+      <chn><![CDATA[用户名称：]]></chn>
+    </usr_name>
+    <usr_pwd>
+      <eng><![CDATA[Login Password :]]></eng>
+      <chn><![CDATA[登陆密码：]]></chn>
+    </usr_pwd>
+    <new_pwd>
+      <eng><![CDATA[New Password :]]></eng>
+      <chn><![CDATA[新密码：]]></chn>
+    </new_pwd>
+    <pwd_confirm>
+      <eng><![CDATA[Confirm Password :]]></eng>
+      <chn><![CDATA[密码确认：]]></chn>
+    </pwd_confirm>
+    <pwd_modify>
+      <eng><![CDATA[Modify Password]]></eng>
+      <chn><![CDATA[修改密码]]></chn>
+    </pwd_modify>
+    <list_name>
+      <eng><![CDATA[User Name]]></eng>
+      <chn><![CDATA[用户名]]></chn>
+    </list_name>
+    <list_group>
+      <eng><![CDATA[Group]]></eng>
+      <chn><![CDATA[用户组]]></chn>
+    </list_group>
+    <list_remove>
+      <eng><![CDATA[Remove]]></eng>
+      <chn><![CDATA[删除]]></chn>
+    </list_remove>
+    <list_modify>
+      <eng><![CDATA[Modify]]></eng>
+      <chn><![CDATA[修改]]></chn>
+    </list_modify>
+  </system_config_right_usermanage.html>
+
+  <system_config_right_snmp.html>
+    <title>
+      <eng><![CDATA[SNMP Setting]]></eng>
+      <chn><![CDATA[简单网络管理协议 设置]]></chn>
+    </title>
+    <snmp_trap_active>
+      <eng><![CDATA[SNMP Switch]]></eng>
+      <chn><![CDATA[SNMP 开关]]></chn>
+    </snmp_trap_active>
+    <snmp_active>
+      <eng><![CDATA[SNMP: ]]></eng>
+      <chn><![CDATA[SNMP：]]></chn>
+    </snmp_active>
+    <trap_active>
+      <eng><![CDATA[Trap: ]]></eng>
+      <chn><![CDATA[Trap：]]></chn>
+    </trap_active>
+    <trap_ip_setting>
+      <eng><![CDATA[Trap IP Setting]]></eng>
+      <chn><![CDATA[Trap IP 设置]]></chn>
+    </trap_ip_setting>
+    <trap_ipv4_addr>
+      <eng><![CDATA[IPv4 Address: ]]></eng>
+      <chn><![CDATA[IP地址：]]></chn>
+    </trap_ipv4_addr>
+    <trap_ip_port>
+      <eng><![CDATA[Port: ]]></eng>
+      <chn><![CDATA[端口：]]></chn>
+    </trap_ip_port>
+    <trap_interval_setting>
+      <eng><![CDATA[Trap Interval]]></eng>
+      <chn><![CDATA[Trap间隔]]></chn>
+    </trap_interval_setting>
+    <trap_interval>
+      <eng><![CDATA[Trap Interval (ms): ]]></eng>
+      <chn><![CDATA[Trap间隔（毫秒）：]]></chn>
+    </trap_interval>
+    <snmp_agent_setting>
+      <eng><![CDATA[SNMP Agent Setting]]></eng>
+      <chn><![CDATA[SNMP代理设置]]></chn>
+    </snmp_agent_setting>
+    <snmp_agent_port>
+      <eng><![CDATA[Port: ]]></eng>
+      <chn><![CDATA[端口：]]></chn>
+    </snmp_agent_port>
+    <snmp_agent_read>
+      <eng><![CDATA[Read Community: ]]></eng>
+      <chn><![CDATA[Read Community：]]></chn>
+    </snmp_agent_read>
+    <snmp_agent_write>
+      <eng><![CDATA[Write Community: ]]></eng>
+      <chn><![CDATA[Write Community：]]></chn>
+    </snmp_agent_write>
+    <device_name_location>
+      <eng><![CDATA[Device Name And Location]]></eng>
+      <chn><![CDATA[设备名称和位置]]></chn>
+    </device_name_location>
+    <device_location>
+      <eng><![CDATA[Device Location:]]></eng>
+      <chn><![CDATA[设备位置：]]></chn>
+    </device_location>
+    <device_name>
+      <eng><![CDATA[Device Name:]]></eng>
+      <chn><![CDATA[设备名称：]]></chn>
+    </device_name>
+  </system_config_right_snmp.html>
+  <system_config_right_syslog.html>
+    <title>
+      <eng><![CDATA[Syslog Setting]]></eng>
+      <chn><![CDATA[系统日志 设置]]></chn>
+    </title>
+    <syslog_setting>
+      <eng><![CDATA[Global Setting]]></eng>
+      <chn><![CDATA[全局参数设置]]></chn>
+    </syslog_setting>
+    <syslog_active>
+      <eng><![CDATA[Global Switch: ]]></eng>
+      <chn><![CDATA[全局开关：]]></chn>
+    </syslog_active>
+    <log_level>
+      <eng><![CDATA[Log Level: ]]></eng>
+      <chn><![CDATA[记录等级：]]></chn>
+    </log_level>
+    <remote_setting>
+      <eng><![CDATA[Remote Log Setting]]></eng>
+      <chn><![CDATA[远程日志设置]]></chn>
+    </remote_setting>
+    <remote_active>
+      <eng><![CDATA[Send Switch: ]]></eng>
+      <chn><![CDATA[发送开关：]]></chn>
+    </remote_active>
+    <remote_ipv4_addr>
+      <eng><![CDATA[Remote Server Address: ]]></eng>
+      <chn><![CDATA[远程服务器地址：]]></chn>
+    </remote_ipv4_addr>
+    <remote_ip_port>
+      <eng><![CDATA[Port: ]]></eng>
+      <chn><![CDATA[端口：]]></chn>
+    </remote_ip_port>
+    <clear_log>
+      <eng><![CDATA[Clear Log]]></eng>
+      <chn><![CDATA[清空日志]]></chn>
+    </clear_log>
+    <refresh_log>
+      <eng><![CDATA[Refresh Log]]></eng>
+      <chn><![CDATA[刷新日志]]></chn>
+    </refresh_log>
+    <log_title>
+      <eng><![CDATA[Log Inforamtion]]></eng>
+      <chn><![CDATA[日志信息]]></chn>
+    </log_title>
+  </system_config_right_syslog.html>
+
+  <upload_right_cgi.html>
+    <title>
+      <eng><![CDATA[Upload Management]]></eng>
+      <chn><![CDATA[上传管理]]></chn>
+    </title>
+    <up_info>
+      <eng><![CDATA[Upload Information]]></eng>
+      <chn><![CDATA[上传信息]]></chn>
+    </up_info>
+    <up_status>
+      <eng><![CDATA[Upload Status :]]></eng>
+      <chn><![CDATA[上传状态：]]></chn>
+    </up_status>
+    <up_size>
+      <eng><![CDATA[Upload Size (Bytes):]]></eng>
+      <chn><![CDATA[上传大小 (Bytes)：]]></chn>
+    </up_size>
+    <file_info>
+      <eng><![CDATA[File Information]]></eng>
+      <chn><![CDATA[文件信息]]></chn>
+    </file_info>
+    <file_val>
+      <eng><![CDATA[File Validation :]]></eng>
+      <chn><![CDATA[文件校验：]]></chn>
+    </file_val>
+    <file_desc>
+      <eng><![CDATA[File Description:]]></eng>
+      <chn><![CDATA[文件描述：]]></chn>
+    </file_desc>
+    <confirm_parameter_import>
+      <eng><![CDATA[Current parameter will be overwrited! Proceed any way ?]]></eng>
+      <chn><![CDATA[当前参数将被导入的文件覆盖！是否继续操作？]]></chn>
+    </confirm_parameter_import>
+    <confirm_soft_import>
+      <eng><![CDATA[Device software will be upgraded! Proceed any way ?]]></eng>
+      <chn><![CDATA[更新设备软件！是否继续操作？]]></chn>
+    </confirm_soft_import>
+    <confirm_license_import>
+      <eng><![CDATA[Attention! The license will be updated. Parameter may be reestored to default status. Please backup Parmaeter files!]]></eng>
+      <chn><![CDATA[注意，设备授权即将被更新。授权不一致的情况下参数文件有可能被恢复默认设置。请小心备份参数文件！]]></chn>
+    </confirm_license_import>
+    <confirm_oem_import>
+      <eng><![CDATA[Update OEM Files! Proceed any way ?]]></eng>
+      <chn><![CDATA[更新设备软件！是否继续操作？]]></chn>
+    </confirm_oem_import>
+  </upload_right_cgi.html>
+  <common_strings>
+    <update_data>
+      <eng><![CDATA[Update Data]]></eng>
+      <chn><![CDATA[更新数据]]></chn>
+    </update_data>
+    <main_module>
+      <eng><![CDATA[Main Module]]></eng>
+      <chn><![CDATA[主模块]]></chn>
+    </main_module>
+    <no_module>
+      <eng><![CDATA[Not Inserted]]></eng>
+      <chn><![CDATA[没有插入]]></chn>
+    </no_module>
+    <sub_modules>
+      <eng><![CDATA[Sub Modules]]></eng>
+      <chn><![CDATA[子模块]]></chn>
+    </sub_modules>
+    <module>
+      <eng><![CDATA[Module]]></eng>
+      <chn><![CDATA[模块]]></chn>
+    </module>
+    <confirm_reboot>
+      <eng><![CDATA[Device will reboot after this procedure. Please do not turn the power off or pull out the power cord to Avoid Any Damage! Proceed any way ?]]></eng>
+      <chn><![CDATA[设备将在该操作完成后自动重启。请不要关闭电源或拔出电源线以避免损坏。 是否继续操作？]]></chn>
+    </confirm_reboot>
+    <service>
+      <eng><![CDATA[Service]]></eng>
+      <chn><![CDATA[节目]]></chn>
+    </service>
+    <serv_num>
+      <eng><![CDATA[Service]]></eng>
+      <chn><![CDATA[节目]]></chn>
+    </serv_num>
+    <service_id>
+      <eng><![CDATA[Service ID]]></eng>
+      <chn><![CDATA[节目号]]></chn>
+    </service_id>
+    <service_name>
+      <eng><![CDATA[Service Name]]></eng>
+      <chn><![CDATA[节目名称]]></chn>
+    </service_name>
+    <service_type>
+      <eng><![CDATA[Service Type]]></eng>
+      <chn><![CDATA[节目类型]]></chn>
+    </service_type>
+    <service_provider>
+      <eng><![CDATA[Service Provider]]></eng>
+      <chn><![CDATA[节目提供者]]></chn>
+    </service_provider>
+    <eit_s>
+      <eng><![CDATA[EIT Schedule Information ]]></eng>
+      <chn><![CDATA[EIT 时间表数据标志]]></chn>
+    </eit_s>
+    <eit_pn>
+      <eng><![CDATA[EIT Current-Next Information ]]></eng>
+      <chn><![CDATA[EIT 当前后继信息标志]]></chn>
+    </eit_pn>
+    <out_ts>
+      <eng><![CDATA[Output TS]]></eng>
+      <chn><![CDATA[输出 TS]]></chn>
+    </out_ts>
+    <in_ts>
+      <eng><![CDATA[Input TS]]></eng>
+      <chn><![CDATA[输入 TS]]></chn>
+    </in_ts>
+    <es_type>
+      <eng><![CDATA[ES Type]]></eng>
+      <chn><![CDATA[基础流类型]]></chn>
+    </es_type>
+    <es_pid>
+      <eng><![CDATA[ES PID]]></eng>
+      <chn><![CDATA[基础流PID]]></chn>
+    </es_pid>
+    <es_scr>
+      <eng><![CDATA[ES Scramble Control]]></eng>
+      <chn><![CDATA[基础流加扰控制]]></chn>
+    </es_scr>
+    <es_desc>
+      <eng><![CDATA[ES PMT Descriptors]]></eng>
+      <chn><![CDATA[基础流 PMT 描述符]]></chn>
+    </es_desc>
+    <route_to>
+      <eng><![CDATA[Routed To]]></eng>
+      <chn><![CDATA[直通到]]></chn>
+    </route_to>
+    <route_from>
+      <eng><![CDATA[From]]></eng>
+      <chn><![CDATA[自]]></chn>
+    </route_from>
+    <scs_ca>
+      <eng><![CDATA[SCS CAS]]></eng>
+      <chn><![CDATA[本地条件接收系统]]></chn>
+    </scs_ca>
+    <remux_ca>
+      <eng><![CDATA[ReMux CAS]]></eng>
+      <chn><![CDATA[复用条件接收系统]]></chn>
+    </remux_ca>
+    <ca>
+      <eng><![CDATA[CAS]]></eng>
+      <chn><![CDATA[条件接收系统]]></chn>
+    </ca>
+    <user_define>
+      <eng><![CDATA[User Defined]]></eng>
+      <chn><![CDATA[用户自定义]]></chn>
+    </user_define>
+    <version>
+      <eng><![CDATA[Version]]></eng>
+      <chn><![CDATA[版本]]></chn>
+    </version>
+    <descriptor>
+      <eng><![CDATA[Descriptor]]></eng>
+      <chn><![CDATA[描述符]]></chn>
+    </descriptor>
+    <desc_content>
+      <eng><![CDATA[Descriptor Data (HEX)]]></eng>
+      <chn><![CDATA[描述符数据 (HEX)]]></chn>
+    </desc_content>
+    <ts_index>
+      <eng><![CDATA[TsIndex]]></eng>
+      <chn><![CDATA[TS索引]]></chn>
+    </ts_index>
+    <ts>
+      <eng><![CDATA[TS]]></eng>
+      <chn><![CDATA[传输流]]></chn>
+    </ts>
+
+    <apply>
+      <eng><![CDATA[Apply]]></eng>
+      <chn><![CDATA[应用]]></chn>
+    </apply>
+    <update>
+      <eng><![CDATA[Update Data]]></eng>
+      <chn><![CDATA[刷新数据]]></chn>
+    </update>
+    <save>
+      <eng><![CDATA[Save]]></eng>
+      <chn><![CDATA[保存]]></chn>
+    </save>
+    <submit>
+      <eng><![CDATA[Submit]]></eng>
+      <chn><![CDATA[提交]]></chn>
+    </submit>
+    <refresh>
+      <eng><![CDATA[Refresh]]></eng>
+      <chn><![CDATA[刷新]]></chn>
+    </refresh>
+    <add>
+      <eng><![CDATA[Add]]></eng>
+      <chn><![CDATA[增加]]></chn>
+    </add>
+    <remove>
+      <eng><![CDATA[Remove]]></eng>
+      <chn><![CDATA[删除]]></chn>
+    </remove>
+    <edit>
+      <eng><![CDATA[Edit]]></eng>
+      <chn><![CDATA[编辑]]></chn>
+    </edit>
+    <reset>
+      <eng><![CDATA[Reset]]></eng>
+      <chn><![CDATA[重置]]></chn>
+    </reset>
+    <upload>
+      <eng><![CDATA[Upload]]></eng>
+      <chn><![CDATA[上传]]></chn>
+    </upload>
+    <download>
+      <eng><![CDATA[Download]]></eng>
+      <chn><![CDATA[下载]]></chn>
+    </download>
+    <import>
+      <eng><![CDATA[Import]]></eng>
+      <chn><![CDATA[导入]]></chn>
+    </import>
+    <export_xml>
+      <eng><![CDATA[Export XML]]></eng>
+      <chn><![CDATA[导出XML]]></chn>
+    </export_xml>
+    <export_log>
+      <eng><![CDATA[Export LOG]]></eng>
+      <chn><![CDATA[导出日志]]></chn>
+    </export_log>
+    <export>
+      <eng><![CDATA[Export]]></eng>
+      <chn><![CDATA[导出]]></chn>
+    </export>
+    <backup>
+      <eng><![CDATA[Backup]]></eng>
+      <chn><![CDATA[备份]]></chn>
+    </backup>
+    <restore>
+      <eng><![CDATA[Restore]]></eng>
+      <chn><![CDATA[恢复]]></chn>
+    </restore>
+    <upgrade>
+      <eng><![CDATA[Upgrade]]></eng>
+      <chn><![CDATA[升级]]></chn>
+    </upgrade>
+    <back>
+      <eng><![CDATA[Back]]></eng>
+      <chn><![CDATA[返回]]></chn>
+    </back>
+    <index>
+      <eng><![CDATA[Index]]></eng>
+      <chn><![CDATA[索引]]></chn>
+    </index>
+    <enable>
+      <eng><![CDATA[Enable]]></eng>
+      <chn><![CDATA[开关]]></chn>
+    </enable>
+    <active>
+      <eng><![CDATA[Status]]></eng>
+      <chn><![CDATA[状态]]></chn>
+    </active>
+    <chan>
+      <eng><![CDATA[Channel]]></eng>
+      <chn><![CDATA[通道]]></chn>
+    </chan>
+    <input>
+      <eng><![CDATA[Input]]></eng>
+      <chn><![CDATA[输入]]></chn>
+    </input>
+    <output>
+      <eng><![CDATA[Output]]></eng>
+      <chn><![CDATA[输出]]></chn>
+    </output>
+    <confirm_popup_window>
+      <eng><![CDATA[Press OK to proceed, Press Cancel to return!]]></eng>
+      <chn><![CDATA[点击确定继续，点击取消返回。]]></chn>
+    </confirm_popup_window>
+    <e3ds3>
+      <eng><![CDATA[E3/DS3]]></eng>
+      <chn><![CDATA[E3/DS3接口]]></chn>
+    </e3ds3>
+    <asi>
+      <eng><![CDATA[ASI]]></eng>
+      <chn><![CDATA[异步串行接口]]></chn>
+    </asi>
+    <tuner_s>
+      <eng><![CDATA[DEMOD-S/S2]]></eng>
+      <chn><![CDATA[DEMOD-S/S2接口]]></chn>
+    </tuner_s>
+    <tuner_c>
+      <eng><![CDATA[DEMOD-C]]></eng>
+      <chn><![CDATA[DEMOD-C接口]]></chn>
+    </tuner_c>
+
+    <qpsk>
+      <eng><![CDATA[QPSK]]></eng>
+      <chn><![CDATA[QPSK]]></chn>
+    </qpsk>
+    <dtmb>
+      <eng><![CDATA[DTMB]]></eng>
+      <chn><![CDATA[国标地面调制]]></chn>
+    </dtmb>
+    <qam_a>
+      <eng><![CDATA[QAM SubChannel - Type A]]></eng>
+      <chn><![CDATA[正交调制通道 - 类型A]]></chn>
+    </qam_a>
+    <qam_b>
+      <eng><![CDATA[QAM SubChannel - Type B]]></eng>
+      <chn><![CDATA[正交调制通道 - 类型B]]></chn>
+    </qam_b>
+    <eth>
+      <eng><![CDATA[GbE]]></eng>
+      <chn><![CDATA[千兆以太网接口]]></chn>
+    </eth>
+    <eth_loop>
+      <eng><![CDATA[GbE Loop]]></eng>
+      <chn><![CDATA[千兆以太网环路接口]]></chn>
+    </eth_loop>
+    <eth_dep>
+      <eng><![CDATA[GbE OUT]]></eng>
+      <chn><![CDATA[千兆以太网输出接口]]></chn>
+    </eth_dep>
+    <eth_loop_dep>
+      <eng><![CDATA[GbE Loop OUT]]></eng>
+      <chn><![CDATA[千兆以太网环路输出接口]]></chn>
+    </eth_loop_dep>
+    <ipqam_rev_a>
+      <eng><![CDATA[IP QAM Module]]></eng>
+      <chn><![CDATA[IP QAM 模块]]></chn>
+    </ipqam_rev_a>
+    <ip_scrambler>
+      <eng><![CDATA[IP Scrambler Module]]></eng>
+      <chn><![CDATA[IP 加扰模块]]></chn>
+    </ip_scrambler>
+    <none>
+      <eng><![CDATA[Not Connected]]></eng>
+      <chn><![CDATA[没有连接]]></chn>
+    </none>
+    <sdi>
+      <eng><![CDATA[SDI]]></eng>
+      <chn><![CDATA[串行数字接口]]></chn>
+    </sdi>
+    <qam>
+      <eng><![CDATA[QAM Modulator]]></eng>
+      <chn><![CDATA[QAM 调制模块接口]]></chn>
+    </qam>
+    <qpsk>
+      <eng><![CDATA[QPSK Modulator]]></eng>
+      <chn><![CDATA[QPSK 调制模块接口]]></chn>
+    </qpsk>
+    <demodulator>
+      <eng><![CDATA[Demodulator]]></eng>
+      <chn><![CDATA[解调模块接口]]></chn>
+    </demodulator>
+    <encoder>
+      <eng><![CDATA[ENCODER]]></eng>
+      <chn><![CDATA[编码器模块]]></chn>
+    </encoder>
+    <close>
+      <eng><![CDATA[NONE]]></eng>
+      <chn><![CDATA[关闭]]></chn>
+    </close>
+    <auto>
+      <eng><![CDATA[AUTO]]></eng>
+      <chn><![CDATA[自动]]></chn>
+    </auto>
+    <off>
+      <eng><![CDATA[OFF]]></eng>
+      <chn><![CDATA[关闭]]></chn>
+    </off>
+    <on>
+      <eng><![CDATA[ON]]></eng>
+      <chn><![CDATA[启动]]></chn>
+    </on>
+    <normal>
+      <eng><![CDATA[NORMAL]]></eng>
+      <chn><![CDATA[正常]]></chn>
+    </normal>
+    <backup>
+      <eng><![CDATA[BACKUP]]></eng>
+      <chn><![CDATA[备份]]></chn>
+    </backup>
+    <override>
+      <eng><![CDATA[OVERRIDE]]></eng>
+      <chn><![CDATA[覆盖输出]]></chn>
+    </override>
+    <keep>
+      <eng><![CDATA[KEEP]]></eng>
+      <chn><![CDATA[保留输出]]></chn>
+    </keep>
+    <ber>
+      <eng><![CDATA[BER]]></eng>
+      <chn><![CDATA[误码率]]></chn>
+    </ber>
+  </common_strings>
+  <mpeg2_strings>
+    <service_type>
+      <index>0</index>
+      <eng><![CDATA[Researved]]></eng>
+      <chn><![CDATA[保留类型]]></chn>
+    </service_type>
+    <service_type>
+      <index>1</index>
+      <eng><![CDATA[Digital TV]]></eng>
+      <chn><![CDATA[数字电视]]></chn>
+    </service_type>
+    <service_type>
+      <index>2</index>
+      <eng><![CDATA[Digital Radio]]></eng>
+      <chn><![CDATA[数字音频广播]]></chn>
+    </service_type>
+    <service_type>
+      <index>3</index>
+      <eng><![CDATA[TELETEXT]]></eng>
+      <chn><![CDATA[图文电视]]></chn>
+    </service_type>
+    <service_type>
+      <index>4</index>
+      <eng><![CDATA[NVOD Reference]]></eng>
+      <chn><![CDATA[准实时点播参考]]></chn>
+    </service_type>
+    <service_type>
+      <index>5</index>
+      <eng><![CDATA[NVOD Time-shifted]]></eng>
+      <chn><![CDATA[准实时点播时移]]></chn>
+    </service_type>
+    <service_type>
+      <index>23</index>
+      <eng><![CDATA[Advanced Codec SD NVOD Time-shifted]]></eng>
+      <chn><![CDATA[标清准实时点播时移（高级编码）]]></chn>
+    </service_type>
+    <es_type>
+      <index>0</index>
+      <eng><![CDATA[Researved]]></eng>
+      <chn><![CDATA[保留类型]]></chn>
+    </es_type>
+    <es_type>
+      <index>1</index>
+      <eng><![CDATA[MPEG-1 Video]]></eng>
+      <chn><![CDATA[MPEG-1 视频]]></chn>
+    </es_type>
+    <es_type>
+      <index>2</index>
+      <eng><![CDATA[MPEG-2 Video]]></eng>
+      <chn><![CDATA[MPEG-2 视频]]></chn>
+    </es_type>
+    <es_type>
+      <index>3</index>
+      <eng><![CDATA[MPEG-1 Audio]]></eng>
+      <chn><![CDATA[MPEG-1 音频]]></chn>
+    </es_type>
+    <es_type>
+      <index>4</index>
+      <eng><![CDATA[MPEG-2 Audio]]></eng>
+      <chn><![CDATA[MPEG-2 音频]]></chn>
+    </es_type>
+    <es_type>
+      <index>15</index>
+      <eng><![CDATA[MPEG-2 AAC Audio]]></eng>
+      <chn><![CDATA[MPEG-2 AAC 音频]]></chn>
+    </es_type>
+    <es_type>
+      <index>16</index>
+      <eng><![CDATA[MPEG-4 Video]]></eng>
+      <chn><![CDATA[MPEG-4 视频]]></chn>
+    </es_type>
+    <es_type>
+      <index>17</index>
+      <eng><![CDATA[MPEG-4 LATM AAC Audio]]></eng>
+      <chn><![CDATA[MPEG-4 LATM AAC 音频]]></chn>
+    </es_type>
+    <es_type>
+      <index>27</index>
+      <eng><![CDATA[H.264 Video]]></eng>
+      <chn><![CDATA[H.264 视频]]></chn>
+    </es_type>
+    <es_type>
+      <index>36</index>
+      <eng><![CDATA[HEVC/H.265 Video]]></eng>
+      <chn><![CDATA[HEVC/H.265 视频]]></chn>
+    </es_type>
+    <es_type>
+      <index>42</index>
+      <eng><![CDATA[AVS/AVS+]]></eng>
+      <chn><![CDATA[AVS/AVS+]]></chn>
+    </es_type>
+  </mpeg2_strings>
+  <alarms_strings>
+    <log_type_1>
+      <eng><![CDATA[Temperature Critical]]></eng>
+      <chn><![CDATA[温度异常]]></chn>
+    </log_type_1>
+    <log_detail_1>
+      <code_0>
+        <eng><![CDATA[Temperature Over Limits]]></eng>
+        <chn><![CDATA[温度超过设定的上限]]></chn>
+      </code_0>
+    </log_detail_1>
+    <log_type_2>
+      <eng><![CDATA[Hardware Error]]></eng>
+      <chn><![CDATA[硬件故障]]></chn>
+    </log_type_2>
+    <log_detail_2>
+      <code_0>
+        <eng><![CDATA[Hardware Error]]></eng>
+        <chn><![CDATA[与数据处理模块的通讯断开]]></chn>
+      </code_0>
+    </log_detail_2>
+    <log_type_3>
+      <eng><![CDATA[NTP Service Error]]></eng>
+      <chn><![CDATA[NTP服务错误]]></chn>
+    </log_type_3>
+    <log_detail_3>
+      <code_0>
+      <eng><![CDATA[NTP Service Timeout]]></eng>
+      <chn><![CDATA[NTP服务超时]]></chn>
+      </code_0>
+    </log_detail_3>
+    <log_type_4>
+      <eng><![CDATA[EMM Error]]></eng>
+      <chn><![CDATA[EMM 错误]]></chn>
+    </log_type_4>
+    <log_detail_4>
+      <code_0>
+      <eng><![CDATA[EMM Link Lost]]></eng>
+      <chn><![CDATA[EMM 连接丢失]]></chn>
+      </code_0>
+    </log_detail_4>
+    <log_type_5>
+      <eng><![CDATA[ECM Error]]></eng>
+      <chn><![CDATA[ECM 错误]]></chn>
+    </log_type_5>
+    <log_detail_5>
+      <code_0>
+      <eng><![CDATA[ECM Link Error]]></eng>
+      <chn><![CDATA[ECM 连接丢失]]></chn>
+      </code_0>
+    </log_detail_5>
+    <log_type_6>
+      <eng><![CDATA[ETH Error]]></eng>
+      <chn><![CDATA[以太网 Error]]></chn>
+    </log_type_6>
+    <log_detail_6>
+      <code_0>
+        <eng><![CDATA[ETH 1 Link Down]]></eng>
+        <chn><![CDATA[以太网 1 连接丢失]]></chn>
+      </code_0>
+      <code_1>
+        <eng><![CDATA[ETH 2 Link Down]]></eng>
+        <chn><![CDATA[以太网 2 连接丢失]]></chn>
+      </code_1>
+      
+      <code_10>
+        <eng><![CDATA[ETH 1 Link Speed = 10Mbps]]></eng>
+        <chn><![CDATA[以太网 1 连接为10Mbps]]></chn>
+      </code_10>
+      <code_11>
+        <eng><![CDATA[ETH 2 Link Speed = 10Mbps]]></eng>
+        <chn><![CDATA[以太网 2 连接为10Mbps]]></chn>
+      </code_11>
+      
+      
+      <code_20>
+        <eng><![CDATA[ETH 1 Link Speed = 100Mbps]]></eng>
+        <chn><![CDATA[以太网 1 连接为100Mbps]]></chn>
+      </code_20>
+      <code_21>
+        <eng><![CDATA[ETH 2 Link Speed = 100Mbps]]></eng>
+        <chn><![CDATA[以太网 2 连接为100Mbps]]></chn>
+      </code_21>
+      
+      
+    </log_detail_6>
+    <log_type_7>
+      <eng><![CDATA[PLL Lock Lost]]></eng>
+      <chn><![CDATA[锁相环失锁]]></chn>
+    </log_type_7>
+    <log_detail_7>
+      <code_x>
+      <eng><![CDATA[PLL Lock Slot %d Lost]]></eng>
+      <chn><![CDATA[锁相环 %d 失锁]]></chn>
+      </code_x>
+    </log_detail_7>
+    <log_type_8>
+      <eng><![CDATA[Input Error]]></eng>
+      <chn><![CDATA[数据输入错误]]></chn>
+    </log_type_8>
+    <log_detail_8>
+      <code_x>
+        <eng><![CDATA[Input Channel %d Bitrate Over Limits]]></eng>
+        <chn><![CDATA[输入通道 %d 码率超过设定限制]]></chn>
+      </code_x>
+    </log_detail_8>
+    <log_type_9>
+      <eng><![CDATA[Output Error]]></eng>
+      <chn><![CDATA[数据输出错误]]></chn>
+    </log_type_9>
+    <log_detail_9>
+      <code_x>
+        <eng><![CDATA[Output Channel %d Bitrate Over Limits]]></eng>
+        <chn><![CDATA[输出通道 %d 码率超过设定限制]]></chn>
+      </code_x>
+    </log_detail_9>
+    <log_type_10>
+      <eng><![CDATA[QAM CHN Overflow]]></eng>
+      <chn><![CDATA[调制通道溢出]]></chn>
+    </log_type_10>
+    <log_detail_10>
+      <code_x>
+        <eng><![CDATA[QAM CHN %d Overflow]]></eng>
+        <chn><![CDATA[调制通道 %d 溢出]]></chn>
+      </code_x>
+    </log_detail_10>
+    <log_type_11>
+      <eng><![CDATA[Fan Malfunction]]></eng>
+      <chn><![CDATA[风扇故障]]></chn>
+    </log_type_11>
+    <log_detail_11>
+      <code_x>
+        <eng><![CDATA[FAN %d Malfunction]]></eng>
+        <chn><![CDATA[风扇 %d 故障]]></chn>
+      </code_x>
+    </log_detail_11>
+    <log_type_12>
+      <eng><![CDATA[Power Supply Failure]]></eng>
+      <chn><![CDATA[电源供应故障]]></chn>
+    </log_type_12>
+    <log_detail_12>
+      <code_x>
+        <eng><![CDATA[Power Supply % Failure]]></eng>
+        <chn><![CDATA[电源 %d 供应故障]]></chn>
+      </code_x>
+    </log_detail_12>
+    <log_type_13>
+      <code_x>
+        <eng><![CDATA[Input Ts Changed]]></eng>
+        <chn><![CDATA[输入Ts变化]]></chn>
+      </code_x>
+    </log_type_13>
+    <log_detail_13>
+      <code_0>
+      <eng><![CDATA[Input Ts %d Changed]]></eng>
+      <chn><![CDATA[输入Ts %d 变化]]></chn>
+      </code_0>
+    </log_detail_13>
+    <log_type_14>
+      <eng><![CDATA[Tuner Short]]></eng>
+      <chn><![CDATA[解调 短路]]></chn>
+    </log_type_14>
+    <log_detail_14>
+      <code_x>
+      <eng><![CDATA[Tuner %d Feed Shorted]]></eng>
+      <chn><![CDATA[Tuner %d 供电短路]]></chn>
+      </code_x>
+    </log_detail_14>
+    <log_type_15>
+      <eng><![CDATA[CVBS UNLOCK]]></eng>
+      <chn><![CDATA[CVBS 未锁定]]></chn>
+    </log_type_15>
+    <log_detail_15>
+      <code_x>
+      <eng><![CDATA[CVBS %d UNLOCK]]></eng>
+      <chn><![CDATA[CVBS %d 未锁定]]></chn>
+      </code_x>
+    </log_detail_15>
+    <log_type_16>
+      <eng><![CDATA[ENCODE ERROR]]></eng>
+      <chn><![CDATA[编码异常]]></chn>
+    </log_type_16>
+    <log_detail_16>
+      <code_x>
+      <eng><![CDATA[VIDEO CHNNEL %d ENCODE ERROR]]></eng>
+      <chn><![CDATA[视频通道 %d 编码异常]]></chn>
+      </code_x>
+    </log_detail_16>
+    <log_type_17>
+      <eng><![CDATA[NO BITRATE]]></eng>
+      <chn><![CDATA[编码无输出码率]]></chn>
+    </log_type_17>
+    <log_detail_17>
+      <code_x>
+      <eng><![CDATA[NO BITRATE OUTPUT]]></eng>
+      <chn><![CDATA[编码无输出码率]]></chn>
+      </code_x>
+    </log_detail_17>
+    <log_type_18>
+      <eng><![CDATA[OVERFLOW]]></eng>
+      <chn><![CDATA[编码输出溢出]]></chn>
+    </log_type_18>
+    <log_detail_18>
+      <code_x>
+      <eng><![CDATA[OVERFLOW]]></eng>
+      <chn><![CDATA[编码输出溢出]]></chn>
+      </code_x>
+    </log_detail_18>
+
+    <log_type_31>
+      <eng><![CDATA[ENCODER BUFFER OVERFLOW]]></eng>
+      <chn><![CDATA[编码缓冲器溢出]]></chn>
+    </log_type_31>
+    <log_detail_31>
+      <code_x>
+        <eng><![CDATA[ENCODER CH %d BUFFER OVERFLOW]]></eng>
+        <chn><![CDATA[编码通道 %d 缓冲器溢出]]></chn>
+      </code_x>
+    </log_detail_31>
+    <log_type_32>
+      <eng><![CDATA[HDMI INPUT SIGNAL LOST]]></eng>
+      <chn><![CDATA[HDMI 输入信号丢失]]></chn>
+    </log_type_32>
+    <log_detail_32>
+      <code_x>
+        <eng><![CDATA[CH %d HDMI INPUT SIGNAL LOST]]></eng>
+        <chn><![CDATA[通道 %d HDMI 输入信号丢失]]></chn>
+      </code_x>
+    </log_detail_32>
+    <log_type_33>
+      <eng><![CDATA[HDMI INPUT VIDEO FORMAT ERROR]]></eng>
+      <chn><![CDATA[HDMI 输入视频格式错误]]></chn>
+    </log_type_33>
+    <log_detail_33>
+      <code_x>
+        <eng><![CDATA[CH %d HDMI INPUT VIDEO FORMAT ERROR]]></eng>
+        <chn><![CDATA[通道 %d HDMI 输入视频格式错误]]></chn>
+      </code_x>
+    </log_detail_33>
+  </alarms_strings>
+
+</root>

@@ -1,0 +1,157 @@
+/*UTF-8编码*/
+/*--------------------------------------------------|
+| my_tree_control 1.0|								|
+|---------------------------------------------------|
+|													|
+|--------------------------------------------------*/
+
+.my_tree_control 
+{
+	font-family: "宋体", Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666;
+	white-space: nowrap;
+	padding: 0px;
+	margin: 0px;
+}
+
+.my_tree_control img 
+{
+	border: 0px;
+	vertical-align: middle;
+}
+
+.my_tree_control input 
+{
+	font-size: 10px;
+	vertical-align: middle;
+}
+
+.my_tree_control select 
+{
+	font-size: 10px;
+	vertical-align: middle;
+	margin-top:-3px;
+}
+
+.my_tree_control button 
+{
+	font-size: 10px;
+	vertical-align: middle;
+}
+
+.my_tree_control a 
+{
+	color: #333;
+	text-decoration: none;
+}
+
+.my_tree_control a.node, .my_tree_control a.nodeSel 
+{
+	font-family: "宋体", Verdana, Geneva, sans-serif;
+	white-space: nowrap;
+	padding: 1px 2px 1px 2px;
+}
+
+.my_tree_control a.node:hover, .my_tree_control a.nodeSel:hover 
+{
+	color: #333;
+	text-decoration: underline;
+}
+
+.my_tree_control a.nodeSel 
+{
+	background-color: #c0d2ec;
+}
+
+.my_tree_control .clip {
+	overflow: hidden;
+}
+
+.my_tree_control form 
+{
+	margin:0px;
+}
+
+.my_tree_control .dtreeNode #dd0 #dd1 div label #textfield {
+	height: 18px;
+	font-size: 12px;
+
+}
+.my_tree_controlNode10
+{
+	height: 18px;
+	font-size: 12px;
+	padding-left:18px;
+}
+.my_tree_controlNode20
+{
+	height: 18px;
+	font-size: 12px;
+	padding-left:36px;
+}
+	
+.input {
+	font-family: "宋体", Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	height: 17px;
+	width: 150px;
+	margin:0px;
+	padding:0px;
+
+}
+.inputc {
+	font-family: "宋体", Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	height: 17px;
+	width: 19px;
+	margin:0px;
+	padding:0px;
+
+}
+
+.texth1 {
+	font-size: 14px; font-weight: bold;
+ margin-left: 10px
+; font-family: "宋体", Arial, Helvetica, sans-serif; color: #0066CC
+}
+.font14 
+{
+ font-size: 14px; font-weight: normal;
+ font-family: "宋体", Arial, Helvetica, sans-serif; color: #0066CC;
+ padding-bottom:7px;
+}
+.padddiv02
+{
+padding-bottom:2px;
+}
+
+a.fontlink1:link 
+{
+	font-family:"宋体";
+	color:#999;
+	font-size:12px;
+	text-decoration:none;
+}
+	
+a.fontlink1:visited 
+{
+	color: #999;
+	font-size:12px;
+	text-decoration: none;
+}
+
+a.fontlink1:hover 
+{
+	font-family:"宋体";
+	color:#333;
+	font-size:12px;
+	text-decoration: underline;
+}
+
+a.fontlink1:active 
+{
+	font-family: "宋体";
+	font-size: 12px;
+	color: #333;
+}

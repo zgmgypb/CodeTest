@@ -1,0 +1,220 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<link rel="StyleSheet" href="/components/my_tree_control/my_tree_control.css" type="text/css">
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/components/my_tree_control/my_tree_control.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript">
+		var TreeItem;
+        var s_ChannelXMLDoc = null;
+        
+        JS_LANInitiate();//初始化语言脚本组件
+        JS_ParamInitate();//初始化系统参数处理脚本组件
+
+        function OnLoad() 
+        {
+            var lTmpStr, lTmpVar;
+            var i, k, lTmpValue, lChannelNum, lSubChannelNum, lChnType;
+            var lRootID, lSecondID, lThridID, lFourthID;
+            var lChnObj, lSUBObj;
+            var lChannelInfo, lSUBInfo;
+			TreeItem = null;
+			TreeItem = new MyTreeControl("TreeItem");
+
+			lTmpStr = JS_LAN("mux_settings");
+			lRootID = TreeItem.AddNewNode(0, lTmpStr);
+
+			lTmpStr = "<a href='mux_right_setting.html' id='xxxxx' target='right_frame'>" + JS_LAN("setting") + "</a>";
+			lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+
+			lTmpStr = "<a href='mux_right_pid_map.html' target='right_frame'>" + JS_LAN("manual_pid") + "</a>";
+			lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+
+			if (JS_ParamGetRemuxSystemInfo().m_InserterDisable == "ON")
+			{
+			    lTmpStr = "<span>" + JS_LAN("manual_inserter") + "</span>";
+			}
+			else
+			{
+			    lTmpStr = "<a href='mux_right_inserter.html' target='right_frame'>" + JS_LAN("manual_inserter") + "</a>";
+			}
+			lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+
+			if (JS_ParamGetRemuxSystemInfo().m_NITDisable == "ON")
+			{
+			    lTmpStr = "<span>" + JS_LAN("nit_edit") + "</span>";
+			}
+			else
+			{
+			    lTmpStr = "<a href='mux_right_nit.html' target='right_frame'>" + JS_LAN("nit_edit") + "</a>";
+			}
+			lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+
+			if (JS_ParamGetRemuxSystemInfo().m_BatchServiceEdit == "ON")
+			{
+			    lTmpStr = "<a href='mux_right_batch_mux.html' target='right_frame'>" + JS_LAN("batch_mux") + "</a>";
+			    lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+			}
+			
+			if (JS_ParamGetECA() != null)
+			{
+				lTmpStr = "<a href='mux_right_encrypt.html?' target='right_frame'>" + JS_LAN("eca_setting") + "</a>";
+				lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+			}
+
+			lTmpStr = JS_LAN("in_serv") + " - <span id='in_serv_num'></span>";;
+			lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+			//从XML中分析出通道的数量，每个通道的TS数量，并分类成输入和输出两类。
+			lChannelNum = JS_ParamGetInChannelNum();
+			for(i = 0; i < lChannelNum; i++)
+			{
+		        lChnObj = JS_ParamGetInChannelObject(i);
+		        lChnType = JS_ParamGetChannelType(lChnObj);
+		        lSubChannelNum = JS_ParamGetSubChannelNum(lChnObj);
+		        if (JS_ParamGetChannelHideMark(lChnObj) != "ON")
+		        {
+		            lTmpStr = JS_LANCMN("chan") + " " + JS_StrLeftPading((i + 1), 2) + " - " + JS_LANCMN(lChnType);
+		            lThridID = TreeItem.AddNewNode(lSecondID, lTmpStr);
+			        for(k = 0; k < lSubChannelNum; k++)
+			        {
+					    lSUBObj = JS_ParamGetSubChnObj(lChnObj, k);
+					    lSUBInfo = JS_ParamGetSubChannelInfo(lSUBObj);
+					    if (lSUBInfo.m_Active == "ON") 
+					    {
+					        lTmpStr = "<a href='mux_right_input_ts.html?chn_ind=" + i + "&sub_ind=" + k + "' target='right_frame'>" + JS_StrLeftPading(k + 1, 3) + " - (" +JS_LANCMN("ts") + " " + JS_StrLeftPading((lSUBInfo.m_TsIndex + 1), 3) + ")</a>";
+						    TreeItem.AddNewNode(lThridID, lTmpStr);
+					    }
+			        }
+		        }
+			}
+
+			lTmpStr = JS_LAN("out_serv") + " - <span id='out_serv_num'></span>";
+			lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+			lChannelNum = JS_ParamGetOutChannelNum();
+			for (i = 0; i < lChannelNum; i++)
+			{
+				lChnObj = JS_ParamGetOutCHNObj(i);
+				lChnType = JS_ParamGetChannelType(lChnObj);
+				if (JS_ParamGetChannelHideMark(lChnObj) != "ON")
+				{
+				    if (lChnType != "ETH_LOOP" && lChnType != "ETH_LOOP_DEP")
+				    {
+				        lTmpStr = JS_LANCMN("chan") + " " + JS_StrLeftPading((i + 1), 2) + " - " + JS_LANCMN(lChnType); ;
+				        lThridID = TreeItem.AddNewNode(lSecondID, lTmpStr);
+				        lSubChannelNum = JS_ParamGetSubChannelNum(lChnObj);
+				        for (k = 0; k < lSubChannelNum; k++)
+				        {
+				            lSUBObj = JS_ParamGetSubChnObj(lChnObj, k);
+				            lSUBInfo = JS_ParamGetSubChannelInfo(lSUBObj);
+				            if (lSUBInfo.m_Active == "ON")
+				            {
+				                lTmpStr = "<a href='mux_right_output_ts.html?chn_ind=" + i + "&sub_ind=" + k + "' target='right_frame'>" + JS_StrLeftPading(k + 1, 3) + " - (" + JS_LANCMN("ts") + " " + JS_StrLeftPading((lSUBInfo.m_TsIndex + 1), 3) + ")</a>";
+				                TreeItem.AddNewNode(lThridID, lTmpStr);
+				            }
+				        }
+				    }
+				}
+            }
+
+            if (JS_ParamHaveTsBackuFunc() == true)
+            {
+                lTmpStr = JS_LAN("ts_backup");
+                lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+			    lTmpStr = "<a href='mux_right_backup_in_ts.html' target='right_frame'>" + JS_LANCMN("in_ts") + "</a>";
+                lThridID = TreeItem.AddNewNode(lSecondID, lTmpStr);
+
+                lTmpStr = "<a href='mux_right_backup_out_ts.html' target='right_frame'>" + JS_LANCMN("out_ts") + "</a>";
+                lThridID = TreeItem.AddNewNode(lSecondID, lTmpStr);
+            }
+            
+            
+			lTmpVar = JS_ParamGetMosiacArray();
+			if (lTmpVar.length > 0)
+			{
+				lTmpStr = "<a href='mux_right_mosiac.html?' target='right_frame'>" + JS_LAN("mosiac") + "</a>";
+				TreeItem.AddNewNode(lRootID, lTmpStr);
+			}
+			
+			if (JS_ParamGetSERVL() != null)
+			{
+				lTmpStr = "<a href='mux_right_servl.html?' target='right_frame'>" + JS_LAN("servl_setting") + "</a>";
+				lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+				lChnNum = JS_ParamGetOutChannelNum();
+				for (i = 0; i < lChnNum; i++)
+				{
+					lChnObj = JS_ParamGetOutCHNObj(i);
+					lChnType = JS_ParamGetChannelType(lChnObj);
+					if (JS_ParamGetChannelHideMark(lChnObj) != "ON")
+					{
+					    if (lChnType != "ETH_LOOP" && lChnType != "ETH_LOOP_DEP")
+					    {
+					        lTmpStr = JS_LANCMN("chan") + " " + JS_StrLeftPading((i + 1), 2) + " - <b>" + JS_LANCMN(lChnType) + "</b>";
+					        lThridID = TreeItem.AddNewNode(lSecondID, lTmpStr);
+					        lSubNum = JS_ParamGetSubChannelNum(lChnObj);
+					        for (k = 0; k < lSubNum; k++)
+					        {
+					            lSubObj = JS_ParamGetSubChnObj(lChnObj, k);
+					            lSubInfo = JS_ParamGetSubChannelInfo(lSubObj);
+					            if (lSubInfo.m_Active == "ON")
+					            {
+					                lTmpStr = "<a href='mux_right_servl_ts.html?chn_ind=" + i + "&sub_ind=" + k + "' target='right_frame'>" + JS_LANCMN("ts") + " " + JS_StrLeftPading((lSubInfo.m_TsIndex + 1), 3) + "</a>";
+					                TreeItem.AddNewNode(lThridID, lTmpStr);
+					            }
+					        }
+					    }
+					}
+
+				}
+			}
+						
+			document.getElementById("item_tree").innerHTML = TreeItem.toString();
+			TreeItem.ToggleCollapse(lRootID, 4, 2);
+			
+			JS_ForcusKeepChangeCallbackSetup($("item_tree"), "red", "white");
+
+
+			lServCountInfo = JS_ParamGetServCountInfo();
+			$("in_serv_num").innerHTML = lServCountInfo.CurrentServTotal + " / " + lServCountInfo.CurrentServMax;
+			$("out_serv_num").innerHTML = lServCountInfo.CurrentServOutput;
+
+        }
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="310px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" background="/graphics/boxmenu_310.gif" align="center">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="left" bgcolor="#F5F9FE">
+				<div id="item_tree" style="height: 507px; width: 290px; overflow: auto; padding: 10px;">
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13" align="center" valign="top" background="/graphics/boxbottom_310.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

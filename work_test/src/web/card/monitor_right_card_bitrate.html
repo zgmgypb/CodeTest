@@ -1,0 +1,529 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/bitrate_process.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/js/monitor_setting.js"></script>
+
+	<script type="text/javascript" src="/js/mpeg2.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+
+	<script type="text/javascript">
+		var s_SubList;
+		var s_SetList;
+		var s_IO, s_DevInd;
+		var s_TotalSubChnNum;
+		var s_UpdateTimeout;
+		var s_bShowColor = false;
+		var s_MaxBitrateArray;
+		var lChnObj, lChnType, lSubType, lSubNum;
+		var lSubChnObjArray, lSubChnInfo;
+
+		JS_LANInitiate();
+
+		function JS_AddSubLimitRow(SubIndex, TsIndex, Lower, Higher, Mark)
+		{
+			var lHolderNode;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "40px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = JS_StrLeftPading(TsIndex + 1, 2);
+			lHolderNode.readOnly = true;
+			s_SetList.SetColValue(1, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = (Lower / 1000000).toFixed(3);
+			s_SetList.SetColValue(2, lHolderNode);
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "80px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = (Higher / 1000000).toFixed(3);
+			s_SetList.SetColValue(3, lHolderNode);
+
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Mark, true);
+			lHolderNode.style.height = "20px";
+			s_SetList.SetColValue(4, lHolderNode);
+			s_SetList.AddRowToDom(false, SubIndex, false);
+		}
+
+		function OnParseBitrateXML(XMLDom)
+		{
+			var i, lRowNum;
+			var lSubArray, lSubObj, lSubIndex;
+			var lHtmlNode, lTmpValue;
+
+			s_UpdateTimeout = 10;
+
+			if (XMLDom != null)
+			{
+
+				
+				lRowNum = s_SubList.GetRowNumber();
+				lSubArray = JS_BitrateGetSubChannelArray(XMLDom, s_IO, s_Chn);
+				if (lSubArray)
+				{
+					if (lRowNum != lSubArray.length)
+					{
+						s_SubList.RemoveAllRow();
+						for (i = 0; i < lSubArray.length; i++)
+						{
+
+							lHolderNode = document.createElement("input");
+							lHolderNode.type = "text";
+							lHolderNode.style.width = "40px";
+							lHolderNode.style.textAlign = "center";
+							lHolderNode.readOnly = true;
+
+							lSubObj = lSubArray[i];
+							lSubIndex = JS_BitrateGetSubIndex(lSubObj);
+							lSubChnInfo = JS_ParamGetSubChannelInfoASI(lSubChnObjArray[lSubIndex]);
+
+
+							lHolderNode.value = JS_StrLeftPading(lSubChnInfo.m_TsIndex + 1, 3);
+							s_SubList.SetColValue(1, lHolderNode);
+
+
+
+							if (s_bShowColor == true)
+							{
+								lHolderNode = document.createElement("input");
+								lHolderNode.type = "text";
+								lHolderNode.style.width = "120px";
+								lHolderNode.style.textAlign = "center";
+								lHolderNode.value = "0%";
+								lHolderNode.readOnly = true;
+								s_SubList.SetColValue(2, lHolderNode);
+							}
+							else
+							{
+								s_SubList.SetColValue(2, "");
+							}
+							s_SubList.SetColValue(3, "");
+
+
+
+							lHolderNode = document.createElement("input");
+							lHolderNode.type = "text";
+							lHolderNode.style.width = "90px";
+							lHolderNode.style.textAlign = "center";
+							lHolderNode.readOnly = true;
+							s_SubList.SetColValue(4, lHolderNode);
+							s_SubList.AddRowToDom(false, lSubIndex, false);
+						}
+
+					}
+					//else 
+					{
+					    $("chn_bitrate").innerHTML = (JS_BitrateGetTotalBitrate(XMLDom, s_IO, s_Chn) / 1000000).toFixed(3);
+					    
+					    for (i = 0; i < lSubArray.length; i++)
+						{
+
+						    lHtmlNode = s_SubList.GetColNodeByIndex(i, 4);
+						    lSubObj = lSubArray[i];
+						    lSubIndex = JS_BitrateGetSubIndex(lSubObj);
+						    lTmpValue = JS_BitrateGetSubBitrate(lSubObj);
+						    lHtmlNode.value = (lTmpValue / 1000000).toFixed(3);
+
+							if (s_bShowColor == true)
+							{
+								lHtmlNode = s_SubList.GetColNodeByIndex(i, 2);
+								lHtmlNode.value = (lTmpValue / s_MaxBitrateArray[lSubIndex] * 100).toFixed(1);
+								if (lHtmlNode.value < 30)
+								{
+									lHtmlNode.style.backgroundColor = "aqua";
+									lHtmlNode.style.color = "black";
+								}
+								else if (lHtmlNode.value < 50)
+								{
+									lHtmlNode.style.backgroundColor = "lime";
+									lHtmlNode.style.color = "black";
+								}
+								else if (lHtmlNode.value < 70)
+								{
+									lHtmlNode.style.backgroundColor = "yellow";
+									lHtmlNode.style.color = "black";
+								}
+								else if (lHtmlNode.value < 90)
+								{
+									lHtmlNode.style.backgroundColor = "orange";
+									lHtmlNode.style.color = "black";
+								}
+								else
+								{
+									lHtmlNode.style.backgroundColor = "red";
+									lHtmlNode.style.color = "white";
+								}
+								lHtmlNode.value += "%";
+							}
+
+						}
+					}
+				}
+
+
+
+				if ($("refresh_data").disabled == true)
+				{
+					$("refresh_data").disabled = false;
+				}
+
+				setTimeout("OnRequestBitrateData()", 1000);
+			}
+		}
+
+		function OnRequestBitrateData()
+		{
+			var lXMLDom, lBodyNode;
+			s_UpdateTimeout--;
+			if (s_UpdateTimeout < 0)
+			{
+				lXMLDom = JS_XMLCreateDomFromFile(null);
+				lBodyNode = JS_XMLParamSetHead(lXMLDom, "monitor", "bitrate", "");
+				JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnParseBitrateXML, false);
+			}
+			else
+			{
+				//更新页面时间
+				$("time_out_value").innerHTML = JS_StrLeftPading(s_UpdateTimeout, 2);
+				setTimeout("OnRequestBitrateData()", 1000);
+			}
+		}
+
+
+		function OnLoad()
+		{
+			var i, bInput, lTmpVar;
+			var lChnArray, lChnInfo, lSubArray, lSubInfo;
+			var lMonChnArray, lMonSubArray, lLimitInfo;
+
+			lTmpVar = JS_ArgGetArgs();
+			s_IO = JS_ArgGetValueByName(lTmpVar, "direction");
+			s_Chn = parseInt(JS_ArgGetValueByName(lTmpVar, "chn_ind"), 10);
+
+
+			if (s_IO == "in")
+			{
+			    $("chn_name").innerHTML = "&nbsp;&nbsp;&nbsp;" + JS_LANCMN("input") + "&nbsp;&nbsp;" + JS_LANCMN("chan") + " " + JS_StrLeftPading(s_Chn + 1, 2);
+			}
+			else
+			{
+			    $("chn_name").innerHTML = "&nbsp;&nbsp;&nbsp;" + JS_LANCMN("output") + "&nbsp;&nbsp;" + JS_LANCMN("chan") + " " + JS_StrLeftPading(s_Chn + 1, 2);
+			}
+
+            
+			JS_ParamInitate();
+			JS_MONInitiate();
+
+			s_SubList = new MyListControl("s_SubList", 410, 470, "bit_list_target", false);
+			s_SubList.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_SubList.SetColProperty(1, 80, JS_LANCMN("ts_index"), "center", "center");
+			s_SubList.SetColProperty(2, 120, "", "center", "center");
+			s_SubList.SetColProperty(3, 20, "", "center", "center");
+			s_SubList.SetColProperty(4, 100, JS_LAN("bitrate"), "center", "center");
+			s_SubList.UpdateListFrame();
+
+
+			s_SetList = new MyListControl("s_SetList", 390, 470, "setting_list_target", false);
+			s_SetList.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_SetList.SetColProperty(1, 70, JS_LANCMN("ts_index"), "center", "center");
+			s_SetList.SetColProperty(2, 90, JS_LAN("low"), "center", "center");
+			s_SetList.SetColProperty(3, 90, JS_LAN("high"), "center", "center");
+			s_SetList.SetColProperty(4, 40, JS_LAN("mark"), "center", "center");
+			s_SetList.UpdateListFrame();
+
+			
+			if (s_IO == "in")
+			{
+				lChnObj = JS_ParamGetInChannelObject(s_Chn);
+				bInput = true;
+			}
+			else
+			{
+				lChnObj = JS_ParamGetOutCHNObj(s_Chn);
+				bInput = false;
+			}
+			
+			lChnType = JS_ParamGetChannelType(lChnObj);
+			lSubType = JS_ParamGetChannelSubType(lChnObj);
+			lSubNum = JS_ParamGetSubChannelNum(lChnObj);
+			lSubChnObjArray = JS_ParamGetSubChannelArray(lChnObj);
+
+			s_TotalSubChnNum = lSubNum;
+			
+			if (bInput == true)
+			{
+				if (lChnType == "ASI")
+				{
+					s_MaxBitrateArray = new Array();
+					for (i = 0; i < lSubChnObjArray.length; i++)
+					{
+						lSubInfo = JS_ParamGetSubChannelInfoASI(lSubChnObjArray[i]);
+						s_MaxBitrateArray[i] = lSubInfo.m_Bitrate;
+					}
+
+					lChnInfo = JS_ParamGetChannelInfoASI(lChnObj);
+					s_MaxBitrateArray[lSubNum] = lChnInfo.m_Bitrate;
+
+					s_bShowColor = true;
+				}
+
+			}
+			else
+			{
+
+				if (lChnType == "QAM" && (lSubType == "QAM_A" || lSubType == "QAM_B"))
+				{
+					s_MaxBitrateArray = new Array();
+					s_MaxBitrateArray[lSubNum] = 0;
+					for (i = 0; i < lSubNum; i++)
+					{
+
+						lSubInfo = JS_ParamGetSubChannelInfoMODULATOR(lSubChnObjArray[i]);
+						s_MaxBitrateArray[i] = JS_MPEG2CalculateDVBCSS2MaxBitrate(lSubInfo.m_Sym, lSubInfo.m_Mode, null);
+						s_MaxBitrateArray[lSubNum] += s_MaxBitrateArray[i];
+					}
+					s_bShowColor = true;
+	            }
+				
+				if (lChnType == "DTMB")
+				{
+					s_MaxBitrateArray = new Array();
+					s_MaxBitrateArray[lSubNum] = 0;
+					for (i = 0; i < lSubNum; i++)
+					{
+
+						lSubInfo = JS_ParamGetSubChannelInfoMODULATOR(lSubChnObjArray[i]);
+						s_MaxBitrateArray[i] = JS_MPEG2CalculateDTMBMaxBitrate(lSubInfo.m_PNMode, lSubInfo.m_Mode, lSubInfo.m_CodeRate);
+						s_MaxBitrateArray[lSubNum] += s_MaxBitrateArray[i];
+					}
+					s_bShowColor = true;
+	            }
+				
+				if ((lChnType == "ETH" || lChnType == "ETH_DEP") && (lSubType == "TS_OVER_IP"))
+				{
+					s_MaxBitrateArray = new Array();
+					for (i = 0; i < lSubNum; i++)
+					{
+						lSubInfo = JS_ParamGetSubChnETHOut(lSubChnObjArray[i]);
+						s_MaxBitrateArray[i] = lSubInfo.m_Bitrate;
+					}
+
+					lChnInfo = JS_ParamGetChnInfoETH(lChnObj);
+					s_MaxBitrateArray[lSubNum] = lChnInfo.m_Bitrate;
+
+					s_bShowColor = true;
+				}
+				if (lChnType == "ASI")
+				{
+					s_MaxBitrateArray = new Array();
+					for (i = 0; i < lSubNum; i++)
+					{
+						lSubInfo = JS_ParamGetSubChannelInfoASI(lSubChnObjArray[i]);
+						s_MaxBitrateArray[i] = lSubInfo.m_Bitrate;
+					}
+
+					lChnInfo = JS_ParamGetChannelInfoASI(lChnObj);
+					s_MaxBitrateArray[lSubNum] = lChnInfo.m_Bitrate;
+
+					s_bShowColor = true;
+				}
+
+			}
+
+			lChnArray = JS_ParamGetChannelArray(bInput);
+			lMonChnArray = JS_MONGetChnArray(bInput);
+			if (lChnArray && lMonChnArray)
+			{
+				if (lChnArray.length > s_Chn)
+				{
+					lSubArray = JS_ParamGetSubChannelArray(lChnArray[s_Chn]);
+					lMonSubArray = JS_MONGetSubArray(lMonChnArray[s_Chn]);
+					for (i = 0; i < lSubArray.length; i++)
+					{
+						lSubInfo = JS_ParamGetSubChannelInfoASI(lSubArray[i]);
+						if (lSubInfo.m_Active == "ON")
+						{
+							lLimitInfo = JS_MONGetLimitInfo(lMonSubArray[i]);
+
+							JS_AddSubLimitRow(i, lSubInfo.m_TsIndex, lLimitInfo.m_Low, lLimitInfo.m_High, lLimitInfo.m_Mark);
+						}
+					}
+				}
+			}
+
+			s_UpdateTimeout = 0;
+			setTimeout("OnRequestBitrateData()", 500);
+
+			//         	lTmpVar = JS_XMLCreateDomFromFile("/tmp/dynamic_bitrate.xml");
+			//         	OnParseBitrateXML(lTmpVar);
+		}
+
+		function OnSubmit(Item)
+		{
+			if (Item.id == "refresh_data")
+			{
+				/*立即更新码率数据*/
+				s_UpdateTimeout = 1;
+				$("refresh_data").disabled = true;
+			}
+			else if (Item.id == "submit_limit_setting")
+			{
+				/*提交通道码率限制参数*/
+				var i, lRowNum;
+				var lColVar, lRowData, lColVar1;
+				var lXMLDom, lBodyNode, lHolderNode, lInfoNode;
+
+				lXMLDom = JS_XMLCreateDomFromFile(null);
+				lBodyNode = JS_XMLParamSetHead(lXMLDom, "monitor", "bitrate_setting", s_IO);
+
+				lRowNum = s_SetList.GetRowNumber();
+				for (i = 0; i < lRowNum; i++)
+				{
+					lRowData = s_SetList.GetRowData(i);
+					JS_XMLAddTextChild(lXMLDom, lBodyNode, "chn_index", s_Chn);
+
+					lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "sub");
+					JS_XMLAddTextChild(lXMLDom, lHolderNode, "sub_ind", lRowData);
+
+					lInfoNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "limit");
+
+					lColVar = s_SetList.GetColNodeByIndex(i, 2);
+					JS_XMLAddTextChild(lXMLDom, lInfoNode, "low", parseInt(parseFloat(lColVar.value) * 1000000, 10));
+
+					{
+						lColVar1 = s_SetList.GetColNodeByIndex(i, 3);
+						JS_UISetErrorIndicator(lColVar, true, true);
+						JS_UISetErrorIndicator(lColVar1, true, true);
+						if (parseInt(parseFloat(lColVar.value) * 1000000, 10) > parseInt(parseFloat(lColVar1.value) * 1000000, 10))
+						{
+							JS_UISetErrorIndicator(lColVar, false, true);
+							JS_UISetErrorIndicator(lColVar1, false, true);
+							return false;
+						}
+					}
+
+					lColVar = s_SetList.GetColNodeByIndex(i, 3);
+					JS_XMLAddTextChild(lXMLDom, lInfoNode, "high", parseInt(parseFloat(lColVar.value) * 1000000, 10));
+
+					lColVar = s_SetList.GetColNodeByIndex(i, 4);
+					JS_XMLAddTextChild(lXMLDom, lInfoNode, "mark", JS_HTMLGetValue(lColVar));
+
+				}
+				JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+				window.top.document.frames["BottomFrame"].OnShowLoadingWindow(5, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+			}
+		}
+        
+        
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" colspan="3" align="center" background="/graphics/boxmenu_850.gif">
+                 <table border="0" cellspacing="0" cellpadding="0" width="100%" style="padding-left:20px;padding-right:20px;">
+					<tr>
+						<td width="200px" align="right">
+						</td>
+						<td align="center">
+							<span><script type="text/javascript">JS_INLAN("title")</script></span><span id="chn_name" style="font-weight: bold"></span>
+						</td>
+						<td width="200px" align="left">
+						    <span id="chn_bitrate" style="font-weight: bold">0.000</span>&nbsp;<span>Mbps</span>
+						</td>
+						<td width="50px" align="right">
+							<span id="time_out_value">00</span>&nbsp;
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+				<div id="bit_list_target" style="height: 474px; overflow: auto; padding: 5px;">
+				</div>
+			</td>
+			<td bgcolor="#F5F9FE" style="padding-top: 5px; padding-bottom: 5px;">
+				<div style="height: 464px; width: 1px; background: #666">
+				</div>
+			</td>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+				<div id="setting_list_target" style="height: 474px; overflow: auto; padding: 5px;">
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" bgcolor="#F5F9FE" align="center">
+				<div style="height: 1px; width: 800px; overflow: hidden; background: #666;">
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" bgcolor="#F5F9FE">
+				<div style="height: 30px; overflow: auto; padding: 5px 25px 7px 25px; text-align: right">
+					<table width="100%" align="center" cellpadding="0" cellspacing="0">
+						<tr>
+							<td width="50%" align="left">
+								<button type="button" onclick='OnSubmit(this);' style="width: 120px; height: 25px" id="refresh_data">
+
+									<script type="text/javascript">										JS_INCMNLAN("update")</script>
+
+								</button>
+							</td>
+							<td width="50%" align="right">
+								<button type="button" onclick='OnSubmit(this);' style="width: 80px; height: 25px" id="submit_limit_setting">
+
+									<script type="text/javascript">										JS_INCMNLAN("submit")</script>
+
+								</button>
+								&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width: 80px; height: 25px">
+
+									<script type="text/javascript">										JS_INCMNLAN("refresh")</script>
+
+								</button>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" height="13" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

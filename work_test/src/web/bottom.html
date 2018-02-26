@@ -1,0 +1,300 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/components/my_loading_window/my_loading_window.js"></script>
+
+	<script type="text/javascript">
+		var s_LoadingWindow;
+		var s_ActiveMark;
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnStatusHTTPGetFuncCB(XMLDom)
+		{
+			var i, lTmpValue, lAlarmNum, lBusyMark, lScrambleStatus, lCryptoNum, lCryptoDuration, lECMUpdate;
+			var lXMLSCSHolder, lXMLSCSArray, lXMLSCSObj;
+
+			if (XMLDom != null) 
+			{
+				lBusyMark = parseInt(JS_XMLGetTagValue(XMLDom, "busy_mark"), 10);
+				if (lBusyMark == false)
+				{
+					if (s_LoadingWindow.IsVisiable())
+					{
+						s_LoadingWindow.HideWindow(false);
+					}
+				}
+				else
+				{
+					if (!s_LoadingWindow.IsVisiable())
+					{
+						s_LoadingWindow.ShowWindow(0, false, false);
+					}
+				}
+
+				
+
+// 				lTmpValue = parseInt(JS_XMLGetTagValue(XMLDom, "apply_mark"));
+// 				if (lTmpValue == 0)
+// 				{
+// 					$("apply").disabled = true;
+// 				}
+// 				else
+// 				{
+// 					$("apply").disabled = false;
+// 				}
+
+				lTmpValue = parseInt(JS_XMLGetTagValue(XMLDom, "save_mark"), 10);
+				if (lTmpValue == 0)
+				{
+					$("save").disabled = true;
+				}
+				else
+				{
+					$("save").disabled = false;
+				}
+
+
+
+
+
+				lAlarmNum = parseInt(JS_XMLGetTagValue(XMLDom, "alarm"), 10);
+				if (lAlarmNum > 0)
+				{
+					$("status_mark").src = "/graphics/red.gif";
+				}
+				else
+				{
+					$("status_mark").src = "/graphics/green.gif";
+				}
+
+
+				$("input_bitrate").value = JS_BitrateFormatINT(parseFloat(JS_XMLGetTagValue(XMLDom, "input_bitrate")));
+				$("output_bitrate").value = JS_BitrateFormatINT(parseFloat(JS_XMLGetTagValue(XMLDom, "output_bitrate")));
+				$("inserter_bitrate").value = JS_BitrateFormatINT(parseInt(JS_XMLGetTagValue(XMLDom, "inserter_bitrate"), 10));
+
+				lXMLSCSHolder = XMLDom.getElementsByTagName("scs_status")[0];
+
+				lScrambleStatus = parseInt(JS_XMLGetTagValue(lXMLSCSHolder, "scramble_status"), 10);
+				if (lScrambleStatus > 0)
+				{
+					$("scramble_mark").src = "/graphics/green.gif";
+				}
+				else
+				{
+					$("scramble_mark").src = "/graphics/grey.gif";
+				}
+
+				lCryptoNum = parseInt(JS_XMLGetTagValue(lXMLSCSHolder, "crypto_period_number"), 10);
+				lCryptoDuration = parseInt(JS_XMLGetTagValue(lXMLSCSHolder, "crypto_durationd"), 10);
+				$("cp_number").innerHTML = lCryptoNum + " / " + lCryptoDuration;
+
+
+				lECMUpdate = JS_XMLGetTagValue(lXMLSCSHolder, "ecm_update");
+				$("ecm_update").innerHTML = lECMUpdate;
+
+				lXMLSCSArray = lXMLSCSHolder.getElementsByTagName("scs");
+				for (i = 0; i < lXMLSCSArray.length; i++)
+				{
+					lXMLSCSObj = lXMLSCSArray[i];
+					lTmpValue = parseInt(JS_XMLGetTagValue(lXMLSCSObj, "active_mark"), 10);
+					if (lTmpValue == 0)
+					{
+						$("cas_ecm_mark_" + i).src = "/graphics/grey.gif";
+						$("cas_emm_mark_" + i).src = "/graphics/grey.gif";
+						$("cas_emm_bitrate_" + i).innerHTML = (0).toFixed(3);
+					}
+					else
+					{
+						lTmpValue = parseInt(JS_XMLGetTagValue(lXMLSCSObj, "emm_status"), 10);
+						if (lTmpValue > 0)
+						{
+							$("cas_emm_mark_" + i).src = "/graphics/green.gif";
+						}
+						else
+						{
+							$("cas_emm_mark_" + i).src = "/graphics/red.gif";
+						}
+
+						lTmpValue = parseInt(JS_XMLGetTagValue(lXMLSCSObj, "ecm_status"), 10);
+						if (lTmpValue > 0)
+						{
+							$("cas_ecm_mark_" + i).src = "/graphics/green.gif";
+						}
+						else
+						{
+							$("cas_ecm_mark_" + i).src = "/graphics/red.gif";
+						}
+
+						lTmpValue = parseInt(JS_XMLGetTagValue(lXMLSCSObj, "emm_bitrate"), 10);
+						$("cas_emm_bitrate_" + i).innerHTML = (lTmpValue / 1048576).toFixed(3);
+					}
+				}
+				setTimeout(OnStatusTimeout, 2000);
+			}
+			else
+			{
+				setTimeout(OnStatusTimeout, 3000);
+			}
+		}
+		
+		function OnLoadingWindowTimeout()
+		{
+			s_LoadingWindow.OnTimer();
+			setTimeout(OnLoadingWindowTimeout, 1000);
+		}
+
+		function OnStatusTimeout()
+		{
+			var lXMLDom;
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+			JS_XMLParamSetHead(lXMLDom, "status", "status", "");
+			JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnStatusHTTPGetFuncCB, false);
+		}
+
+		function OnWindowResize()
+		{
+			s_LoadingWindow.OnResize();
+		}
+
+		function OnShowLoadingWindow(Count, bShowCount, bAutoHide, Script)
+		{
+			s_LoadingWindow.ShowWindow(Count, bShowCount, bAutoHide, Script);
+		}
+
+		function OnSubmit(Node)
+		{
+			var lXMLDom, lHolderNode;
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+			if (Node.id == "apply")
+			{
+				lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "apply_all", "");
+				JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+				OnShowLoadingWindow(2, true, false, "");
+			}
+			else if (Node.id == "save")
+			{
+				lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "save_all_parameters", "");
+				JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+				OnShowLoadingWindow(2, true, false, "");
+			}
+		}
+
+		function OnLoad()
+		{
+			s_LoadingWindow = new MyLoadingWindow(window.top.document, "loading_window");
+			window.onresize = OnWindowResize;
+			s_LoadingWindow.ShowWindow(0, false, false, null);
+			setTimeout(OnStatusTimeout, 200);
+			setTimeout(OnLoadingWindowTimeout, 1000);
+		}
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="100%" align="center" cellpadding="0" cellspacing="0" background="/graphics/bottombg.gif">
+        <tr>
+            <td width="100%" align="center">
+                <table width="1152px" align="center" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="90px" align="left" height="50px" style="padding-left: 10px">
+                            <img src="/graphics/green.gif" width="25px" height="25px" style="" id="status_mark" >&nbsp<span style="color:#0066cc;" ><script>document.write(JS_LAN("status"))</script></span>
+                        </td>
+                         <td width="2px">
+							<hr size="30px" width= "0px"   color="#FFFFFF" /> 
+                        </td>
+                       <td width="220px" align="left" style="padding-left: 10px; padding-right:10px">
+                            <table cellspacing="2px" cellpadding="0" width="100%">
+                            	<tr>
+                            		<td  style="color:#0066cc"><script>document.write(JS_LAN("scramble"))</script></td>
+                            		<td align="center"><img src="/graphics/grey.gif" id="scramble_mark" /></td>
+                            		<td align="right"><span id="cp_number">65535</span></td>
+                            	</tr>
+                            	<tr>
+                            		<td  style="color:#0066cc"><script>document.write(JS_LAN("ecm_update"))</script></td>
+                            		<td align="right" colspan="2"><span id="ecm_update">0000-00-00 00:00:00</span></td>
+                            	</tr>
+                            </table>
+                        </td>
+                        <td width="5px">
+							<hr size="30px" width= "0px"   color="#FFFFFF" /> 
+                        </td>
+                        <td width="160px" align="left" style="padding-left: 10px; padding-right:10px">
+                            <table cellspacing="2px" cellpadding="0" width="100%">
+                            		<tr>
+                            			<td width="60px"  style="color:#0066cc">CAS 1 :</td>
+                            			<td align="center"><img src="/graphics/grey.gif" id="cas_ecm_mark_0" /></td>
+                            			<td align="center"><img src="/graphics/grey.gif" id="cas_emm_mark_0" /></td>
+                            			<td width="40px" align="right"><span id="cas_emm_bitrate_0" >0.000</span>&nbsp;<span>Mbps</span></td>
+                            		</tr>
+                            		<tr>
+                            			<td  style="color:#0066cc">CAS 2 :</td>
+                            			<td align="center"><img src="/graphics/grey.gif" id="cas_ecm_mark_1" /></td>
+                            			<td align="center"><img src="/graphics/grey.gif" id="cas_emm_mark_1" /></td>
+                            			<td align="right"><span id="cas_emm_bitrate_1" >0.000</span>&nbsp;<span>Mbps</span></td>
+                            		</tr>
+								</table>
+                        </td>
+                        <td width="2px">
+							<hr size="30px" width= "0px" color="#FFFFFF" /> 
+                        </td>
+                        <td width="160px" align="left" style="padding-left: 10px; padding-right:10px">
+                            <table cellspacing="2px" cellpadding="0" width="100%">
+                            	<tr>
+                            		<td width="60px" style="color:#0066cc">CAS 3 :</td>
+                            		<td align="center"><img src="/graphics/grey.gif" id="cas_ecm_mark_2" /></td>
+                            		<td align="center"><img src="/graphics/grey.gif" id="cas_emm_mark_2" /></td>
+                            		<td align="right"><span id="cas_emm_bitrate_2" >0.000</span>&nbsp;<span>Mbps</span></td>
+                            	</tr>
+                            	<tr>
+                            		<td  style="color:#0066cc">CAS 4 :</td>
+                            		<td align="center"><img src="/graphics/grey.gif" id="cas_ecm_mark_3" /></td>
+                            		<td align="center"><img src="/graphics/grey.gif" id="cas_emm_mark_3" /></td>
+                            		<td align="right"><span id="cas_emm_bitrate_3" >0.000</span>&nbsp;<span>Mbps</span></td>
+                            	</tr>
+                            </table>
+                        </td>
+                        <td width="2px">
+							<hr size="30px" width= "0px" color="#FFFFFF" /> 
+                        </td>
+                        <td width="160px" align="left" style="padding-left: 10px; padding-right:10px">
+                            <table  cellspacing="0px" cellpadding="0" width="100%">
+                            	<tr>
+                            		<td width="60px"><span style="color:#0066cc" id="input_text"><script>document.write(JS_LAN("in"))</script></span></td>
+                            		<td align="right"><input id="input_bitrate" style="width:60px; text-align:right;background-color:transparent;border:0px" value="0.000"/>&nbsp;<span>Mbps</span></td>
+                            	</tr>
+                            	<tr>
+                            		<td><span  style="color:#0066cc" id="output_text"><script>document.write(JS_LAN("out"))</script></span></td>
+                            		<td align="right"><input id="output_bitrate" style="width:60px; text-align:right;background-color:transparent;border:0px" value="0.000"/>&nbsp;<span>Mbps</span></td>
+                            	</tr>
+                            	<tr>
+                            		<td><span style="color:#0066cc" id="inserter_text"><script>document.write(JS_LAN("inserter"))</script></span></td>
+                            		<td align="right"><input id="inserter_bitrate" style="width:60px; text-align:right;background-color:transparent;border:0px" value="0.000"/>&nbsp;<span>Mbps</span></td>
+                            	</tr>
+                           </table>
+                        </td>
+                        <td width="2px">
+							<hr size="30px" width= "0px" color="#FFFFFF" /> 
+                        </td>
+                        <td width="80px" align="left" style="padding-left: 10px; padding-right:10px">
+                            <table  cellspacing="2px" cellpadding="0" width="100%">
+                            	<tr>
+                             		<td width="60px"><button id="apply" type="button" style="width:60px" onclick="OnSubmit(this)" disabled ><script>document.write(JS_LANCMN("apply"))</script></button></td> 
+                            	</tr>
+                            	<tr>
+                            		<td width="60px"><button id="save" type="button" style="width:60px" onclick="OnSubmit(this)" disabled ><script>document.write(JS_LANCMN("save"))</script></button></td>
+                            	</tr>
+                           </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

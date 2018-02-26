@@ -1,0 +1,279 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript">
+		var s_CPMinDuration = 5000; /*60秒*/
+		var s_CPMaxDuration = 60000; /*60秒*/
+		JS_LANInitiate(); 
+
+		function OnLoad()
+		{
+			var lItemInfo;
+
+			JS_ParamInitate();
+
+			lItemInfo = JS_ParamGetSCSSystemInfo();
+			$("default_cp").value = lItemInfo.m_DefaultCP;
+			$("network_delay").value = lItemInfo.m_NetDelayCP;
+			$("fixed_cw").value = lItemInfo.m_FixedCW;
+			JS_UISelectSetCurIndexByValue($("fixed_cw_mark"), lItemInfo.m_bUserFixedCWMark);
+
+		    $("super_id").value = lItemInfo.m_Supercasid;
+		    $("bss_sw").value = lItemInfo.m_BSSSW;
+		    $("key").value = lItemInfo.m_Key;
+		    JS_UISelectSetCurIndexByValue($("sw_mark"), lItemInfo.m_bUserBSSSWMark);
+			    
+			if (lItemInfo.m_BSSMark != "ON")
+			{
+			    $("super_id").disabled = true;
+			    $("bss_sw").disabled = true;
+			    $("key").disabled = true;
+			    $("sw_mark").disabled = true;
+		        JS_UISelectSetCurIndexByValue($("sw_mark"), "OFF");
+			}
+
+			JS_RestrctInputInt($("default_cp"));
+			JS_RestrctInputInt($("network_delay"));
+			JS_RestrctInputHEX($("fixed_cw"));
+
+			JS_RestrctInputHEX($("super_id"));
+			JS_RestrctInputHEX($("key"));
+			JS_RestrctInputHEX($("bss_sw"));
+		}
+		
+        function Validation() 
+        {
+
+            var lCASystemID;
+            var lValidValue;
+            JS_UISetErrorIndicator($("super_id"), true, false);
+
+            lValidValue = parseInt(JS_HTMLGetValueByID("super_id"), 16);
+            lCASystemID = parseInt(lValidValue / 65536, 10);
+            if (lCASystemID > 0) 
+            {
+
+            }
+            else 
+            {
+                JS_UISetErrorIndicator($("super_id"), false, true);
+                return false;
+            }
+		}
+
+		function OnSubmit(Item)
+		{
+		    var lHolderNode, lTmpValue;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+			
+			JS_UISetErrorIndicatorByID("default_cp", true, false);
+			JS_UISetErrorIndicatorByID("network_delay", true, false);
+			JS_UISetErrorIndicatorByID("fixed_cw", true, false);
+
+			if (JS_HTMLGetValueByID("default_cp") < s_CPMinDuration || JS_HTMLGetValueByID("default_cp") > s_CPMaxDuration)
+			{
+				JS_UISetErrorIndicatorByID("default_cp", false, true);
+				return;
+}
+			
+			if (parseInt(JS_HTMLGetValueByID("network_delay"), 10) < 0) {
+			    JS_UISetErrorIndicatorByID("network_delay", false, true);
+			    return;
+			}
+			
+			lTmpValue = JS_HTMLGetValueByID("fixed_cw");
+			if (JS_ValidHexData(lTmpValue) == false || lTmpValue.length != 16)
+			{
+				JS_UISetErrorIndicatorByID("fixed_cw", false, true);
+				return;
+			}
+			lTmpValue = JS_HTMLGetValueByID("bss_sw");
+			if (JS_ValidHexData(lTmpValue) == false || lTmpValue.length != 32)
+			{
+				JS_UISetErrorIndicatorByID("bss_sw", false, true);
+				return;
+			}
+			lTmpValue = JS_HTMLGetValueByID("key");			
+			if (JS_ValidHexData(lTmpValue) == false || lTmpValue.length != 32)
+			{
+				JS_UISetErrorIndicatorByID("key", false, true);
+				return;
+            }
+            if (Validation() == false) 
+            {
+                JS_UISetErrorIndicatorByID("super_id", false, true);
+                return;
+			}			
+			
+			
+
+			lHolderNode = JS_XMLParamSetHead(lXMLDom, "scramble", "settings", "");
+			JS_XMLAddTextChild(lXMLDom, lHolderNode, "default_cp", JS_HTMLGetValueByID("default_cp"));
+			JS_XMLAddTextChild(lXMLDom, lHolderNode, "network_delay", parseInt(JS_HTMLGetValueByID("network_delay"), 10));
+			JS_XMLAddTextChild(lXMLDom, lHolderNode, "fixed_cw", JS_HTMLGetValueByID("fixed_cw"));
+			JS_XMLAddTextChild(lXMLDom, lHolderNode, "fixed_cw_mark", JS_HTMLGetValueByID("fixed_cw_mark"));
+
+			JS_XMLAddTextChild(lXMLDom, lHolderNode, "super_id", JS_HTMLGetValueByID("super_id"));
+			JS_XMLAddTextChild(lXMLDom, lHolderNode, "bss_sw", JS_HTMLGetValueByID("bss_sw"));
+			JS_XMLAddTextChild(lXMLDom, lHolderNode, "sw_mark", JS_HTMLGetValueByID("sw_mark"));
+			JS_XMLAddTextChild(lXMLDom, lHolderNode, "key", JS_HTMLGetValueByID("key"));
+			
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+        
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                	<tr>
+                		<td width="150px" align="right"></td>
+                        <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+                		<td width="150px" align="right"></td>
+                	</tr>
+                </table>
+			</td>
+		</tr>
+		<tr>
+			<td bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("default_cp")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 40%">
+											<span><script type="text/javascript">JS_INLAN("cp")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px; text-align: center" id="default_cp" value="0" />&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: right; width: 40%">
+											<span><script type="text/javascript">											          JS_INLAN("network_delay")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px; text-align: center" id="network_delay" value="0" />&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: right; width: 20%">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("fixed_cw")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 90%">
+											<span><script type="text/javascript">JS_INLAN("cw")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 180px" id="fixed_cw" />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;<select id="fixed_cw_mark"><option value="OFF">OFF</option>
+												<option value="ON">ON</option>
+											</select>
+										</td>
+										<td style="text-align: right; width: 20%">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="15px" valign="top" align="left"  style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>						
+						<tr>
+			                <td height="30px" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+                                <span><script type="text/javascript">JS_INLAN("ca_sys")</script></span>
+			                </td>
+		                </tr>
+		                <tr>
+							<td height="10px" valign="top" align="left"  style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+		                <tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 40%">
+											<span><script type="text/javascript">JS_INLAN("supercas_id")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px; text-align: center" id="super_id" value="0" />&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 50%">
+											<span><script type="text/javascript">JS_INLAN("sw")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 230px" id="bss_sw" />&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;<select id="sw_mark"><option value="OFF">OFF</option>
+												<option value="ON">ON</option>
+											</select>
+										</td>
+										<td style="text-align: right; width: 20%">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="10px" valign="top" align="left"  style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>		
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 90%">
+											<span><script type="text/javascript">JS_INLAN("key")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 230px" id="key" />
+										</td>
+										<td style="text-align: right; width: 20%">
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="3" height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+			<td valign="top" align="left" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

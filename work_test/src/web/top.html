@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/device_information.js"></script>
+    <script type="text/javascript" src="/js/device_setting.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript">
+		JS_LANInitiate(); //初始化语言脚本组件
+		JS_InfoInitiate();
+		JS_DevSettingInitiate();
+		var anchors = null;
+		anchors = document.anchors;
+		
+		function OnHTTPGetFuncCB(XMLDom)
+		{
+			var lTmpVar;
+			if (XMLDom) 
+			{
+				lTmpVar = (JS_XMLGetTagValue(XMLDom, "time_date"));
+				$("time_date").innerHTML = lTmpVar;
+				setTimeout(OnTimeTimeout, 5000);
+			}
+			else
+			{
+//				setTimeout(OnTimeTimeout, 5000);
+			}
+		}
+
+		function OnTimeTimeout()
+		{
+			var lXMLDom, lHolderNode, lSCSIDs, lServIDs, lACIDs;
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "status", "time", "");
+			JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnHTTPGetFuncCB, false);
+		}
+
+		function OnUpdateTimeout()
+		{
+			window.top.document.location.reload();
+		}
+
+		function OnSelect(Item)
+		{
+			var lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			//发送命令回到服务器，然后试图刷新整个窗口。
+
+			lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "language", "");
+			JS_XMLAddTextChild(lXMLDom, lHolderNode, "language", JS_HTMLGetValue(Item));
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+
+			setTimeout(OnUpdateTimeout, 500);
+
+		}
+		
+		
+		function OnLoad()
+		{
+			JS_UISelectSetCurIndexByValue($("language_selection"), JS_LANGetLanguageIndex(), true);
+			setTimeout(OnTimeTimeout, 100);
+			loadon_show();
+			if ((JS_InfoGetSN().substr(0,7) == "TC41A07") || (JS_InfoGetSN().substr(0,7) == "TC41A08")) { /* GN1846、GN1866 没有加扰功能 */
+			    $("scramble_setting").style.display = "none";
+			}
+			if (((JS_InfoGetSN().substr(0,7) == "TC41A07") || (JS_InfoGetSN().substr(0,7) == "TC41A08"))) {
+			    $("mux_setting").style.display = "none";
+			}
+		}
+
+		function loadon_show()
+		{
+			var nowSrc;
+	
+			nowSrc = top.document.getElementById( "MainFrame" ).src;
+			//var tmpArray = nowSrc.split( "?" )[0].split( "/" );
+			//var tmpSrc = tmpArray[ tmpArray.length - 1 ];
+			for( var i = 0; i < anchors.length; i++ )
+			{
+				if( anchors[ i ].href.toString() == nowSrc )
+				{
+					click_show( anchors[ i ] );	
+					break;
+				}
+			}
+		}
+		
+		function click_show( obj )
+		{
+
+			for( var i = 0; i < anchors.length; i++ )
+			{
+				anchors[ i ].blur();
+				anchors[ i ].style.color = 'blue';
+				
+			}
+			obj.focus();
+			obj.style.color = "#ff0000";
+		}
+		
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td width="100%" align="center" background="/graphics/topbg.gif">
+                <table width="900" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="179px" align="right" >
+                            <img src="/graphics/logo.jpg" width="129px" height="42px" />
+                        </td>
+                        <td width="600px" align="center" valign="middle" class="font18pt_cn">
+                            <h1><script>document.write(JS_InfoGetDeviceName(JS_LANGetLanguageString()))</script></h1>
+                        </td>
+                        <td width="120px" align="left" valign="bottom">
+                            <div style="padding-top:5px; padding-bottom:1px; text-align:right">
+                                <span id="time_date">2012-04-28 12:30:30</span>
+                            </div>
+                            <div style="text-align:right">
+                                <select id="language_selection" size="1" onchange="OnSelect(this)" >
+                                    <option value="0" >英文 English</option>
+                                    <option value="1">简体中文 Simple Chinese</option>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td height="28" colspan="0" background="/graphics/menu_bg2.gif">
+                <table width="880" border="0" align="center" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td align="center" valign="middle">
+                            <a href="information_config.html" target="MainFrame" class="nline" id='information_config' onclick='click_show( this )'>
+
+                                <script>document.write(JS_LAN("Inforamtion"))</script>
+
+                            </a>
+                        </td>
+                        <td align="center" valign="middle">
+                            <a href="monitor_config.html" target="MainFrame" class="nline" id='monitor_config' onclick='click_show( this )'>
+
+                                <script>document.write(JS_LAN("monitor"))</script>
+
+                            </a>
+                        </td>
+                        <td align="center" valign="middle">
+                            <a href="io_config.html" target="MainFrame" class="nline" id='io_config'  onclick='click_show( this )' >
+
+                                <script>document.write(JS_LAN("io_config"))</script>
+
+                            </a>
+                        </td>
+                        <td align="center" valign="middle" id="mux_setting">
+                            <a href="mux_config.html" target="MainFrame" class="nline" id='mux_config'  onclick='click_show( this )'>
+
+                                <script>document.write(JS_LAN("mux_setting"))</script>
+
+                            </a>
+                        </td>
+                        <td align="center" valign="middle" id="scramble_setting">
+                            <a href="scramble_config.html" target="MainFrame" class="nline" id='scramble_config' onclick='click_show( this )' >
+
+                                <script>document.write(JS_LAN("scramble_setting"))</script>
+
+                            </a>
+                        </td>
+                        <td align="center" valign="middle">
+                            <a href="system_config.html" target="MainFrame" class="nline" id='system_config' onclick='click_show( this )' >
+
+                                <script>document.write(JS_LAN("system_config"))</script>
+
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

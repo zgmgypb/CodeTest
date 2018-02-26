@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/js/monitor_setting.js"></script>
+    <script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+    <script type="text/javascript">
+    	var s_AlarmList;
+    	var s_DetailList;
+    	var s_SettingList;
+    	var s_UpdateTimeout;
+    	var s_DetailLogID;
+    	JS_LANInitiate(); 
+
+    	function OnAddAlarmRow(IDs)
+    	{
+    		var lHolderNode;
+    		var lTmpValue;
+
+    		lHolderNode = document.createElement("input");
+    		lHolderNode.type = "text";
+    		lHolderNode.style.width = "130px";
+    		lHolderNode.style.textAlign = "center";
+    		lHolderNode.value = JS_LANGetAlarmByID(parseInt(IDs, 16), false, 0);
+    		lHolderNode.defaultValue = lHolderNode.value;
+    		lHolderNode.readOnly = true;
+    		s_AlarmList.SetColValue(1, lHolderNode);
+
+    		lHolderNode = document.createElement("img");
+    		lHolderNode.name = "green";
+    		lHolderNode.src = "/graphics/green.gif"
+    		s_AlarmList.SetColValue(2, lHolderNode);
+
+    		lHolderNode = document.createElement("input");
+    		lHolderNode.type = "text";
+    		lHolderNode.style.width = "30px";
+    		lHolderNode.style.textAlign = "center";
+    		lHolderNode.value = 0;
+    		lHolderNode.defaultValue = lHolderNode.value;
+    		lHolderNode.readOnly = true;
+    		s_AlarmList.SetColValue(3, lHolderNode);
+
+    		lHolderNode = document.createElement("input");
+    		lHolderNode.type = "button";
+    		lHolderNode.style.width = "43px";
+    		lHolderNode.style.textAlign = "center";
+    		lHolderNode.name = IDs;
+    		lHolderNode.onclick = function()
+    		{
+    			OnSubmitReset(lHolderNode);
+    		}
+    		lHolderNode.value = JS_LAN("reset");
+    		s_AlarmList.SetColValue(4, lHolderNode);
+
+    		lHolderNode = document.createElement("input");
+    		lHolderNode.type = "button";
+    		lHolderNode.style.width = "40px";
+    		lHolderNode.style.textAlign = "center";
+    		lHolderNode.name = IDs;
+    		lHolderNode.onclick = function()
+    		{
+    			OnSubmitDetail(lHolderNode);
+    		}
+    		lHolderNode.value = JS_LAN("detail");
+    		s_AlarmList.SetColValue(5, lHolderNode);
+    		
+    		s_AlarmList.AddRowToDom(false, IDs, false);
+
+    	}
+
+    	function OnAddDetailRow(Detail, Date)
+    	{
+    		var lHolderNode;
+
+    		lHolderNode = document.createElement("input");
+    		lHolderNode.type = "text";
+    		lHolderNode.style.width = "140px";
+    		lHolderNode.style.textAlign = "center";
+    		lHolderNode.value = Date;
+    		lHolderNode.defaultValue = lHolderNode.value;
+    		lHolderNode.readOnly = true;
+    		s_DetailList.SetColValue(1, lHolderNode);
+    		
+    		lHolderNode = document.createElement("input");
+    		lHolderNode.type = "text";
+    		lHolderNode.style.width = "480px";
+    		lHolderNode.style.textAlign = "center";
+    		lHolderNode.value = Detail;
+    		lHolderNode.defaultValue = lHolderNode.value;
+    		lHolderNode.readOnly = true;
+    		s_DetailList.SetColValue(2, lHolderNode);
+
+    		s_DetailList.AddRowToDom(false, 0, false);
+    	}
+    	
+    	function OnAddSettingRow(IDs, bTrap, bPanel, LogLevel)
+    	{
+    		var lHolderNode;
+    		var lTmpValue;
+
+    		lHolderNode = document.createElement("input");
+    		lHolderNode.type = "text";
+    		lHolderNode.style.width = "130px";
+    		lHolderNode.style.textAlign = "center";
+    		lHolderNode.value = JS_LANGetAlarmByID(parseInt(IDs, 16), false, 0);
+    		lHolderNode.defaultValue = lHolderNode.value;
+    		lHolderNode.readOnly = true;
+    		s_SettingList.SetColValue(1, lHolderNode);
+
+    		lHolderNode = document.createElement("input");
+    		lHolderNode.type = "checkbox";
+    		lHolderNode.style.width = "25px";
+    		lHolderNode.style.textAlign = "center";
+    		if (bTrap == "ON")
+    		{
+    			lHolderNode.checked = true;
+    			lHolderNode.defaultChecked = true;
+    		}
+    		else
+    		{
+    			lHolderNode.checked = false;
+    			lHolderNode.defaultChecked = false;
+    		}
+    		s_SettingList.SetColValue(2, lHolderNode);
+
+    		lHolderNode = document.createElement("input");
+    		lHolderNode.type = "checkbox";
+    		lHolderNode.style.width = "25px";
+    		lHolderNode.style.textAlign = "center";
+    		if (bPanel == "ON")
+    		{
+    			lHolderNode.checked = true;
+    			lHolderNode.defaultChecked = true;
+    		}
+    		else
+    		{
+    			lHolderNode.checked = false;
+    			lHolderNode.defaultChecked = false;
+    		}
+    		s_SettingList.SetColValue(3, lHolderNode);
+
+
+    		lHolderNode = JS_UISelectCreate();
+    		JS_UISelectAddOption(lHolderNode, 0, JS_LAN("disable"));
+    		JS_UISelectAddOption(lHolderNode, 1, JS_LAN("info"));
+    		JS_UISelectAddOption(lHolderNode, 2, JS_LAN("warnning"));
+    		JS_UISelectAddOption(lHolderNode, 3, JS_LAN("critical"));
+    		JS_UISelectSetCurIndexByValue(lHolderNode, LogLevel, true);
+    		lHolderNode.style.height = "20px";
+    		s_SettingList.SetColValue(4, lHolderNode);
+
+    		s_SettingList.AddRowToDom(false, IDs, false);
+
+    	}
+    	
+     	function OnAjaxAlarmCB(XMLDom)
+    	{
+    		var i;
+    		var lTmpValue, lRowNum;
+    		var lLogArray, lLogObj, lColVar;
+    		var lSCSArray, lSCSObj, lCASActive;
+    		s_UpdateTimeout = 15;
+
+    		if (XMLDom != null) 
+    		{
+
+    			lRowNum = s_AlarmList.GetRowNumber();
+    			lLogArray = XMLDom.getElementsByTagName("log");
+    			if (lRowNum == lLogArray.length)
+    			{
+    				for (i = 0; i < lRowNum; i++)
+    				{
+    					lLogObj = lLogArray[i];
+    					lColVar = s_AlarmList.GetColNodeByIndex(i, 3);
+    					lTmpValue = parseInt(JS_XMLGetTagValue(lLogObj, "count"), 10);
+    					lColVar.value = lTmpValue;
+
+    					lColVar = s_AlarmList.GetColNodeByIndex(i, 2);
+    					if ((lTmpValue > 0) && (lColVar.name == "green"))
+    					{
+    						lColVar.src = "/graphics/red.gif"
+    						lColVar.name = "red";
+    					}
+    					else if ((lTmpValue == 0) && (lColVar.name == "red"))/* if (lColVar.src == "/graphics/red.gif")*/
+    					{
+    						lColVar.src = "/graphics/green.gif"
+    						lColVar.name = "green";
+    					}
+    				}
+    			}
+
+
+    			if ($("refresh_data").disabled == true)
+    			{
+    				$("refresh_data").disabled = false;
+    			}
+
+    			setTimeout("OnRequestAlarmData()", 1000);
+    		}
+    	}
+
+    	function OnAjaxDetailCB(XMLDom)
+    	{
+    		var i, lTmpStr;
+    		var lDID, lDArray, lDObj;
+    		var lUsrData, lLogDate;
+
+    		if (XMLDom != null)
+    		{
+    			lDArray = XMLDom.getElementsByTagName("detail");
+    			if (lDArray) 
+    			{
+    				for (i = 0; i < lDArray.length; i++)
+    				{
+    					lDObj = lDArray[i];
+    					lUsrData = parseInt(JS_XMLGetTagValue(lDObj, "usr_data"), 10);
+    					lLogDate = JS_XMLGetTagValue(lDObj, "time_date");
+    					lTmpStr = JS_LANGetAlarmByID(s_DetailLogID, true, lUsrData);
+    					OnAddDetailRow(lTmpStr, lLogDate);
+    				}
+    			}
+    		}
+    	}
+
+    	function OnRequestAlarmData()
+        {
+            var lXMLDom, lBodyNode;
+            s_UpdateTimeout--;
+            if (s_UpdateTimeout < 0)
+            {
+                lXMLDom = JS_XMLCreateDomFromFile(null);
+                lBodyNode = JS_XMLParamSetHead(lXMLDom, "monitor", "alarms", "");
+                JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxAlarmCB, false);
+            }
+            else 
+            {
+                //更新页面时间
+                $("time_out_value").innerHTML = JS_StrLeftPading(s_UpdateTimeout, 2);
+                setTimeout("OnRequestAlarmData()", 1000);
+            }
+        }
+
+        function OnUpdateData(Item)
+        {
+        	s_UpdateTimeout = 1;
+        	$("refresh_data").disabled = true;
+        }
+
+        function OnSubmitReset(Item)
+        {
+        	if (Item.id == "reset_all_counter")
+        	{
+        		var lXMLDom, lBodyNode, lHolderNode, lInfoNode;
+        		lXMLDom = JS_XMLCreateDomFromFile(null);
+        		lBodyNode = JS_XMLParamSetHead(lXMLDom, "monitor", "reset_counter", "all");
+        		JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+        	}
+        	else
+        	{
+        		var lXMLDom, lBodyNode, lHolderNode, lInfoNode;
+        		lXMLDom = JS_XMLCreateDomFromFile(null);
+        		lBodyNode = JS_XMLParamSetHead(lXMLDom, "monitor", "reset_counter", Item.name);
+        		JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+        	}
+        }
+        
+        function OnSubmitDetail(Item)
+        {
+        	var lXMLDom, lBodyNode, lHolderNode, lInfoNode;
+
+        	s_DetailLogID = Item.name;
+        	s_DetailList.RemoveAllRow();
+    		lXMLDom = JS_XMLCreateDomFromFile(null);
+    		lBodyNode = JS_XMLParamSetHead(lXMLDom, "monitor", "alarms_detail", s_DetailLogID);
+    		JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnAjaxDetailCB, false);
+    	}
+    	
+    	function OnSubmitSetting(Item)
+    	{
+    		var i, lTmpValue, lHoldVar;
+    		var lIDs, lRowNum, lCriticalTemp, lFanTemp;
+    		var lXMLDom, lBodyNode, lHolderNode, lInfoNode;
+
+    		lXMLDom = JS_XMLCreateDomFromFile(null);
+    		lBodyNode = JS_XMLParamSetHead(lXMLDom, "monitor", "alarm_settings", "");
+
+    		lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "log_system");
+
+    		lRowNum = s_SettingList.GetRowNumber();
+    		for (i = 0; i < lRowNum; i++)
+    		{
+    			lIDs = s_SettingList.GetRowData(i);
+
+    			lInfoNode = JS_XMLAddNormalChild(lXMLDom, lHolderNode, "log");
+    			JS_XMLAddTextChild(lXMLDom, lInfoNode, "log_id", lIDs);
+
+    			lHoldVar = s_SettingList.GetColNodeByIndex(i, 2);
+    			JS_XMLAddTextChild(lXMLDom, lInfoNode, "trap", JS_HTMLGetValue(lHoldVar));
+
+    			lHoldVar = s_SettingList.GetColNodeByIndex(i, 3);
+    			JS_XMLAddTextChild(lXMLDom, lInfoNode, "panel", JS_HTMLGetValue(lHoldVar));
+
+    			lHoldVar = s_SettingList.GetColNodeByIndex(i, 4);
+    			JS_XMLAddTextChild(lXMLDom, lInfoNode, "level", JS_HTMLGetValue(lHoldVar));
+    		}
+
+    		JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+    		window.top.document.frames["BottomFrame"].OnShowLoadingWindow(2, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+    	}
+    	function OnLoad()
+    	{
+    		var i, lTmpVar;
+    		var lLogArray, lLogObj, lLogInfo;
+
+    		lTmpVar = JS_ArgGetArgs();
+
+        	JS_MONInitiate();
+
+    		lLogInfo = JS_MONGetSystemInfo();
+
+    		s_AlarmList = new MyListControl("s_AlarmList", 420, 290, "alarm_list", false);
+    		s_AlarmList.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+    		s_AlarmList.SetColProperty(1, 140, JS_LAN("description"), "center", "center");
+    		s_AlarmList.SetColProperty(2, 45, JS_LAN("status"), "center", "center");
+    		s_AlarmList.SetColProperty(3, 45, JS_LAN("counter"), "center", "center");
+    		s_AlarmList.SetColProperty(4, 45, JS_LAN("reset_title"), "center", "center");
+    		s_AlarmList.SetColProperty(5, 45, JS_LAN("detail_title"), "center", "center");
+    		s_AlarmList.UpdateListFrame();
+
+    		lLogArray = JS_MONGetLogSystemArray();
+    		for (i = 0; i < lLogArray.length; i++)
+    		{
+    			lLogObj = lLogArray[i];
+    			lLogInfo = JS_MONGetLogInfo(lLogObj);
+    			OnAddAlarmRow(lLogInfo.m_IDs);
+    		}
+
+    		s_SettingList = new MyListControl("s_SettingList", 380, 290, "setting_list", false);
+    		s_SettingList.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+    		s_SettingList.SetColProperty(1, 140, JS_LAN("description"), "center", "center");
+    		s_SettingList.SetColProperty(2, 30, JS_LAN("trap"), "center", "center");
+    		s_SettingList.SetColProperty(3, 30, JS_LAN("panel"), "center", "center");
+    		s_SettingList.SetColProperty(4, 80, JS_LAN("log_level"), "center", "center");
+    		s_SettingList.UpdateListFrame();
+
+    		lLogArray = JS_MONGetLogSystemArray();
+    		for (i = 0; i < lLogArray.length; i++)
+    		{
+    			lLogObj = lLogArray[i];
+    			lLogInfo = JS_MONGetLogInfo(lLogObj);
+    			OnAddSettingRow(lLogInfo.m_IDs, lLogInfo.m_Trap, lLogInfo.m_Panel, lLogInfo.m_Level);
+    		}
+
+    		s_DetailList = new MyListControl("s_DetailList", 800, 136, "detail_list", false);
+    		s_DetailList.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+    		s_DetailList.SetColProperty(1, 160, JS_LAN("log_date"), "center", "center");
+    		s_DetailList.SetColProperty(2, 500, JS_LAN("detail_info"), "center", "center");
+    		s_DetailList.UpdateListFrame();
+
+
+    		s_UpdateTimeout = 0;
+    		setTimeout("OnRequestAlarmData()", 500);
+    	}
+
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="30px" colspan="3" align="center" background="/graphics/boxmenu_850.gif">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%" style="padding-left:20px;padding-right:20px;">
+                	<tr>
+                		<td width="150px" align="right"></td>
+                		<td><span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span></td>
+                		<td width="150px" align="right"><span id="time_out_value">00</span>&nbsp;</td>
+                	</tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="alarm_list" style="height: 305px; overflow: auto; padding: 5px;">
+                </div>
+            </td>
+            <td bgcolor="#F5F9FE" style="padding-top:5px; padding-bottom:5px;">
+				<div style="height:300px; width: 1px; background:#666"></div>
+            </td>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="setting_list" style="height: 305px; overflow: auto; padding: 5px;">
+                </div>
+           </td>
+        </tr>
+        <tr>
+            <td colspan="3" bgcolor="#F5F9FE" align="center" style="padding:3px 0px 5px 0px;">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666;"></div>
+           </td>
+        </tr>
+        <tr>
+            <td colspan="3" align="center" bgcolor="#F5F9FE">
+                <div id="detail_list" style="height: 150px; overflow: auto; padding: 5px;">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" bgcolor="#F5F9FE" align="center" >
+				<div style="height:1px; width:800px;overflow:hidden; background:#666;"></div>
+           </td>
+        </tr>
+		<tr>
+			<td colspan="3" bgcolor="#F5F9FE">
+				<div style="height: 30px; overflow: auto; padding: 5px 25px 7px 25px; text-align: right">
+				    <table width="100%" align="center" cellpadding="0" cellspacing="0">
+						<tr>
+							<td width="50%" align="left">
+								<button type="button" onclick='OnUpdateData(this);' style="width: 100px; height: 25px" id="refresh_data"><script type="text/javascript">JS_INCMNLAN("update_data")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='OnSubmitReset(this);' style="width: 120px; height: 25px" id="reset_all_counter"><script type="text/javascript">JS_INLAN("reset_all")</script></button>&nbsp;&nbsp;
+							</td>
+							<td width="50%" align="right">
+								<button type="button" onclick='OnSubmitSetting(this);' style="width:80px; height:25px"id="submit_pidmap" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+								<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+							</td>
+						</tr>
+					</table>
+
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="3" height="13"  background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

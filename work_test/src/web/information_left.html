@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <link rel="StyleSheet" href="/components/my_tree_control/my_tree_control.css" type="text/css">
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+    <script type="text/javascript" src="/components/my_tree_control/my_tree_control.js"></script>
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/js/device_information.js"></script>
+    <script type="text/javascript" src="card/card_language.js"></script>
+    <script type="text/javascript" src="card/card_system.js"></script>
+    <script type="text/javascript">
+        JS_LANInitiate();//初始化语言脚本组件
+        JS_InfoInitiate();
+        JS_CardInfoInitiate();
+        JS_CLANInitiate();
+        function OnLoad() 
+        {
+            var lTmpStr;
+            var lRootHolder, lMainHolder, lModuleHolder;
+            
+            s_TreeItem = new MyTreeControl("s_TreeItem");
+            
+            lTmpStr = JS_LAN("info_item");
+            lRootHolder = s_TreeItem.AddNewNode(0, lTmpStr);
+
+            lTmpStr = JS_LANCMN("main_module");
+            lMainHolder = s_TreeItem.AddNewNode(lRootHolder, lTmpStr);
+
+            lTmpStr = JS_LAN("device_model") + JS_InfoGetModelName();
+            s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+
+            lTmpStr = JS_LAN("serial_number") + JS_InfoGetSN();
+            s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+
+            lTmpStr = JS_LAN("soft_version") + JS_InfoGetSoftwareVersion();
+            s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+
+            lTmpStr = JS_LAN("hard_version") + JS_InfoGetHardwareVersion();
+            s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+
+            lTmpStr = JS_LAN("kernel_release") + JS_InfoGetKernelRelease();
+            s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+
+            lTmpStr = JS_LAN("soft_release") + JS_InfoGetSoftRelease();
+            s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+
+            lTmpStr = JS_LAN("fpga_release") + JS_InfoGetFPGARelease();
+            s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+
+            lTmpStr = JS_LAN("manufacturer") + JS_InfoGetManufacture();
+            s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+
+            lTmpStr = JS_LAN("official_website") + "<a href='http://" + JS_InfoGetOffcialWebsite() + "' target='_top '>" + JS_InfoGetOffcialWebsite() + "</a>";
+            s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+
+            if (JS_InfoHaveManual()) 
+            {
+                lTmpStr = JS_LAN("user_manual") + "<a href='/tmp/manual.pdf' target='_top'>" + JS_LAN("user_manual") + "</a>";
+                s_TreeItem.AddNewNode(lMainHolder, lTmpStr);
+            }
+            
+            if (JS_InfoGePlatformType() == "encoder_card_platform")
+            {
+                var k;
+                var lMArray, lMObj, lModuleInfo;
+                var lModuleNode;
+                lTmpStr = JS_LANCMN("sub_modules");
+                lModuleHolder = s_TreeItem.AddNewNode(lRootHolder, lTmpStr);
+                
+                lMArray = JS_CardInfoGetModuleArray();
+                if (JS_ISValidObject(lMArray))
+                {
+                    for (i = 0; i < lMArray.length; i++)
+                    {
+                        lMObj = lMArray[i];
+                        lState = JS_CardInfoGetModuleState(lMObj);
+                        if (lState == "normal")
+                        {
+                            lModuleInfo = JS_CardInfoGetModuleInfo(lMObj);
+
+                            if (JS_ISValidObject(lModuleInfo))
+                            {
+                                lTmpStr = JS_LANCMN("module") + " " + JS_StrLeftPading(i + 1, 2) + " - " + JS_CLANGetModuleNameByTag(lModuleInfo.m_ModuleTag);
+                                lModuleNode = s_TreeItem.AddNewNode(lModuleHolder, lTmpStr);
+
+                                lTmpStr = JS_LAN("serial_number") + lModuleInfo.m_SN;
+                                s_TreeItem.AddNewNode(lModuleNode, lTmpStr);
+
+                                lTmpStr = JS_LAN("firmware_v") + lModuleInfo.m_FirmwareV;
+                                s_TreeItem.AddNewNode(lModuleNode, lTmpStr);
+
+                                if (JS_ISValidObject(lModuleInfo.m_FPGAArray))
+                                {
+                                    if (lModuleInfo.m_FPGAArray.length == 1)
+                                    {
+                                        lTmpStr = JS_LAN("fpga_r") + JS_LAN("date") + JS_XMLGetValue(lModuleInfo.m_FPGAArray[0]);
+                                        s_TreeItem.AddNewNode(lModuleNode, lTmpStr);
+                                    }
+                                    else
+                                    {
+                                        for (k = 0; k < lModuleInfo.m_FPGAArray.length; k++)
+                                        {
+                                            lTmpStr = JS_LAN("fpga_r") + "-" + JS_StrLeftPading(i + 1, 2) + JS_LAN("date") + +JS_XMLGetValue(lModuleInfo.m_FPGAArray[k]);
+                                            s_TreeItem.AddNewNode(lModuleNode, lTmpStr);
+                                        }
+                                    }
+                                }
+                                
+                                
+                            }
+                            
+                        }
+                        else
+                        {
+                            lTmpStr = JS_LANCMN("module") + " " + JS_StrLeftPading(i + 1, 2) + " - " + JS_LANCMN("no_module")
+                            lModuleNode = s_TreeItem.AddNewNode(lModuleHolder, lTmpStr);
+                        }
+                    }
+                }
+            }
+            
+
+            document.getElementById("item_tree").innerHTML = s_TreeItem.toString();
+            s_TreeItem.ToggleCollapse(lRootHolder, 2, 2);
+        }
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="310px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="30px" background="/graphics/boxmenu_310.gif" align="center">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="left" bgcolor="#F5F9FE">
+                <div id="item_tree" style="height: 507px;width:290px; overflow: auto; padding: 10px;">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" align="center" valign="top" background="/graphics/boxbottom_310.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

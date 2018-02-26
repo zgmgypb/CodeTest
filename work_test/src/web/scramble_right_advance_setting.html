@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+	    <script type="text/javascript" src="/components/my_loading_window/my_loading_window.js"></script>
+
+
+	<script type="text/javascript">
+		var s_BitrateListItem = null;
+		var s_TsIndex;
+
+		JS_LANInitiate(); 
+		function OnLoad()
+		{
+			var lTmpVar, i, lItemNum;
+			var lESScrambleObj, lESScrambleInfoObj, lItemInfo;
+
+			lTmpVar = JS_ArgGetArgs();
+		
+			JS_ParamInitate();
+
+			s_BitrateListItem = new MyListControl("s_BitrateListItem", 820, 472, "list_target", false);
+			s_BitrateListItem.SetColProperty(0, 40, JS_LANCMN("index"), "center", "center");
+			s_BitrateListItem.SetColProperty(1, 140, JS_LAN("es_type"), "center", "center");
+			s_BitrateListItem.SetColProperty(2, 140, JS_LAN("es_type_value"), "center", "center");
+			s_BitrateListItem.SetColProperty(3, 350, "", "center", "center");
+			s_BitrateListItem.SetColProperty(4, 60, JS_LAN("scramble"), "center", "center");
+			s_BitrateListItem.UpdateListFrame();
+
+			lESScrambleObj = JS_ParamGetESScrambleObj();
+			lItemNum = JS_ParamGetESScrambleNum(lESScrambleObj);
+			lESScrambleInfoObj = JS_ParamGetESScrambleInfoObj(lESScrambleObj)
+			for (i = 0; i < lItemNum; i++)
+			{
+			    lESScrambleInfoObj = JS_ParamGetESScrambleInfoObj(lESScrambleObj, i)
+			    lItemInfo = JS_ParamGetESScrambleInfo(lESScrambleInfoObj)
+			    OnAddESRow(i, lItemInfo.m_ESTypeValue, lItemInfo.m_Scramble);
+			}
+			
+		}
+
+
+		function OnAddESRow(Index, ESTypeValue, Scramble)
+		{
+		    var lHolderNode;
+			var i;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "100px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.readOnly = true;
+			lHolderNode.id = "estype_" + Index;
+
+			lHolderNode.value = JS_LANGetMpeg2EsTypeString(ESTypeValue);
+			lHolderNode.defaultValue = lHolderNode.value;
+			s_BitrateListItem.SetColValue(1, lHolderNode);
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "100";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.readOnly = true;
+			lHolderNode.value = ESTypeValue;
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "estypevalue_" + Index;
+
+			s_BitrateListItem.SetColValue(2, lHolderNode);
+
+			
+
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, "OFF", "OFF");
+			JS_UISelectAddOption(lHolderNode, "ON", "ON");
+			JS_UISelectSetCurIndexByValue(lHolderNode, Scramble, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "scramble_" + Index;
+
+			s_BitrateListItem.SetColValue(4, lHolderNode);
+			s_BitrateListItem.AddRowToDom(false);
+		}
+
+		function OnSubmit(Item)
+		{
+			var i, k, lRowNum;
+			var lXMLDom, lBodyNode, lHolderNode;
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "scramble", "advance_setting", "");
+
+			lRowNum = s_BitrateListItem.GetRowNumber();
+			for (i = 0; i < lRowNum; i++) 
+			{
+			    lHolderNode = JS_XMLAddNormalChild(lXMLDom, lBodyNode, "es_setting");
+			    JS_XMLAddTextChild(lXMLDom, lHolderNode, "es_type_value", JS_HTMLGetValueByID("estypevalue_" + i));
+			    JS_XMLAddTextChild(lXMLDom, lHolderNode, "scramble", JS_HTMLGetValueByID("scramble_" + i));
+
+			}
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(5, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+
+		
+
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" height="560px"border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                	<tr>
+                		<td width="150px" align="right"></td>
+                        <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+                		<td width="150px" align="right"></td>
+                	</tr>
+                </table>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="center" bgcolor="#F5F9FE">
+				<div id="list_target" style="height: 484px; width: 820px; overflow: auto; padding: 1px 10px 0px 10px; border: solid 0px #FF0000;">
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+			<td valign="top" align="left" bgcolor="#F5F9FE">                 
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

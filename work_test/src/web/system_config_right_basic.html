@@ -1,0 +1,517 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/device_setting.js"></script>
+	<script type="text/javascript" src="/js/device_information.js"></script>
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+    
+	<script type="text/javascript">
+	    var s_NTPIntervalLow = 60;
+	    var s_NTPIntervalHigh = 86400;
+	    JS_LANInitiate(); //初始化语言脚本组件
+	    JS_InfoInitiate();
+
+	    function OnLoad()
+	    {
+	        var lItemInfo;
+
+
+	        JS_RestrctInputFloat($("ipv4_addr"));
+	        JS_RestrctInputFloat($("ipv4_mask"));
+	        JS_RestrctInputFloat($("ipv4_gate"));
+	        JS_RestrctInputFloat($("ntp_addr"));
+
+	        JS_RestrctInputInt($("ntp_interval"));
+
+	        JS_DevSettingInitiate();
+
+	        lItemInfo = JS_DevGetManagePortSetting();
+	        $("ipv4_addr").value = lItemInfo.m_IPv4Addr;
+	        $("ipv4_mask").value = lItemInfo.m_IPv4Mask;
+	        $("ipv4_gate").value = lItemInfo.m_IPv4Gate;
+	        $("ip_mac").value = lItemInfo.m_IPMac;
+	        // 			$("ping_target").value = lItemInfo.m_IPv4Gate;
+
+	        if (lItemInfo.m_DataIPv4Addr != null)
+	        {
+	            $("data_ipv4_addr").value = lItemInfo.m_DataIPv4Addr;
+	            $("data_ipv4_mask").value = lItemInfo.m_DataIPv4Mask;
+	            $("data_ipv4_gate").value = lItemInfo.m_DataIPv4Gate;
+	            $("data_ip_mac").value = lItemInfo.m_DataIPMac;
+	        }
+	        else
+	        {
+	            $("data_ipv4_addr").disabled = true;
+	            $("data_ipv4_mask").disabled = true;
+	            $("data_ipv4_gate").disabled = true;
+	            $("data_ip_mac").disabled = true;
+	            $("submit_data_ip").disabled = true;
+	            $("submit_data_mac").disabled = true;
+	        }
+
+	        lItemInfo = JS_DevGetNTPPortSetting();
+	        $("ntp_addr").value = lItemInfo.m_IPv4Addr;
+	        $("ntp_interval").value = lItemInfo.m_Interval;
+	        JS_UISelectSetCurIndexByValue($("ntp_mark"), lItemInfo.m_Active, true);
+
+            if ((JS_InfoGetSN().substr(0,7) == "TC41A07") || (JS_InfoGetSN().substr(0,7) == "TC41A08")) {
+                var i, lTmpStr, lTmpValue, lCharSetArray;
+                
+                $("tr_outputsetting_title").style.display = "inline";
+                $("tr_outputsetting_content").style.display = "inline";
+                JS_UISelectSetCurIndexByValue($("output_type"), JS_DevGetIpOutputType(), true);
+                
+                JS_ParamInitate();
+			    lCharSetArray = JS_ParamGetCharSetArray();
+			    for (i = 0; i < lCharSetArray.length; i++)
+			    {
+				    lCharSetInfo = JS_ParamGetCharSetInfo(lCharSetArray[i]);
+				    JS_UISelectAddOption($("output_charset"), lCharSetInfo.m_Value, lCharSetInfo.m_Txt);
+			    }
+			    JS_UISelectSetCurIndexByValue($("output_charset"), JS_DevGetOutputCharset());
+            }
+
+	        //OnChangeNTPMark();
+
+	    }
+
+	    //		function OnChangeNTPMark()
+	    //		{
+	    //			var lTmpVar, lTmpValue;
+	    //			lTmpVar = $("ntp_mark");
+	    //			lTmpValue = JS_UISelectGetCurValue(lTmpVar);
+	    //			if (lTmpValue == "ON")
+	    //			{
+	    //				$("yearid").disabled = true;
+	    //				$("monthid").disabled = true;
+	    //				$("dayid").disabled = true;
+	    //				$("hoursid").disabled = true;
+	    //				$("minutesid").disabled = true;
+	    //				$("secondsid").disabled = true;
+	    //				$("get_time").disabled = true;
+	    //				$("submit_time").disabled = true;
+	    //			}
+	    //			else
+	    //			{
+	    //				$("yearid").disabled = false;
+	    //				$("monthid").disabled = false;
+	    //				$("dayid").disabled = false;
+	    //				$("hoursid").disabled = false;
+	    //				$("minutesid").disabled = false;
+	    //				$("secondsid").disabled = false;
+	    //				$("get_time").disabled = false;
+	    //				$("submit_time").disabled = false;
+	    //			}
+	    //		}
+
+	    function OnClickUTCTime()
+	    {
+	        var lTmpDate = new Date();
+	        $("yearid").value = lTmpDate.getUTCFullYear();
+	        $("monthid").value = lTmpDate.getUTCMonth() + 1;
+	        $("dayid").value = lTmpDate.getUTCDate();
+	        $("hoursid").value = lTmpDate.getUTCHours();
+	        $("minutesid").value = lTmpDate.getUTCMinutes();
+	        $("secondsid").value = lTmpDate.getUTCSeconds();
+	    }
+
+	    function OnSubmit(Item)
+	    {
+	        var lHolderNode;
+	        var lTmpTarget;
+	        var lValidValue;
+	        var lXMLDom = JS_XMLCreateDomFromFile(null);
+	        if (Item.id == "submit_ip")
+	        {
+	            lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "manage_ipv4_setting", "");
+
+	            JS_UISetErrorIndicator($("ipv4_addr"), true, false);
+	            JS_UISetErrorIndicator($("ipv4_mask"), true, false);
+	            JS_UISetErrorIndicator($("ipv4_gate"), true, false);
+
+	            JS_UISetErrorIndicator($("data_ipv4_addr"), true, false);
+	            JS_UISetErrorIndicator($("data_ipv4_mask"), true, false);
+
+	            lValidValue = JS_HTMLGetValueByID("ipv4_addr");
+	            if (JS_ValidIPv4(lValidValue) != 1)
+	            {
+	                JS_UISetErrorIndicator($("ipv4_addr"), false, true);
+	                return;
+	            }
+
+	            lValidValue = JS_HTMLGetValueByID("ipv4_mask");
+	            if (JS_ValidIPv4Mask(lValidValue) != 1)
+	            {
+	                JS_UISetErrorIndicator($("ipv4_mask"), false, true);
+	                return;
+	            }
+
+	            lValidValue = JS_HTMLGetValueByID("ipv4_gate");
+	            if (JS_ValidIPv4(lValidValue) != 1)
+	            {
+	                JS_UISetErrorIndicator($("ipv4_gate"), false, true);
+	                return;
+	            }
+
+	            if (JS_ValidIPv4WithMaskConfilict(JS_HTMLGetValueByID("ipv4_addr"), JS_HTMLGetValueByID("ipv4_mask"), JS_HTMLGetValueByID("data_ipv4_addr"), JS_HTMLGetValueByID("data_ipv4_mask")) == false)
+	            {
+	                JS_UISetErrorIndicator($("ipv4_addr"), false, true);
+	                JS_UISetErrorIndicator($("ipv4_mask"), false, true);
+	                JS_UISetErrorIndicator($("data_ipv4_addr"), false, true);
+	                JS_UISetErrorIndicator($("data_ipv4_mask"), false, true);
+	                return;
+
+	            }
+
+
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ipv4_addr", JS_HTMLGetValueByID("ipv4_addr"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ipv4_mask", JS_HTMLGetValueByID("ipv4_mask"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ipv4_gate", JS_HTMLGetValueByID("ipv4_gate"));
+
+	            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	            // 				lTmpTarget = "window.top.location.href = \"http://" + JS_HTMLGetValueByID("ipv4_addr") + "\";";
+	            // 				window.top.document.frames["BottomFrame"].OnShowLoadingWindow(10, true, false, lTmpTarget);
+	            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	        }
+	        else if (Item.id == "submit_mac")
+	        {
+	            lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "manage_mac_setting", "");
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ip_mac", JS_HTMLGetValueByID("ip_mac"));
+
+	            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	        }
+	        else if (Item.id == "submit_data_ip")
+	        {
+	            lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "manage_data_ipv4_setting", "");
+
+	            JS_UISetErrorIndicator($("data_ipv4_addr"), true, false);
+	            JS_UISetErrorIndicator($("data_ipv4_mask"), true, false);
+	            JS_UISetErrorIndicator($("data_ipv4_gate"), true, false);
+
+	            JS_UISetErrorIndicator($("ipv4_addr"), true, false);
+	            JS_UISetErrorIndicator($("ipv4_mask"), true, false);
+
+	            lValidValue = JS_HTMLGetValueByID("data_ipv4_addr");
+	            if (JS_ValidIPv4(lValidValue) != 1)
+	            {
+	                JS_UISetErrorIndicator($("data_ipv4_addr"), false, true);
+	                return;
+	            }
+
+	            lValidValue = JS_HTMLGetValueByID("data_ipv4_mask");
+	            if (JS_ValidIPv4Mask(lValidValue) != 1)
+	            {
+	                JS_UISetErrorIndicator($("data_ipv4_mask"), false, true);
+	                return;
+	            }
+
+	            lValidValue = JS_HTMLGetValueByID("data_ipv4_gate");
+	            if (JS_ValidIPv4(lValidValue) != 1)
+	            {
+	                JS_UISetErrorIndicator($("data_ipv4_gate"), false, true);
+	                return;
+	            }
+
+	            if (JS_ValidIPv4WithMaskConfilict(JS_HTMLGetValueByID("ipv4_addr"), JS_HTMLGetValueByID("ipv4_mask"), JS_HTMLGetValueByID("data_ipv4_addr"), JS_HTMLGetValueByID("data_ipv4_mask")) == false)
+	            {
+	                JS_UISetErrorIndicator($("ipv4_addr"), false, true);
+	                JS_UISetErrorIndicator($("ipv4_mask"), false, true);
+	                JS_UISetErrorIndicator($("data_ipv4_addr"), false, true);
+	                JS_UISetErrorIndicator($("data_ipv4_mask"), false, true);
+	                return;
+
+	            }
+
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "data_ipv4_addr", JS_HTMLGetValueByID("data_ipv4_addr"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "data_ipv4_mask", JS_HTMLGetValueByID("data_ipv4_mask"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "data_ipv4_gate", JS_HTMLGetValueByID("data_ipv4_gate"));
+
+	            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	            // 				lTmpTarget = "window.top.location.href = \"http://" + JS_HTMLGetValueByID("ipv4_addr") + "\";";
+	            // 				window.top.document.frames["BottomFrame"].OnShowLoadingWindow(10, true, false, lTmpTarget);
+	            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	        }
+	        else if (Item.id == "submit_data_mac")
+	        {
+	            lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "manage_data_mac_setting", "");
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "data_ip_mac", JS_HTMLGetValueByID("data_ip_mac"));
+
+	            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	        }
+	        else if (Item.id == "submit_output_set") {
+	            lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "ip_output_type_setting", "");
+
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ip_output_type", JS_HTMLGetValueByID("output_type"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "output_charset", JS_UISelectGetCurValue($("output_charset")));
+
+	            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	            if ((JS_InfoGetSN().substr(0,7) == "TC41A07") || (JS_InfoGetSN().substr(0,7) == "TC41A08")) {
+	                window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	            }
+	            else {
+	            	window.top.document.frames["BottomFrame"].OnShowLoadingWindow(1, true, false, "window.top.document.location.reload()");
+	            }
+	        }
+	        else if (Item.id == "submit_ntp")
+	        {
+	            lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "ntp_setting", "");
+
+	            JS_UISetErrorIndicator($("ntp_addr"), true, false);
+
+	            lValidValue = JS_HTMLGetValueByID("ntp_addr");
+	            if (JS_ValidIPv4(lValidValue) != 1)
+	            {
+	                JS_UISetErrorIndicator($("ntp_addr"), false, true);
+	                return;
+	            }
+
+	            lValidValue = parseInt(JS_HTMLGetValueByID("ntp_interval"), 10);
+	            if (lValidValue < s_NTPIntervalLow || lValidValue > s_NTPIntervalHigh)
+	            {
+	                JS_UISetErrorIndicator($("ntp_interval"), false, true);
+	                return;
+	            }
+
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ipv4_addr", JS_HTMLGetValueByID("ntp_addr"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ntp_interval", JS_HTMLGetValueByID("ntp_interval"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ntp_mark", JS_HTMLGetValueByID("ntp_mark"));
+
+	            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	        }
+	        else if (Item.id == "submit_time")
+	        {
+	            lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "time_setting", "");
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "year", JS_HTMLGetValueByID("yearid"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "month", JS_HTMLGetValueByID("monthid"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "day", JS_HTMLGetValueByID("dayid"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "hour", JS_HTMLGetValueByID("hoursid"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "minute", JS_HTMLGetValueByID("minutesid"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "second", JS_HTMLGetValueByID("secondsid"));
+
+	            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	            window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+	        }
+	        else if (Item.id == "ping_cmd")
+	        {
+	            lHolderNode = JS_XMLParamSetHead(lXMLDom, "system_config", "ping_cmd", "");
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ping_target", JS_HTMLGetValueByID("ping_target"));
+	            JS_XMLAddTextChild(lXMLDom, lHolderNode, "ping_timeout", JS_HTMLGetValueByID("ping_timeout"));
+
+	            JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+	        }
+
+	    }
+        
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("ip_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 80%">
+											<span><script type="text/javascript">JS_INLAN("ip_addr")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px;text-align:center;" id="ipv4_addr" />&nbsp;&nbsp;&nbsp; <span><script type="text/javascript">JS_INLAN("ip_mask")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px;text-align:center;" id="ipv4_mask" />&nbsp;&nbsp;&nbsp; <span><script type="text/javascript">JS_INLAN("ip_gate")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px;text-align:center;" id="ipv4_gate" />&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="submit_ip" onclick="OnSubmit(this);" style="width: 60px" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("mac_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 90%">
+											<span><script type="text/javascript">JS_INLAN("mac_addr")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 180px;text-align:center;" id="ip_mac" />
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="submit_mac" onclick="OnSubmit(this);" style="width: 60px" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr id="tr_outputsetting_title" style="display:none;">
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("output_setting")</script></span>
+							</td>
+						</tr>
+						<tr id="tr_outputsetting_content" style="display:none;">
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 40%">
+											<span><script type="text/javascript">JS_INLAN("output_type")</script></span>&nbsp;&nbsp;&nbsp;
+											<select id="output_type" style="width: 180px;text-align:center;">
+												<option value="SPTS">SPTS</option>
+												<option value="MPTS">MPTS</option>
+											</select>
+										</td>
+										<td style="text-align: left; width: 35%">
+											<span><script type="text/javascript">JS_INLAN("out_charset")</script></span>&nbsp;&nbsp;&nbsp;<select id="output_charset"></select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="submit_output_set" onclick="OnSubmit(this);" style="width: 60px" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("data_ip_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 80%">
+											<span><script type="text/javascript">JS_INLAN("ip_addr")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px;text-align:center;" id="data_ipv4_addr" />&nbsp;&nbsp;&nbsp; <span><script type="text/javascript">JS_INLAN("ip_mask")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px;text-align:center;" id="data_ipv4_mask"/>&nbsp;&nbsp;&nbsp; <span><script type="text/javascript">JS_INLAN("ip_gate")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px;text-align:center;" id="data_ipv4_gate" disabled/>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="submit_data_ip" onclick="OnSubmit(this);" style="width: 60px" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("data_mac_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 90%">
+											<span><script type="text/javascript">JS_INLAN("mac_addr")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 180px;text-align:center;" id="data_ip_mac" />
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="submit_data_mac" onclick="OnSubmit(this);" style="width: 60px" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("ntp_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 90%">
+											<span><script type="text/javascript">JS_INLAN("ntp_addr")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 110px;text-align:center;" id="ntp_addr" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span><script type="text/javascript">JS_INLAN("ntp_interval")</script></span>&nbsp;&nbsp;&nbsp;<input type="text" style="width: 50px;text-align:center;" id="ntp_interval" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span><script type="text/javascript">JS_INLAN("ntp_mark")</script></span>&nbsp;&nbsp;&nbsp;
+											<select id="ntp_mark" id="ntp_mark">
+												<option value="OFF">OFF</option>
+												<option value="ON">ON</option>
+											</select>
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="submit_ntp" onclick="OnSubmit(this);" style="width: 60px" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("td_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 90%">
+											<input type="text" name="years" id="yearid" style='width: 50px;text-align:center;' />
+											<span>- </span>
+											<input type="text" name="months" id="monthid" style='width: 20px;text-align:center;' />
+											<span>- </span>
+											<input type="text" name="days" id="dayid" style='width: 20px;text-align:center;' />&nbsp;&nbsp;
+											<input type="text" name="hours" id="hoursid" style='width: 20px;text-align:center;' />
+											<span>: </span>
+											<input type="text" name="minutes" id="minutesid" style='width: 20px;text-align:center;' />
+											<span>: </span>
+											<input type="text" name="seconds" id="secondsid" style='width: 20px;text-align:center;' />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+											<button type="button" onclick="OnClickUTCTime()" id="get_time" style="width:180px"><script type="text/javascript">											                                                               	JS_INLAN("get_utc")</script></button>
+										</td>
+										<td style="text-align: right; width: 20%">
+											<button type="button" id="submit_time" onclick="OnSubmit(this);" style="width: 60px"><script type="text/javascript">JS_INCMNLAN("submit")</script></button>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="3" height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+        <tr>
+            <td colspan="3" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+           </td>
+        </tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

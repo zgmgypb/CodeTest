@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+
+	<script type="text/javascript" src="/js/language.js"></script>
+
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+
+	<script type="text/javascript">
+
+		JS_LANInitiate(); //初始化语言脚本组件
+
+		function OnLoad()
+		{
+			var i, lItemInfo, lTmpStr, lTmpValue, lCharSetArray;
+
+			JS_ParamInitate();
+			lCharSetArray = JS_ParamGetCharSetArray();
+			for (i = 0; i < lCharSetArray.length; i++)
+			{
+				lCharSetInfo = JS_ParamGetCharSetInfo(lCharSetArray[i]);
+				JS_UISelectAddOption($("input_charset"), lCharSetInfo.m_Value, lCharSetInfo.m_Txt);
+				JS_UISelectAddOption($("output_charset"), lCharSetInfo.m_Value, lCharSetInfo.m_Txt);
+			}
+			JS_UISelectAddOption($("out_charset_marker"), 1, "ON");
+			JS_UISelectAddOption($("out_charset_marker"), 0, "OFF");
+
+			lItemInfo = $("time_zone");
+			for (i = -52; i <= 52; i++)
+			{
+				if (i < 0)
+				{
+					lTmpValue = -i;
+					lTmpStr = "UTC -";
+				}
+				else
+				{
+					lTmpValue = i;
+					lTmpStr = "UTC +";
+				}
+				lTmpStr += JS_StrLeftPading(parseInt(lTmpValue / 4, 10), 2) + ":" + JS_StrLeftPading((lTmpValue % 4) * 15, 2); ;
+				JS_UISelectAddOption(lItemInfo, i, lTmpStr);
+			}
+
+			lItemInfo = JS_ParamGetRemuxSystemInfo();
+			JS_UISelectSetCurIndexByValue($("input_charset"), lItemInfo.m_DefaultInCharset);
+			JS_UISelectSetCurIndexByValue($("output_charset"), lItemInfo.m_DefaultOutCharset);
+			JS_UISelectSetCurIndexByValue($("out_charset_marker"), lItemInfo.m_OutCharsetMarker);
+			JS_UISelectSetCurIndexByValue($("time_zone"), lItemInfo.m_TZ);
+			$("time_update_cycle").value = lItemInfo.m_TimeUpdate;
+			JS_UISelectSetCurIndexByValue($("tot_mark"), lItemInfo.m_TOTMark);
+			JS_UISelectSetCurIndexByValue($("auto_inc"), lItemInfo.m_AutoMark);
+			$("country_code").value = lItemInfo.m_CountrCode;
+			if (lItemInfo.m_UseSDT != "ON" && lItemInfo.m_UseSDT != "OFF")
+			{
+			    $("spts_sdt_mark").disabled = true;
+			}
+			else
+			{
+			    JS_UISelectSetCurIndexByValue($("spts_sdt_mark"), lItemInfo.m_UseSDT);
+			}
+
+			JS_RestrctInputInt($("time_update_cycle"));
+
+
+			lItemInfo = JS_ParamGetPCRInfo();
+			if (lItemInfo.m_PCRCMark != undefined)
+			{
+				$("pcrc_pos").value = lItemInfo.m_PCRCPos;
+				$("pcrc_neg").value = lItemInfo.m_PCRCNeg;
+				JS_UISelectSetCurIndexByValue($("pcrc_mark"), lItemInfo.m_PCRCMark);
+			}
+			else
+			{
+				$("pcrc_pos").value = 0;
+				$("pcrc_neg").value = 0;
+				$("pcrc_pos").disabled = true;
+				$("pcrc_neg").disabled = true;
+				$("pcrc_mark").disabled = true;
+			}
+			
+			
+		}
+
+		function OnSubmit(Item)
+		{
+			var lTmpValue;
+			var lHolderNode;
+			var lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			JS_UISetErrorIndicatorByID("time_update_cycle", true, false);
+
+			lTmpValue = parseInt($("time_update_cycle").value, 10);
+			if (lTmpValue < 5 || lTmpValue > 60)
+			{
+				JS_UISetErrorIndicatorByID("time_update_cycle", false, true);
+				return;
+			}
+
+			lTmpValue = $("country_code").value.length;
+			if (lTmpValue != 3)
+			{
+			    JS_UISetErrorIndicatorByID("country_code", false, true);
+			    return;
+			}
+
+			lBodyNode = JS_XMLParamSetHead(lXMLDom, "remux_config", "remux_setting", "");
+
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "input_charset", JS_UISelectGetCurValue($("input_charset")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "output_charset", JS_UISelectGetCurValue($("output_charset")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "out_charset_marker", JS_UISelectGetCurValue($("out_charset_marker")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "time_zone", JS_UISelectGetCurValue($("time_zone")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "time_update_cycle", $("time_update_cycle").value);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "tot_mark", JS_UISelectGetCurValue($("tot_mark")));
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "country_code", $("country_code").value);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "auto_inc", JS_UISelectGetCurValue($("auto_inc")));
+			if ($("spts_sdt_mark").disabled == false) 
+			{
+			    JS_XMLAddTextChild(lXMLDom, lBodyNode, "spts_sdt_mark", JS_UISelectGetCurValue($("spts_sdt_mark")));
+			}
+
+
+			lTmpValue = parseInt($("pcrc_pos").value, 10);
+			if (lTmpValue < 0 || lTmpValue > 127)
+			{
+				JS_UISetErrorIndicatorByID("pcrc_pos", false, true);
+				return;
+			}
+			
+			lTmpValue = parseInt($("pcrc_neg").value, 10);
+			if (lTmpValue < 0 || lTmpValue > 127)
+			{
+				JS_UISetErrorIndicatorByID("pcrc_neg", false, true);
+				return;
+			}
+			
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "pcrc_pos", $("pcrc_pos").value);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "pcrc_neg", $("pcrc_neg").value);
+			JS_XMLAddTextChild(lXMLDom, lBodyNode, "pcrc_mark", JS_UISelectGetCurValue($("pcrc_mark")));
+			
+
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(6, true, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+		}
+        
+    </script>
+
+</head>
+<body onload="OnLoad()">
+	<table width="850px" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td height="30px" align="center" background="/graphics/boxmenu_850.gif">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+			</td>
+		</tr>
+		<tr>
+			<td  bgcolor="#F5F9FE">
+				<div style="height: 480px; width: 820px; overflow: auto; padding: 5px 10px 0px 10px;">
+					<table border="0" cellspacing="0" cellpadding="0" width="100%">
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("def_charset")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 35%">
+											<span><script type="text/javascript">JS_INLAN("in_charset")</script></span>&nbsp;&nbsp;&nbsp;<select id="input_charset"></select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 35%">
+											<span><script type="text/javascript">JS_INLAN("out_charset")</script></span>&nbsp;&nbsp;&nbsp;<select id="output_charset"></select>&nbsp;&nbsp;&nbsp;
+										</td>
+										<td style="text-align: left; width: 30%">
+											<span><script type="text/javascript">JS_INLAN("out_charset_marker")</script></span>&nbsp;&nbsp;&nbsp;<select id="out_charset_marker"></select>&nbsp;&nbsp;&nbsp;
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("tz")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 100%">
+											<span><script type="text/javascript">JS_INLAN("ts_sel")</script></span>&nbsp;&nbsp;&nbsp;<select id="time_zone"></select>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("tdt")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 30%">
+											<span><script type="text/javascript">JS_INLAN("tdt_cycle")</script></span>&nbsp;&nbsp;&nbsp;<input id="time_update_cycle" type="text" style="text-align: center; width: 70px" value="5" />
+										</td>
+										<td style="text-align: left; width: 40%">
+											<span><script type="text/javascript">JS_INLAN("tdt_mark")</script></span>&nbsp;&nbsp;&nbsp;<select id="tot_mark"><option value="OFF">OFF</option>
+												<option value="ON">ON</option>
+											</select>
+										</td>
+										<td style="text-align: left; width: 30%">
+											<span><script type="text/javascript">JS_INLAN("country_code")</script></span>&nbsp;&nbsp;&nbsp;<input id="country_code" type="text" style="text-align: center; width: 70px" value="5" />
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("pcr_correction")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 30%">
+											<span><script type="text/javascript">JS_INLAN("pcrc_pos")</script></span>&nbsp;&nbsp;&nbsp;<input id="pcrc_pos" type="text" style="text-align: center; width: 70px" value="5" />
+										</td>
+										<td style="text-align: left; width: 30%">
+											<span><script type="text/javascript">JS_INLAN("pcrc_neg")</script></span>&nbsp;&nbsp;&nbsp;<input id="pcrc_neg" type="text" style="text-align: center; width: 70px" value="5" />
+										</td>
+										<td style="text-align: left; width: 70%">
+											<span><script type="text/javascript">JS_INLAN("pcrc_mark")</script></span>&nbsp;&nbsp;&nbsp;<select id="pcrc_mark"><option value="OFF">OFF</option>
+												<option value="ON">ON</option>
+											</select>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+								<span><script type="text/javascript">JS_INLAN("other_setting")</script></span>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#F5F9FE" style="padding-left: 25px; padding-right: 25px">
+								<table width="100%">
+									<tr>
+										<td style="text-align: left; width: 50%">
+											<span><script type="text/javascript">JS_INLAN("auto_inc")</script></span>&nbsp;&nbsp;&nbsp;<select id="auto_inc"><option value="OFF">OFF</option>
+												<option value="ON">ON</option>
+											</select>
+										</td>
+										<td style="text-align: left; width: 50%">
+											<span><script type="text/javascript">JS_INLAN("spts_sdt_mark")</script></span>&nbsp;&nbsp;&nbsp;<select id="spts_sdt_mark"><option value="OFF">OFF</option>
+												<option value="ON">ON</option>
+											</select>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td height="30px" valign="top" align="left" bgcolor="#E4EFF8" style="padding-left: 13px; color: #069; font-size: 12pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+        <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+		<tr>
+            <td colspan="3" height="30px" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+			</td>
+		</tr>
+		<tr>
+			<td height="13px" background="/graphics/boxbottom_850.gif">
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

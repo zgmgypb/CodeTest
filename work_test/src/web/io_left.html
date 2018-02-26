@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <link rel="StyleSheet" href="/components/my_tree_control/my_tree_control.css" type="text/css">
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+    <script type="text/javascript" src="/components/my_tree_control/my_tree_control.js"></script>
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/js/system_parameter.js"></script>
+    <script type="text/javascript" src="/js/device_information.js"></script>
+    <script type="text/javascript" src="card/card_language.js"></script>
+    <script type="text/javascript" src="card/card_system.js"></script>
+    <script type="text/javascript">
+		var s_TreeItem;
+        var s_ChannelXMLDoc = null;
+        var s_CardRootID;
+        JS_LANInitiate();
+        JS_InfoInitiate();
+        JS_ParamInitate();//初始化系统参数处理脚本组件
+
+        JS_CLANInitiate();
+        JS_CardInfoInitiate();
+
+        function GetMainChnString(bInput, ChnInd, ChnType)
+        {
+            var lTmpStr;
+            if (bInput) 
+            {
+                if (ChnType == "ASI")
+                {
+                    lTmpStr = "<a href='io_right_in_asi.html?direction=input&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if (ChnType == "ETH")
+                {
+                    lTmpStr = "<a href='io_right_in_eth.html?direction=input&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if (ChnType == "E3DS3")
+                {
+                    lTmpStr = "<a href='io_right_in_e3ds3.html?direction=input&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if ("TUNER_S" == ChnType)
+                {
+                    lTmpStr = "<a href='io_right_in_demod_s.html?direction=input&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if ("TUNER_C" == ChnType)
+                {
+                    lTmpStr = "<a href='io_right_in_demod_c.html?direction=input&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if ("TUNER_DTMB" == ChnType)
+                {
+                    lTmpStr = "<a href='io_right_in_demod_dtmb.html?direction=input&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if ("ENCODER" == ChnType && ((JS_InfoGetSN().substr(0,7) == "TC41A07") || (JS_InfoGetSN().substr(0,7) == "TC41A08"))) /* GN1846 设备号 0x4107，GN1866 设备号 0x4108 */
+                {
+                    lTmpStr = "<a href='io_right_in_encode_new.html?direction=input&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " 
+                              + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                //add by leonli for GM8358Q
+                else if ("ENCODER" == ChnType)
+                {
+                    lTmpStr = "<a href='io_right_in_encode.html?direction=input&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                //add by leonli for GM8398Q
+                else if ("ENCODER_CVBS_DXT8243" == ChnType)
+                {
+                    lTmpStr = "<a href='io_right_in_encode_GM8398Q.html?direction=input&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else
+                {
+                    lTmpStr = JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType);
+                } 
+            }
+            else
+            {
+                if (ChnType == "MODULATOR" || ChnType == "QAM")
+                {
+                    lTmpStr = "<a href='io_right_out_qam.html?direction=output&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if (ChnType == "QPSK")
+                {
+                    lTmpStr = "<a href='io_right_out_qpsk.html?direction=output&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if (ChnType == "DTMB")
+                {
+                    lTmpStr = "<a href='io_right_out_dtmb.html?direction=output&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if (ChnType == "ASI")
+                {
+                    lTmpStr = "<a href='io_right_out_asi.html?direction=output&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else if (ChnType == "ETH" || ChnType == "ETH_LOOP" || ChnType == "ETH_DEP" || ChnType == "ETH_LOOP_DEP")
+                {
+                    lTmpStr = "<a href='io_right_out_eth.html?direction=output&chn_ind=" + ChnInd + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType) + "</a>";
+                }
+                else
+                {
+                    lTmpStr = JS_LANCMN("chan") + " " + JS_StrLeftPading((ChnInd + 1), 2) + " - " + JS_LANCMN(ChnType);
+                }
+            }
+            
+            return lTmpStr;
+        }
+
+
+        function OnLoad() 
+        {
+            var i, lTmpStr, lTmpVar;
+            var lTmpValue, lChnNum, lSubChnNum, ChnType;
+            var lRootID, lMainID, lSecondID, lThridID, lFourthID;
+            var lChnObj, lSubObj;
+            s_TreeItem = new MyTreeControl("s_TreeItem");
+
+            lTmpStr = JS_LAN("io_settings");
+            lRootID = s_TreeItem.AddNewNode(0, lTmpStr);
+            
+            if (JS_InfoGePlatformType() == "encoder_card_platform")
+            {
+                lTmpStr = JS_LANCMN("main_module");
+                lMainID = s_TreeItem.AddNewNode(lRootID, lTmpStr);
+            }
+            else
+            {
+                lMainID = lRootID;
+            }
+
+            lChnNum = JS_ParamGetInChannelNum();
+            for (i = 0; i < lChnNum; i++)
+            {
+                lChnObj = JS_ParamGetInChannelObject(i);
+                ChnType = JS_ParamGetChannelType(lChnObj);
+                if (ChnType == "ETH")
+                {
+                    lTmpStr = "<a href='io_right_igmp_setting.html' target='right_frame'>" + JS_LAN("igmp_setting") + "</a>";
+                    lSecondID = s_TreeItem.AddNewNode(lMainID, lTmpStr);
+                    break;
+                }
+            }
+            
+            if ((JS_InfoGetSN().substr(0,7) == "TC41A07") || (JS_InfoGetSN().substr(0,7) == "TC41A08"))
+            {
+                lTmpStr = "<a href='io_right_edid_setting.html' target='right_frame'>" + JS_LAN("edid_setting") + "</a>";
+                lSecondID = s_TreeItem.AddNewNode(lMainID, lTmpStr);
+            }
+
+            lTmpStr = JS_LAN("in_chn");
+            lSecondID = s_TreeItem.AddNewNode(lMainID, lTmpStr);
+            //从XML中分析出通道的数量，每个通道的TS数量，并分类成输入和输出两类。
+            lChnNum = JS_ParamGetInChannelNum();
+
+            var blFirstInChn = false;
+
+            for (i = 0; i < lChnNum; i++)
+            {
+                lChnObj = JS_ParamGetInChannelObject(i);
+                ChnType = JS_ParamGetChannelType(lChnObj);
+
+                lTmpStr = GetMainChnString(true, i, ChnType);
+
+                if (JS_ParamGetChannelHideMark(lChnObj) == "ON")
+                {
+                    lTmpStr = "";
+                }
+
+                if (lTmpStr != "")
+                {
+                    lThridID = s_TreeItem.AddNewNode(lSecondID, lTmpStr);
+                }
+
+            }
+
+
+            lTmpStr = JS_LAN("out_chn");
+            lSecondID = s_TreeItem.AddNewNode(lMainID, lTmpStr);
+            lChnNum = JS_ParamGetOutChannelNum();
+            for (i = 0; i < lChnNum; i++)
+            {
+                lChnObj = JS_ParamGetOutCHNObj(i);
+                ChnType = JS_ParamGetChannelType(lChnObj);
+
+                lTmpStr = GetMainChnString(false, i, ChnType);
+                
+                if (JS_ParamGetChannelHideMark(lChnObj) == "ON")
+                {
+                    lTmpStr = "";
+                }
+
+
+                if (lTmpStr != "")
+                {
+                    lThridID = s_TreeItem.AddNewNode(lSecondID, lTmpStr);
+                }
+
+            }
+
+            if (JS_ParamCheckSFNM())
+            {
+                lTmpStr = "<a href=io_right_sfn_modulator.html ? target='right_frame'>" + JS_LAN("sfn_modulator_setting") + "</a>";
+                lSecondID = s_TreeItem.AddNewNode(lRootID, lTmpStr);
+            }
+
+            if (JS_ParamCheckSFNA())
+            {
+                lTmpStr = "<a href=io_right_sfn_adaptor.html ? target='right_frame'>" + JS_LAN("sfn_adaptor_setting") + "</a>";
+                lSecondID = s_TreeItem.AddNewNode(lRootID, lTmpStr);
+            }
+
+            if (JS_ParamCheckGNS())
+            {
+                lTmpStr = "<a href=io_right_gns.html ? target='right_frame'>" + JS_LAN("gps_setting") + "</a>";
+                lSecondID = s_TreeItem.AddNewNode(lRootID, lTmpStr);
+            }
+
+            if (JS_ParamGetDPDSetting())
+            {
+                lTmpStr = "<a href=io_right_dpd.html ? target='right_frame'>" + JS_LAN("dpd_setting") + "</a>";
+                lSecondID = s_TreeItem.AddNewNode(lRootID, lTmpStr);
+            }
+
+
+            if (JS_InfoGePlatformType() == "encoder_card_platform")
+            {
+                var lMArray, lMObj, lModuleInfo;
+                var lChnObj, lChnInfo;
+                var lState;
+                var lModuleRoot, lModuleNode;
+                
+                lTmpStr = JS_LANCMN("sub_modules");
+                lModuleRoot = s_TreeItem.AddNewNode(lRootID, lTmpStr);
+
+                lMArray = JS_CardInfoGetModuleArray();
+                if (JS_ISValidObject(lMArray))
+                {
+                    for (i = 0; i < lMArray.length; i++)
+                    {
+                        lMObj = lMArray[i];
+                        lState = JS_CardInfoGetModuleState(lMObj);
+                        if (lState == "normal")
+                        {
+                            lModuleInfo = JS_CardInfoGetModuleInfo(lMObj);
+                            lTmpStr = "<a href='/card/io_right_" + lModuleInfo.m_ModuleTag + ".html?" + "module=" + i + "&module_tag=" + lModuleInfo.m_ModuleTag + "' target='right_frame'>" + JS_LANCMN("module") + " " + JS_StrLeftPading(i + 1, 2) + " - " + JS_CLANGetModuleNameByTag(lModuleInfo.m_ModuleTag) + " </a>";
+                        }
+                        else
+                        {
+                            lTmpStr = JS_LANCMN("module") + " " + JS_StrLeftPading(i + 1, 2) + " - " + JS_LANCMN("no_module")
+                        }
+                        lModuleNode = s_TreeItem.AddNewNode(lModuleRoot, lTmpStr);
+
+                        if (lState == "normal")
+                        {
+                            if (JS_ISValidObject(lModuleInfo.m_ChnArray))
+                            {
+                                for (k = 0; k < lModuleInfo.m_ChnArray.length; k++)
+                                {
+                                    lChnObj = lModuleInfo.m_ChnArray[k];
+                                    lChnInfo = JS_CardInfoGetModuleChnInfo(lChnObj);
+                                    lTmpStr = "<a href='/card/io_right_" + lChnInfo.m_ChnTag + ".html?" + "module=" + i + "&module_tag=" + lModuleInfo.m_ModuleTag + "&chn=" + k + "&chn_tag=" + lChnInfo.m_ChnTag + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading(k + 1, 2) + " - " + JS_CLANGetCHNNameByTag(lChnInfo.m_ChnTag) + " </a>";
+                                    s_TreeItem.AddNewNode(lModuleNode, lTmpStr);
+                                }
+                            }
+                        }
+
+
+                    }
+                }
+            }
+
+            document.getElementById("item_tree").innerHTML = s_TreeItem.toString();
+            s_TreeItem.ToggleCollapse(lRootID, 4, 2);
+            JS_ForcusKeepChangeCallbackSetup($("item_tree"), "red", "white");
+        }
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="310px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0"id="Table1">
+        <tr>
+            <td height="30px" background="/graphics/boxmenu_310.gif" align="center">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="left" bgcolor="#F5F9FE">
+                <div id="item_tree" style="height: 507px;width:290px; overflow: auto; padding: 10px;">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" align="center" valign="top" background="/graphics/boxbottom_310.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

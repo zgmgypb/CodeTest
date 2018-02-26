@@ -1,0 +1,6 @@
+/*UTF-8编码*/
+.my_list_control ul { list-style-type: none;}
+.my_list_control li { background:#f0f0fe;text-decoration:none; margin-left: 10px;margin-right: 10px;margin-bottom: 2px;margin-top: 2px;}
+.my_list_control li:hover { background:#DDDDff;}
+.my_list_control #title li { background:#DDDDff;text-decoration:none;margin-left: 10px;margin-right: 10px;margin-bottom: 2px;margin-top: 2px;}
+.my_list_control #title li:hover { background:#DDDDff;}

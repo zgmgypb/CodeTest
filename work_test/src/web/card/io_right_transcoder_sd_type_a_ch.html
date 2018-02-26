@@ -1,0 +1,780 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link href="/style/doc.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		body
+		{
+			background-image: url(/graphics/bg001.gif);
+		}
+	</style>
+
+	<script type="text/javascript" src="/js/common_process.js"></script>
+	<script type="text/javascript" src="/js/language.js"></script>
+	<script type="text/javascript" src="/js/system_parameter.js"></script>
+	<script type="text/javascript" src="/components/my_list_control/my_list_control.js"></script>
+	<script type="text/javascript" src="/card/card_language.js"></script>
+	<script type="text/javascript" src="/card/card_system.js"></script>
+
+    <script type="text/javascript">
+	    var s_ServList = null;
+	    var s_InListItem = null;
+	    var s_OutListItem = null;
+		var s_ModuleInd, s_ModuleTag, s_ChnInd, s_ChnTag;
+		var s_SubChnNum = 2;
+		var s_ParamSupportXML = null;
+		var s_ServSelect;
+		var s_UNIIDArray = new Array();
+		var s_CurAnalyseInd = -1;
+	
+		JS_CLANInitiate();
+		
+		JS_LANInitiate();
+		
+		JS_CardParamInitiate();
+		
+		JS_ParamInitate();
+		
+		function OnXMLCBAnalyseResultGet(XMLDom)
+		{
+		    var lTmpVar;
+		    var lRowInd;
+		    if (JS_XMLGetTagValue(XMLDom, "analyse_status") == "ok") 
+		    {
+		        lTmpVar = s_ServList.GetColNodeByIndex(s_CurAnalyseInd, 2);
+		        lTmpVar.value = JS_XMLGetTagValue(XMLDom, "video_es_info");
+		        for (lRowInd = 0; lRowInd < s_ServList.GetRowNumber(); lRowInd++)
+		        {
+		            lTmpVar = s_ServList.GetColNodeByIndex(lRowInd, 3);
+		            lTmpVar.disabled = false;
+		        }
+		    }
+		    else if (JS_XMLGetTagValue(XMLDom, "analyse_status") == "wait") 
+		    {
+		        setTimeout(OnTimeoutGetAnalyseResult, 500);
+		    }
+		    else
+		    {
+		        alert(JS_CLAN("alert_analyse_failed"));   
+		    
+		        for (lRowInd = 0; lRowInd < s_ServList.GetRowNumber(); lRowInd++)
+		        {
+		            lTmpVar = s_ServList.GetColNodeByIndex(lRowInd, 3);
+		            lTmpVar.disabled = false;
+		        }
+		    
+		    }
+		}
+		
+		function OnTimeoutGetAnalyseResult()
+		{
+	        var lXMLDom, lBodyHolder;
+	        lXMLDom = JS_XMLCreateDomFromFile(null);
+	        lBodyHolder = JS_XMLParamSetHead(lXMLDom, "status", "es_anaylse", "");
+	        JS_XMLAddTextChild(lXMLDom, lBodyHolder, "cmd_type", "analyse_result_get");
+	        JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnXMLCBAnalyseResultGet, false);
+		}
+		
+		function OnClickAnalyze(Index)
+		{
+		    var lRowInd;
+		    var lXMLDom, lBodyHolder;
+	        var lTmpVar;
+	                
+	        s_CurAnalyseInd = Index;
+
+		    lTmpVar = s_ServList.GetColNodeByIndex(s_CurAnalyseInd, 1);
+           
+            if (JS_UISelectGetCurValue(lTmpVar) == 0) 
+            {
+               alert(JS_CLAN("alert_select_valid_service"));   
+            }
+            else
+            {
+	            for (lRowInd = 0; lRowInd < s_ServList.GetRowNumber(); lRowInd++)
+	            {
+	                lTmpVar = s_ServList.GetColNodeByIndex(lRowInd, 3);
+	                lTmpVar.disabled = true;
+	            }
+
+	            lTmpVar = s_ServList.GetColNodeByIndex(s_CurAnalyseInd, 1);
+	            lXMLDom = JS_XMLCreateDomFromFile(null);
+	            lBodyHolder = JS_XMLParamSetHead(lXMLDom, "remux_config", "es_anaylse", "");
+	            JS_XMLAddTextChild(lXMLDom, lBodyHolder, "cmd_type", "analyse_serv_set");
+	            JS_XMLAddTextChild(lXMLDom, lBodyHolder, "serv_uniid", JS_UISelectGetCurValue(lTmpVar));
+			    JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+
+	            setTimeout(OnTimeoutGetAnalyseResult, 500);
+            }
+	    }
+		
+		
+		function AddParamOption(XMLDom, SelectUI, type)
+		{
+		    var lParamLimit, lVIDFMTArray;
+		    
+		    lParamLimit = JS_XMLGetTagNameFirstObj(XMLDom, "param_support");
+		    if (JS_ISValidObject(lParamLimit)) 
+		    {
+	            var i, lName, lValue;
+		        lVIDFMTArray = JS_XMLGetTagNameArray(lParamLimit, type);
+		        if (JS_ISValidObject(lVIDFMTArray))
+		        {
+		            for (i = 0; i < lVIDFMTArray.length; i++)
+		            {
+		                lName = JS_XMLGetTagValue(lVIDFMTArray[i], "name");
+		                lValue = JS_XMLGetTagValue(lVIDFMTArray[i], "value");
+		                JS_UISelectAddOption(SelectUI, lValue, lName);
+		            }
+		        }
+		    }
+		}
+
+        function AddOutputMuxServOption(SelectDOM)
+        {
+            var i, k, m;
+            var lTmpTsStr, lTmpStr;
+            var lHolderNode;
+            var lAdded;
+            var lCHNArray, lSUBArray, lOutTsArray;
+            var lColor;
+
+            JS_UISelectAddOption(SelectDOM, 0, "OFF");
+            
+            lOutTsArray = JS_ParamGetTsArray(false);
+
+            lCHNArray = JS_ParamGetChannelArray(false);
+            for (i = 0; i < lCHNArray.length; i++)
+            {
+                lSUBArray = JS_ParamGetSubChannelArray(lCHNArray[i]);
+                for (k = 0; k < lSUBArray.length; k++)
+                {
+                    lSubInfo = JS_ParamGetSubChannelInfo(lSUBArray[k]);
+                    if (lSubInfo.m_Active == "ON")
+                    {
+                        if (JS_ParamGetTsRouteMark(lOutTsArray[lSubInfo.m_TsIndex]) == "OFF") 
+                        {
+                            lTmpTsStr = "CHN" + " " + JS_StrLeftPading(i + 1, 2) + "-" + JS_StrLeftPading(k + 1, 3) + " - " + " ("+ "TS" + " " + JS_StrLeftPading(lSubInfo.m_TsIndex + 1, 3) + ")";
+                            lServArray = JS_ParamGetServArrayByTsIndex(lSubInfo.m_TsIndex, false);
+                            for(m = 0; m < lServArray.length; m++)
+                            {
+                                lServInfo = JS_ParamGetServiceInfo(lServArray[m], false);
+                                lTmpStr = lTmpTsStr + " - " + JS_StrLeftPading(lServInfo.m_ServID, 5);;
+                                lTmpStr += " - " + lServInfo.m_ServName;
+                                if (JS_ParamGetServiceInfoTransMark(lServArray[m]) == true) 
+                                {
+                                    JS_UISelectAddOptionColor(SelectDOM, lServInfo.m_UniqueID, lTmpStr, "#AAAAAA", null);
+                                }
+                                else
+                                {
+                                    JS_UISelectAddOptionColor(SelectDOM, lServInfo.m_UniqueID, lTmpStr, null, null);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+		
+		function OnDataChange(Obj, Index)
+		{
+		    var i, lTmpValue, lTmpNode;
+
+		    if (Obj.id.slice(0, Obj.id.lastIndexOf("_")) == "vid_out")
+		    {
+		        lTmpValue = JS_UISelectGetCurValue(Obj);
+
+		        lTmpNode = s_OutListItem.GetColNodeByIndex(Index, 2);
+		        JS_UISelectRemoveAll(lTmpNode);
+		        if (parseInt(lTmpValue, 10) == 0)
+		        {
+		            AddParamOption(s_ParamSupportXML, lTmpNode, "vid_out_mpeg2_profile_level");
+		        }
+		        else
+		        {
+		            AddParamOption(s_ParamSupportXML, lTmpNode, "vid_out_h264_profile_level");
+		        }
+		    }
+		}
+
+		function AddTranscoderInRow(SubInd, bEnable, UNIID, VID_FMT, VID_FRRES, AUD_FMT, Delay, DISABLE)
+		{
+			var lRowInd;
+			var lHolderNode;
+
+            lRowInd = 1;
+			lHolderNode = s_ServSelect.cloneNode(true);
+			JS_UISelectSetCurIndexByValue(lHolderNode, UNIID, true);
+			JS_UISelectSetCurSelectOptionColor(lHolderNode, "black", null);
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.height = "18px";
+			lHolderNode.style.width = "320px";
+			lHolderNode.id = "uni_id" + SubInd;
+			s_ServList.SetColValue(lRowInd, lHolderNode);lRowInd++;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.width = "340px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.readOnly = true;
+			lHolderNode.value = " ";
+			lHolderNode.id = "es_info_" + SubInd;
+			s_ServList.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+			
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "button";
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.width = "60px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.onclick = function()
+			{
+			    OnClickAnalyze(SubInd);
+			}
+			lHolderNode.value = JS_CLAN("start");
+			s_ServList.SetColValue(lRowInd, lHolderNode); lRowInd++;
+			
+			s_ServList.AddRowToDom(false);
+
+
+			lRowInd = 1;
+			lHolderNode = JS_UISelectCreate();
+			JS_UISelectAddOption(lHolderNode, 1, "ON");
+			JS_UISelectAddOption(lHolderNode, 0, "OFF");
+			JS_UISelectSetCurIndexByValue(lHolderNode, bEnable, true);
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "enable" + SubInd;
+			s_InListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+			
+			lHolderNode = JS_UISelectCreate();
+			AddParamOption(s_ParamSupportXML, lHolderNode, "vid_in_fmt");
+			JS_UISelectSetCurIndexByValue(lHolderNode, VID_FMT, true);
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "vid_in_fmt" + SubInd;
+			s_InListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+			lHolderNode = JS_UISelectCreate();
+			AddParamOption(s_ParamSupportXML, lHolderNode, "vid_in_res_fr");
+			JS_UISelectSetCurIndexByValue(lHolderNode, VID_FRRES, true);
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "vid_in_res_fr" + SubInd;
+			s_InListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+			lHolderNode = JS_UISelectCreate();
+			AddParamOption(s_ParamSupportXML, lHolderNode, "aud_in_fmt");
+			JS_UISelectSetCurIndexByValue(lHolderNode, AUD_FMT, true);
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "aud_in_fmt" + SubInd;
+			s_InListItem.SetColValue(lRowInd, lHolderNode);lRowInd++;
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.width = "50px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = Delay;
+			lHolderNode.id = "pid_delay" + SubInd;
+			s_InListItem.SetColValue(lRowInd, lHolderNode);lRowInd++;
+			
+			s_InListItem.AddRowToDom(false);
+		}
+		
+		function AddTranscoderOutRow(SubInd, VID_FMT, VID_PROFILE, VID_FRRES, VID_RATE, VID_XBR, AUD_FMT, PCR_COMB, DISABLE)
+		{
+			var i;
+			var lHolderNode, lFMTNode;
+			var lRowInd;
+
+			lRowInd = 1;
+			lHolderNode = JS_UISelectCreate();
+			AddParamOption(s_ParamSupportXML, lHolderNode, "vid_out_fmt");
+			JS_UISelectSetCurIndexByValue(lHolderNode, VID_FMT, true);
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "vid_out_fmt" + SubInd;
+			s_OutListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+			lHolderNode.onchange = function()
+			{
+			    OnDataChange(this, SubInd);
+			}
+			
+			lFMTNode = lHolderNode;
+
+			lHolderNode = JS_UISelectCreate();
+			if (VID_FMT == "0") 
+			{
+			    AddParamOption(s_ParamSupportXML, lHolderNode, "vid_out_mpeg2_profile_level");
+			}
+			else
+			{
+			    AddParamOption(s_ParamSupportXML, lHolderNode, "vid_out_h264_profile_level");
+			}
+			JS_UISelectSetCurIndexByValue(lHolderNode, VID_PROFILE, true);
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "vid_out_profile_level" + SubInd;
+			s_OutListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+			lHolderNode = JS_UISelectCreate();
+			AddParamOption(s_ParamSupportXML, lHolderNode, "vid_out_res_fr");
+			JS_UISelectSetCurIndexByValue(lHolderNode, VID_FRRES, true);
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "vid_out_res_fr" + SubInd;
+			s_OutListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+			lContainer = document.createElement("div");
+			lHolderNode = document.createElement("input");
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.type = "text";
+			lHolderNode.style.width = "70px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.value = (VID_RATE / 1000000).toFixed(3);
+			lHolderNode.defaultValue = lHolderNode.value;
+			lHolderNode.id = "vid_out_rate" + SubInd;
+			JS_RestrctInputFloat(lHolderNode);
+			lContainer.appendChild(lHolderNode);
+			lHolderNode = document.createElement("span");
+			lHolderNode.disabled = DISABLE;
+			lHolderNode.innerHTML = "-";
+			lContainer.appendChild(lHolderNode);
+			lHolderNode = JS_UISelectCreate();
+			AddParamOption(s_ParamSupportXML, lHolderNode, "vid_out_xbr");
+			JS_UISelectSetCurIndexByValue(lHolderNode, VID_XBR, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "vid_out_xbr" + SubInd;
+			lContainer.appendChild(lHolderNode);
+			s_OutListItem.SetColValue(lRowInd, lContainer); lRowInd++;
+
+			lHolderNode = JS_UISelectCreate();
+			AddParamOption(s_ParamSupportXML, lHolderNode, "aud_out_fmt");
+			JS_UISelectSetCurIndexByValue(lHolderNode, AUD_FMT, true);
+			//lHolderNode.disabled = DISABLE;
+			lHolderNode.disabled = true;
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "aud_out_fmt" + SubInd;
+			s_OutListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+			lHolderNode = JS_UISelectCreate();
+			AddParamOption(s_ParamSupportXML, lHolderNode, "aud_out_rate");
+			JS_UISelectSetCurIndexByValue(lHolderNode, AUD_FMT, true);
+			lHolderNode.style.height = "18px";
+			lHolderNode.disabled = true;
+			s_OutListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+			lHolderNode = JS_UISelectCreate();
+			AddParamOption(s_ParamSupportXML, lHolderNode, "aud_out_sampl");
+			JS_UISelectSetCurIndexByValue(lHolderNode, AUD_FMT, true);
+			lHolderNode.disabled = true;
+			lHolderNode.style.height = "18px";
+			s_OutListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+
+
+			lHolderNode = document.createElement("input");
+			lHolderNode.type = "checkbox";
+			lHolderNode.style.width = "25px";
+			lHolderNode.style.textAlign = "center";
+			lHolderNode.style.height = "18px";
+			lHolderNode.id = "pcr_combine" + SubInd;
+			if (PCR_COMB == "ON")
+			{
+			    lHolderNode.checked = true;
+			    lHolderNode.defaultChecked = true;
+			}
+			else
+			{
+			    lHolderNode.checked = false;
+			    lHolderNode.defaultChecked = false;
+			}
+			s_OutListItem.SetColValue(lRowInd, lHolderNode); lRowInd++;
+			
+
+
+			s_OutListItem.AddRowToDom(false);
+		}
+		
+		function OnSubmit(Item)
+		{
+			var i, k;
+			var lBodyHolder, lChnHolder, lSubHolder;
+			var lHolder;
+			var lXMLDom;
+			
+			
+			/*校验*/
+			{
+			    var lTmpVar;
+			    var lTmpVar1;
+			    for (i = 0; i < s_SubChnNum; i++)
+			    {
+			        JS_UISetErrorIndicatorByID("uni_id" + i, true, false);
+			        JS_UISetErrorIndicatorByID("vid_out_rate" + i, true, true);
+			        JS_UISetErrorIndicatorByID("pid_delay" + i, true, true);
+			        JS_UISetErrorIndicatorByID("vid_out_res_fr" + i, true, true);
+			    }
+			    
+			    /*节目不能和其它通道选取的节目重复，也不能跟自己的子通道重复*/
+			    for (i = 0; i < s_SubChnNum; i++)
+			    {
+			        lTmpVar = JS_HTMLGetValueByID("uni_id" + i);
+			        for (k = 0; k < s_UNIIDArray.length; k++)
+			        {
+			            if (lTmpVar == s_UNIIDArray[k]) 
+			            {
+			                JS_UISetErrorIndicatorByID("uni_id" + i, false, true);
+			                return;
+			            }
+			        }
+
+			        for (k = i + 1; k < s_SubChnNum; k++)
+			        {
+			            lTmpVar1 = JS_HTMLGetValueByID("uni_id" + k);
+			            if (lTmpVar == lTmpVar1)
+			            {
+			                if (parseInt(lTmpVar, 10) != 0) 
+			                {
+			                    JS_UISetErrorIndicatorByID("uni_id" + k, false, true);
+			                    return;
+			                }
+			            }
+			        }
+			        
+			    }
+			    
+			    /*码率限制*/
+				for (i = 0; i < s_SubChnNum; i++)
+			    {
+			        lTmpVar = parseFloat(JS_HTMLGetValueByID("vid_out_rate" + i));
+			        if (lTmpVar > 5.5 || lTmpVar < 0.5) 
+			        {
+			            JS_UISetErrorIndicatorByID("vid_out_rate" + i, false, true);
+			            return;
+			        }
+			    }
+
+                /*延时限制*/
+			    for (i = 0; i < s_SubChnNum; i++)
+			    {
+			        lTmpVar = parseInt(JS_HTMLGetValueByID("pid_delay" + i), 10);
+			        if (lTmpVar > 5000 || lTmpVar < 0)
+			        {
+			            JS_UISetErrorIndicatorByID("pid_delay" + i, false, true);
+			            return;
+			        }
+			    }
+			    
+			    
+			    /*分辨率和帧率限制*/
+			    for (i = 0; i < s_SubChnNum; i++)
+			    {
+			        lTmpVar = parseInt(JS_HTMLGetValueByID("vid_in_res_fr" + i), 16) % 256;
+			        lTmpVar1 = parseInt(JS_HTMLGetValueByID("vid_out_res_fr" + i), 16) % 256;
+			        if ((lTmpVar != lTmpVar1))
+			        {
+			            JS_UISetErrorIndicatorByID("vid_out_res_fr" + i, false, true);
+			            return;
+			        }
+			    }
+			    
+			}
+			
+			lXMLDom = JS_XMLCreateDomFromFile(null);
+
+			lBodyHolder = JS_XMLParamSetSubModuleHead(lXMLDom, s_ModuleInd, "param_set");
+
+			lHolder = JS_XMLAddNormalChild(lXMLDom, lBodyHolder, "parameter");
+			
+			lChnHolder = JS_XMLAddNormalChild(lXMLDom, lHolder, "chn");
+			
+			JS_XMLAddTextChild(lXMLDom, lChnHolder, "chn_ind", s_ChnInd);
+			
+			for (i = 0; i < s_SubChnNum; i++)
+			{
+			    lSubHolder = JS_XMLAddNormalChild(lXMLDom, lChnHolder, "sub");
+
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "sub_ind", i);
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "enable", JS_HTMLGetValueByID("enable" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "uni_id", JS_HTMLGetValueByID("uni_id" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "vid_in_fmt", JS_HTMLGetValueByID("vid_in_fmt" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "vid_in_res_fr", JS_HTMLGetValueByID("vid_in_res_fr" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "aud_in_fmt", JS_HTMLGetValueByID("aud_in_fmt" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "pid_delay", JS_HTMLGetValueByID("pid_delay" + i));
+			    
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "vid_out_fmt", JS_HTMLGetValueByID("vid_out_fmt" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "vid_out_res_fr", JS_HTMLGetValueByID("vid_out_res_fr" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "vid_out_profile_level", JS_HTMLGetValueByID("vid_out_profile_level" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "vid_out_rate", parseFloat(JS_HTMLGetValueByID("vid_out_rate" + i)) * 1000000);
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "vid_out_xbr", JS_HTMLGetValueByID("vid_out_xbr" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "aud_out_fmt", JS_HTMLGetValueByID("aud_out_fmt" + i));
+			    JS_XMLAddTextChild(lXMLDom, lSubHolder, "pcr_combine", JS_HTMLGetValueByID("pcr_combine" + i));
+
+			}
+
+			JS_HttpPost("/goform/xmlcgipost", lXMLDom, false);
+			window.top.document.frames["BottomFrame"].OnShowLoadingWindow(3, false, false, "window.top.document.frames['MainFrame'].document.frames['right_frame'].location.reload()");
+    }
+
+        
+		function OnXMLCBLimitData(XMLDom) 
+		{
+	       s_ParamSupportXML = XMLDom;
+		}
+		
+		function OnTimeoutDelayLoadData()
+		{
+		    var i, k;
+		    var lTmpVar
+		    var lModuleParam;
+		    var lTransServIdsArray;
+		    
+		    /*获取该模块的参数限制*/
+		    {
+		        var lXMLDom, lBodyHolder;
+
+		        lXMLDom = JS_XMLCreateDomFromFile(null);
+		        lBodyHolder = JS_XMLParamSetSubModuleHead(lXMLDom, s_ModuleInd, "param_support");
+		        JS_HttpGet("/goform/xmlcgiget", escape(lXMLDom.xml), OnXMLCBLimitData, true);
+		    }
+
+		    /*生成可以转码的节目列表*/
+		    {
+		        s_ServSelect = JS_UISelectCreate();
+
+		        AddOutputMuxServOption(s_ServSelect);
+		    }
+
+		    lModuleParam = JS_CardParamGetSubModuleParamNode(s_ModuleInd);
+		    
+		    if (JS_ISValidObject(lModuleParam)) 
+		    {
+		        var lHolder;
+		        
+		        lHolder = JS_XMLGetTagNameFirstObj(lModuleParam, "parameter");
+		        
+		        lChnArray = JS_XMLGetTagNameArray(lHolder, "chn");
+
+		        if (s_ChnInd < lChnArray.length)
+		        {
+		            lSubArray = JS_XMLGetTagNameArray(lChnArray[s_ChnInd], "sub");
+		            if (JS_XMLGetTagValueINT(lChnArray[s_ChnInd], "disabled") == 1)
+		            {
+		                DISABLE = true;
+		                $("submit").disabled = true;
+		            }
+		            else
+		            {
+		                DISABLE = false;
+
+		            }
+		            s_SubChnNum = lSubArray.length;
+		                
+		                /*找到，没有被当前通道适用的ServIDs*/
+		                lTransServIdsArray = JS_ParamGetTransServUNIIDArray();
+
+	                    if (lTransServIdsArray.length > 0)
+	                    {
+	                        for (k = 0; k < lTransServIdsArray.length; k++)
+	                        {
+	                            lTmpVar = JS_XMLGetValue(lTransServIdsArray[k]);
+		                        for (i = 0; i < s_SubChnNum; i++)
+		                        {
+		                            UNIID = JS_XMLGetTagValue(lSubArray[i], "uni_id");
+	                                if (UNIID == lTmpVar)
+	                                {
+	                                    break;
+	                                }
+		                        }
+		                        
+	                            if (i == s_SubChnNum)
+	                            {
+	                                s_UNIIDArray.push(lTmpVar);
+	                            }
+	                        }
+	                    }
+	                    
+		                for (i = 0; i < s_SubChnNum; i++)
+		                {
+		                    bEnable = JS_XMLGetTagValueINT(lSubArray[i], "enable");
+		                    UNIID = JS_XMLGetTagValue(lSubArray[i], "uni_id");
+		                    VID_FMT = JS_XMLGetTagValue(lSubArray[i], "vid_in_fmt");
+		                    VID_FRRES = JS_XMLGetTagValue(lSubArray[i], "vid_in_res_fr");
+		                    AUD_FMT = JS_XMLGetTagValue(lSubArray[i], "aud_in_fmt");
+		                    PID_DELAY = JS_XMLGetTagValueINT(lSubArray[i], "pid_delay");
+		                    AddTranscoderInRow(i, bEnable, UNIID, VID_FMT, VID_FRRES, AUD_FMT, PID_DELAY, DISABLE);
+		                    VID_FMT = JS_XMLGetTagValue(lSubArray[i], "vid_out_fmt");
+		                    VID_PROFILE = JS_XMLGetTagValue(lSubArray[i], "vid_out_profile_level");
+		                    VID_FRRES = JS_XMLGetTagValue(lSubArray[i], "vid_out_res_fr");
+		                    VID_RATE = JS_XMLGetTagValue(lSubArray[i], "vid_out_rate");
+		                    VID_XBR = JS_XMLGetTagValue(lSubArray[i], "vid_out_xbr");
+		                    AUD_FMT = JS_XMLGetTagValue(lSubArray[i], "aud_out_fmt");
+		                    PCR_COMB = JS_XMLGetTagValue(lSubArray[i], "pcr_combine");
+		                    AddTranscoderOutRow(i, VID_FMT, VID_PROFILE, VID_FRRES, VID_RATE, VID_XBR, AUD_FMT, PCR_COMB, DISABLE);
+		                }
+		            
+		            
+		        }
+		    }
+
+		}
+		
+
+		function OnLoad()
+		{
+		    var i;
+		    var lTmpVar
+
+			lTmpVar = JS_ArgGetArgs();
+			
+			s_ModuleInd = parseInt(JS_ArgGetValueByName(lTmpVar, "module"), 10);
+			s_ModuleTag = JS_ArgGetValueByName(lTmpVar, "module_tag");
+			s_ChnInd = parseInt(JS_ArgGetValueByName(lTmpVar, "chn"), 10);
+			s_ChnTag = JS_ArgGetValueByName(lTmpVar, "chn_tag");
+
+			if (s_ModuleInd != null && s_ChnInd != null)
+			{
+			    $("cur_name").innerHTML = JS_LANCMN("module") + "-" + JS_StrLeftPading(s_ModuleInd + 1, 2) + "&nbsp;&nbsp;&nbsp;"  + JS_LANCMN("chan") + "-" + JS_StrLeftPading((s_ChnInd + 1), 2);
+			    $("chn_type").innerHTML = JS_CLANGetCHNNameByTag(s_ChnTag);
+
+			    i = 0;
+			    s_ServList = new MyListControl("s_ServList", 830, 116, "serv_param", false);
+
+			    s_ServList.SetColProperty(i, 40, JS_LANCMN("index"), "center", "center"); i++;
+			    s_ServList.SetColProperty(i, 325, JS_CLAN("serv_select"), "center", "center"); i++;
+			    s_ServList.SetColProperty(i, 365, JS_CLAN("video_es_info"), "center", "center"); i++;
+			    s_ServList.SetColProperty(i, 70, JS_CLAN("analyse"), "center", "center"); i++;
+			    s_ServList.UpdateListFrame();
+
+
+			    i = 0;
+			    s_InListItem = new MyListControl("s_InListItem", 830, 116, "in_param", false);
+
+			    s_InListItem.SetColProperty(i, 40, JS_LANCMN("index"), "center", "center"); i++;
+			    s_InListItem.SetColProperty(i, 60, JS_LANCMN("enable"), "center", "center"); i++;
+			    s_InListItem.SetColProperty(i, 180, JS_CLAN("video_fmt"), "center", "center"); i++;
+			    s_InListItem.SetColProperty(i, 165, JS_CLAN("video_res_fr"), "center", "center"); i++;
+			    s_InListItem.SetColProperty(i, 140, JS_CLAN("aud_fmt"), "center", "center"); i++;
+			    s_InListItem.SetColProperty(i, 110, JS_CLAN("pid_delay"), "center", "center"); i++;
+			    s_InListItem.UpdateListFrame();
+
+			    i = 0;
+			    s_OutListItem = new MyListControl("s_OutListItem", 830, 116, "out_param", false);
+
+				s_OutListItem.SetColProperty(i, 40, JS_LANCMN("index"), "center", "center");i++;
+				s_OutListItem.SetColProperty(i, 140, JS_CLAN("video_fmt"), "center", "center"); i++;
+				s_OutListItem.SetColProperty(i, 90, JS_CLAN("video_pro_level"), "center", "center"); i++;
+				s_OutListItem.SetColProperty(i, 120, JS_CLAN("video_res_fr"), "center", "center"); i++;
+				s_OutListItem.SetColProperty(i, 150, JS_CLAN("video_rate"), "center", "center"); i++;
+				s_OutListItem.SetColProperty(i, 90, JS_CLAN("aud_fmt"), "center", "center"); i++;
+				s_OutListItem.SetColProperty(i, 60, JS_CLAN("aud_rate"), "center", "center"); i++;
+				s_OutListItem.SetColProperty(i, 50, JS_CLAN("aud_sampl"), "center", "center"); i++;
+				s_OutListItem.SetColProperty(i, 40, JS_CLAN("comb"), "center", "center"); i++;
+				s_OutListItem.UpdateListFrame();
+				
+                setTimeout(OnTimeoutDelayLoadData, 1);
+            }
+		}
+
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="850px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0" id="table_whole">
+        <tr>
+            <td height="30px" align="center" background="/graphics/boxmenu_850.gif" id="setting_title">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%" style="padding-left:20px;padding-right:20px;">
+					<tr>
+						<td width="250px" align="right">
+						</td>
+						<td align="center">
+							<span style="font-weight: bold"><script type="text/javascript" >JS_CINLAN("title")</script></span>
+						</td>
+						<td width="220px" align="right">
+						    <span id="cur_name" ></span>
+						</td>
+						<td width="30px" align="right">
+						</td>
+					</tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td height="30px" align="center" bgcolor="#F5F9FE">
+				<div id="head" style="height: 30px; width: 800px; overflow: auto; padding: 10px 20px 0px 10px;">
+					<table width="100%">
+						<tr>
+							<td height="22px" bgcolor="#E4EFF8" width="40%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+                               <span id="chn_type"></span>
+                               <span ><script type="text/javascript">JS_CINLAN("trans_setting")</script></span>
+							</td>
+							<td height="20px" bgcolor="#F5F9FE" width="75%" align="left" style="padding-left: 13px; color: #069; font-size: 10pt;">
+							</td>
+						</tr>
+					</table>
+				</div>
+            </td>
+        </tr>
+         <tr>
+            <td bgcolor="#F5F9FE" align="center" style="color: #069; font-size: 10pt;">
+				<div style=" background-color:#E4EFF8; height:18px; width: 810px; overflow: auto;">
+                    <span><script type="text/javascript">JS_CINLAN("serv_param")</script></span>
+				</div>
+            </td>
+        </tr>
+       <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE" >
+                <div id="serv_param" style="height: 115px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td bgcolor="#F5F9FE" align="center" style="color: #069; font-size: 10pt;">
+				<div style=" background-color:#E4EFF8; height:18px; width: 810px; overflow: auto;">
+                    <span><script type="text/javascript">JS_CINLANCMN("decode_param")</script></span>
+				</div>
+            </td>
+        </tr>
+       <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE" >
+                <div id="in_param" style="height: 115px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td bgcolor="#F5F9FE" align="center" style="color: #069; font-size: 10pt;">
+				<div style=" background-color:#E4EFF8; height:18px; width: 810px; overflow: auto;">
+                    <span><script type="text/javascript">JS_CINLANCMN("encode_param")</script></span>
+				</div>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                <div id="out_param" style="height: 115px; overflow: hidden; padding: 5px 10px 10px 10px;">
+                </div>
+            </td>
+        </tr>
+         <tr>
+            <td height="1px" bgcolor="#F5F9FE" align="center">
+				<div style="height:1px; width:800px;overflow:hidden; background:#666"></div>
+           </td>
+        </tr>
+       <tr>
+            <td valign="top" align="center" bgcolor="#F5F9FE">
+                 <div style="height: 30px;width:820px; overflow: auto;padding: 5px 20px 5px 2px; text-align:right">
+					<button type="button" onclick="OnSubmit(this);" style="width: 80px; height: 25px" id="submit" ><script type="text/javascript">JS_INCMNLAN("submit")</script></button>&nbsp;&nbsp;
+					<button type="button" onclick='location.reload();' style="width: 80px; height: 25px" id="refresh"><script type="text/javascript">JS_INCMNLAN("refresh")</script></button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" background="/graphics/boxbottom_850.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

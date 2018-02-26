@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link href="/style/doc.css" rel="stylesheet" type="text/css" />
+    <link rel="StyleSheet" href="/components/my_tree_control/my_tree_control.css" type="text/css">
+    <style type="text/css">
+        body
+        {
+            background-image: url(/graphics/bg001.gif);
+        }
+    </style>
+
+    <script type="text/javascript" src="/components/my_tree_control/my_tree_control.js"></script>
+    <script type="text/javascript" src="/js/language.js"></script>
+    <script type="text/javascript" src="/js/common_process.js"></script>
+    <script type="text/javascript" src="/js/system_parameter.js"></script>
+    <script type="text/javascript" src="/js/device_information.js"></script>
+    <script type="text/javascript" src="/js/device_setting.js"></script>
+    <script type="text/javascript" src="card/card_language.js"></script>
+    <script type="text/javascript" src="card/card_system.js"></script>
+
+    <script type="text/javascript">
+		var TreeItem;
+        var s_ChannelXMLDoc = null;
+        var s_CardRootID;
+        JS_LANInitiate(); //初始化语言脚本组件
+        JS_ParamInitate(); //初始化系统参数处理脚本组件
+        JS_InfoInitiate();
+        JS_DevSettingInitiate();
+
+        JS_CLANInitiate();
+        JS_CardInfoInitiate();
+     
+        function OnXMLDataCB(XMLDom)
+        {
+            var i;
+            var lTmpStr, lTmpValue
+            var lMArray, lCArray;
+            var lModuleID;
+            var lState, lModuleType, lModuleTag;
+            var lChnTag, lSubNum;
+
+            if (JS_ISValidObject(XMLDom))
+            {
+                lMArray = JS_XMLGetTagNameArray(XMLDom, "module");
+                for (i = 0; i < lMArray.length; i++)
+                {
+                    lState = JS_XMLGetTagValue(lMArray[i], "state");
+                    if (lState == "normal")
+                    {
+                        lModuleType = JS_XMLGetTagValueINT(lMArray[i], "type", 10);
+                        lModuleTag = JS_XMLGetTagValue(lMArray[i], "module_tag");
+                        lTmpStr = JS_LANCMN("module") + " " + JS_StrLeftPading(i + 1, 2) + " - " + JS_CLANGetModuleNameByType(lModuleType);
+                    }
+                    else
+                    {
+                        lTmpStr = JS_LANCMN("module") + " " + JS_StrLeftPading(i + 1, 2) + " - " + JS_LANCMN("no_module")
+                    }
+                    lModuleID = TreeItem.AddNewNode(s_CardRootID, lTmpStr);
+
+                    if (lState == "normal")
+                    {
+                    }
+
+
+                }
+            }
+        }
+        
+        
+        function OnLoad() 
+        {
+            var lTmpStr, lTmpVar;
+            var i, lTmpValue, lChnNum, lChnType;
+            var lRootID, lSecondID, lThridID, lFourthID;
+            var lChnObj, lSubObj, lSubArray;
+            var lChnInfo;
+			TreeItem = null;
+			TreeItem = new MyTreeControl("TreeItem");
+
+			lTmpStr = JS_LAN("monitor_items");
+			lRootID = TreeItem.AddNewNode(0, lTmpStr);
+
+			lTmpStr = JS_LAN("device_monitor");
+			lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+
+			lTmpStr = "<a href='monitor_right_alarm.html' target='right_frame'>" + JS_LAN("alarm") + "</a>";
+			TreeItem.AddNewNode(lSecondID, lTmpStr);
+			
+			lTmpStr = "<a href='monitor_right_status_" + JS_InfoGePlatformType() + ".html' target='right_frame'>" + JS_LAN("status") + "</a>";
+			TreeItem.AddNewNode(lSecondID, lTmpStr);
+
+			
+			
+// 			lTmpStr = "Log"
+// 			lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+// 			lTmpStr = "<a href='monitor_right_log.html' target='right_frame'>" + "Log" + "</a>";
+// 			TreeItem.AddNewNode(lSecondID, lTmpStr);
+
+	        if ((JS_InfoGetSN().substr(0,7) == "TC41A07") || (JS_InfoGetSN().substr(0,7) == "TC41A08")) {
+	            lTmpStr = "<a href='monitor_right_input_status.html?chn_ind=0' target='right_frame'>" + JS_LAN("input_monitor") + "</a>";
+			    TreeItem.AddNewNode(lRootID, lTmpStr);
+	        }
+
+			lTmpStr = JS_LAN("bitrate");
+			lSecondID = TreeItem.AddNewNode(lRootID, lTmpStr);
+
+			lTmpStr = JS_LAN("input");
+			lThridID = TreeItem.AddNewNode(lSecondID, lTmpStr);
+			//从XML中分析出通道的数量，每个通道的TS数量，并分类成输入和输出两类。
+			lChnNum = JS_ParamGetInChannelNum();
+			for(i = 0; i < lChnNum; i++)
+			{
+		        lChnObj = JS_ParamGetInChannelObject(i);
+		        lChnType = JS_ParamGetChannelType(lChnObj);
+		        if (JS_ParamGetChannelHideMark(lChnObj) != "ON") 
+		        {
+		            lTmpStr = "<a href='monitor_right_bitrate.html?direction=in&chn_ind=" + i + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((i + 1), 2) + " - " + JS_LANCMN(lChnType) + "</a>";
+		            lFourthID = TreeItem.AddNewNode(lThridID, lTmpStr);
+		            lSubArray = JS_ParamGetSubChannelArray(lChnObj);
+		            for (k = 0; k < lSubArray.length; k++)
+		            {
+		                lSubInfo = JS_ParamGetSubChannelInfoMonitor(lSubArray[k]);
+		                if (lSubInfo.m_Active == "ON" && lSubInfo.m_PIDStatMark != "OFF")
+		                {
+		                    lTmpStr = "<a href='monitor_right_bitrate_pid.html?direction=in&chn_ind=" + i + "&sub_ind=" + k + "&ts_ind=" + lSubInfo.m_TsIndex + "' target='right_frame'>" + JS_StrLeftPading(k + 1, 3) + " - (" + JS_LANCMN("ts") + " " + JS_StrLeftPading((lSubInfo.m_TsIndex + 1), 3) + ")</a>";
+		                    TreeItem.AddNewNode(lFourthID, lTmpStr);
+		                }
+		            }
+		        }
+			}
+
+			lTmpStr = JS_LAN("output");
+			lThridID = TreeItem.AddNewNode(lSecondID, lTmpStr);
+			lChnNum = JS_ParamGetOutChannelNum();
+			for(i = 0; i < lChnNum; i++)
+			{
+		        if (((JS_InfoGetSN().substr(0,7) == "TC41A07") || (JS_InfoGetSN().substr(0,7) == "TC41A08")) && (JS_DevGetIpOutputType() == "SPTS")) {
+		            lChnObj = JS_ParamGetInChannelObject(i);
+		            lChnType = JS_ParamGetChannelType(lChnObj);
+		        }
+		        else {
+		            lChnObj = JS_ParamGetOutCHNObj(i);
+		            lChnType = JS_ParamGetChannelType(lChnObj);
+		        }
+
+		        if (JS_ParamGetChannelHideMark(lChnObj) != "ON")
+		        {
+		            if (lChnType != "ETH_LOOP" && lChnType != "ETH_LOOP_DEP")
+		            {
+		                lTmpStr = "<a href='monitor_right_bitrate.html?direction=out&chn_ind=" + i + "' target='right_frame'>" + JS_LANCMN("chan") + " " + JS_StrLeftPading((i + 1), 2) + " - " + JS_LANCMN(lChnType) + "</a>";
+		                lFourthID = TreeItem.AddNewNode(lThridID, lTmpStr);
+		                lSubArray = JS_ParamGetSubChannelArray(lChnObj);
+		                if (lChnType == "ASI")
+		                {
+		                }
+		                else if (lChnType == "ETH")
+		                {
+		                    /* 针对 GN1846/GN1866 使用的数据网口和管理网口一样，所以这里不显示 IP 地址信息 */
+		                    if (((JS_InfoGetSN().substr(0,7) != "TC41A07") && (JS_InfoGetSN().substr(0,7) != "TC41A08"))) {
+		                        lChnInfo = JS_ParamGetChnInfoETH(lChnObj);
+		                        lTmpStr = "IP - [" + lChnInfo.m_IPv4Addr + "]";
+		                        TreeItem.AddNewNode(lFourthID, lTmpStr);
+		                    }
+		                }
+		                for (k = 0; k < lSubArray.length; k++)
+		                {
+		                    lSubInfo = JS_ParamGetSubChannelInfoMonitor(lSubArray[k]);
+		                    if (lSubInfo.m_Active == "ON" && lSubInfo.m_PIDStatMark != "OFF")
+		                    {
+		                        lTmpStr = "<a href='monitor_right_bitrate_pid.html?direction=out&chn_ind=" + i + "&sub_ind=" + k + "&ts_ind=" + lSubInfo.m_TsIndex + "' target='right_frame'>" + JS_StrLeftPading(k + 1, 3) + " - (" + JS_LANCMN("ts") + " " + JS_StrLeftPading((lSubInfo.m_TsIndex + 1), 3) + ")</a>";
+		                        TreeItem.AddNewNode(lFourthID, lTmpStr);
+		                    }
+		                }
+		            }
+		        }
+ 			}
+
+ 			if (JS_InfoGePlatformType() == "encoder_card_platform")
+ 			{
+ 			    var lMArray, lMObj, lModuleInfo;
+ 			    var lChnObj, lChnInfo;
+ 			    var lState;
+ 			    var lModuleRoot, lModuleNode;
+
+ 			    lTmpStr = JS_LANCMN("sub_modules");
+ 			    lModuleRoot = TreeItem.AddNewNode(lRootID, lTmpStr);
+
+ 			    lMArray = JS_CardInfoGetModuleArray();
+ 			    if (JS_ISValidObject(lMArray))
+ 			    {
+ 			        for (i = 0; i < lMArray.length; i++)
+ 			        {
+ 			            lMObj = lMArray[i];
+ 			            lState = JS_CardInfoGetModuleState(lMObj);
+ 			            if (lState == "normal")
+ 			            {
+ 			                lModuleInfo = JS_CardInfoGetModuleInfo(lMObj);
+ 			                lTmpStr = JS_LANCMN("module") + " " + JS_StrLeftPading(i + 1, 2) + " - " + JS_CLANGetModuleNameByTag(lModuleInfo.m_ModuleTag);
+ 			            }
+ 			            else
+ 			            {
+ 			                lTmpStr = JS_LANCMN("module") + " " + JS_StrLeftPading(i + 1, 2) + " - " + JS_LANCMN("no_module")
+ 			            }
+ 			            lModuleNode = TreeItem.AddNewNode(lModuleRoot, lTmpStr);
+
+ 			            if (lState == "normal")
+ 			            {
+ 			                lTmpStr = "<a href='/card/monitor_right_card_alarm.html?" + "module=" + i + "&module_tag= " + lModuleInfo.m_ModuleTag + "' target='right_frame'>" + JS_LAN("alarm") + "</a>";
+ 			                TreeItem.AddNewNode(lModuleNode, lTmpStr);
+
+ 			                lTmpStr = "<a href='/card/monitor_right_card_status_" + lModuleInfo.m_ModuleTag + ".html?" + "module=" + i + "&module_tag= " + lModuleInfo.m_ModuleTag + "' target='right_frame'>" + JS_LAN("status") + "</a>";
+ 			                TreeItem.AddNewNode(lModuleNode, lTmpStr);
+ 			            }
+ 			        }
+ 			    }
+ 			}
+			
+			
+			document.getElementById("item_tree").innerHTML = TreeItem.toString();
+			TreeItem.ToggleCollapse(lRootID, 4, 2);
+			JS_ForcusKeepChangeCallbackSetup($("item_tree"), "red", "white");
+}
+    </script>
+
+</head>
+<body onload="OnLoad()">
+    <table width="310px" height="560px" border="0" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td height="30px" background="/graphics/boxmenu_310.gif" align="center">
+                <span style="font-weight: bold"><script type="text/javascript">JS_INLAN("title")</script></span>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top" align="left" bgcolor="#F5F9FE">
+                <div id="item_tree" style="height: 507px;width:290px; overflow: auto; padding: 10px;">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td height="13" align="center" valign="top" background="/graphics/boxbottom_310.gif">
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
