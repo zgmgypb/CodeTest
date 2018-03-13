@@ -1,0 +1,71 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AllocNALU	rtp_rtsp.c	/^NALU_t *AllocNALU(int buffersize)$/;"	f
+DEST_IP	h264.h	21;"	d
+E	h264.h	/^	unsigned char E:1;$/;"	m	struct:__anon4
+F	h264.h	/^	unsigned char F:1;$/;"	m	struct:__anon2
+F	h264.h	/^	unsigned char F:1;$/;"	m	struct:__anon3
+FU_HEADER	h264.h	/^} FU_HEADER; \/**\/\/* 1 BYTES *\/$/;"	t	typeref:struct:__anon4
+FU_INDICATOR	h264.h	/^} FU_INDICATOR; \/**\/\/* 1 BYTES *\/$/;"	t	typeref:struct:__anon3
+FindStartCode2	rtp_rtsp.c	/^static int FindStartCode2 (unsigned char *Buf)$/;"	f	file:
+FindStartCode3	rtp_rtsp.c	/^static int FindStartCode3 (unsigned char *Buf)$/;"	f	file:
+FreeNALU	rtp_rtsp.c	/^void FreeNALU(NALU_t *n)$/;"	f
+GetAnnexbNALU	rtp_rtsp.c	/^int GetAnnexbNALU (NALU_t *nalu)$/;"	f
+H264	h264.h	24;"	d
+MAXLINE	client_test.c	10;"	d	file:
+MAX_RTP_PKT_LENGTH	h264.h	19;"	d
+NALU_HEADER	h264.h	/^} NALU_HEADER; \/**\/\/* 1 BYTES *\/$/;"	t	typeref:struct:__anon2
+NALU_t	rtp_rtsp.c	/^} NALU_t;$/;"	t	typeref:struct:__anon5	file:
+NRI	h264.h	/^	unsigned char NRI:2;$/;"	m	struct:__anon3
+NRI	h264.h	/^    unsigned char NRI:2;$/;"	m	struct:__anon2
+OpenBitstreamFile	rtp_rtsp.c	/^void OpenBitstreamFile (char *fn)$/;"	f
+PACKET_BUFFER_END	h264.h	16;"	d
+R	h264.h	/^	unsigned char R:1;$/;"	m	struct:__anon4
+RTP_FIXED_HEADER	h264.h	/^} RTP_FIXED_HEADER;$/;"	t	typeref:struct:__anon1
+S	h264.h	/^	unsigned char S:1;$/;"	m	struct:__anon4
+SERV_PORT	client_test.c	11;"	d	file:
+TYPE	h264.h	/^	unsigned char TYPE:5;$/;"	m	struct:__anon2
+TYPE	h264.h	/^    unsigned char TYPE:5;$/;"	m	struct:__anon3
+TYPE	h264.h	/^    unsigned char TYPE:5;$/;"	m	struct:__anon4
+allowedCommandNames	rtp_rtsp.c	/^static char const* allowedCommandNames$/;"	v	file:
+bits	rtp_rtsp.c	/^FILE *bits = NULL;                \/\/!< the bit stream file$/;"	v
+buf	rtp_rtsp.c	/^  char *buf;                    \/\/! contains the first byte followed by the EBSP$/;"	m	struct:__anon5	file:
+csrc_len	h264.h	/^    unsigned char csrc_len:4;        \/**\/\/* expect 0 *\/$/;"	m	struct:__anon1
+do_cli	client_test.c	/^void do_cli(FILE *fp, int sockfd, struct sockaddr *pservaddr, socklen_t servlen)$/;"	f
+dump	rtp_rtsp.c	/^void dump(NALU_t *n)$/;"	f
+extension	h264.h	/^    unsigned char extension:1;        \/**\/\/* expect 1, see RTP_OP below *\/$/;"	m	struct:__anon1
+forbidden_bit	rtp_rtsp.c	/^  int forbidden_bit;            \/\/! should be always FALSE$/;"	m	struct:__anon5	file:
+fu_hdr	rtp_rtsp.c	/^FU_HEADER		*fu_hdr;$/;"	v
+fu_ind	rtp_rtsp.c	/^FU_INDICATOR	*fu_ind;$/;"	v
+get_cmd_name	rtp_rtsp.c	/^char *get_cmd_name(char *request)$/;"	f
+handleCmd_DESCRIBE	rtp_rtsp.c	/^void handleCmd_DESCRIBE(char *fResponseBuffer)$/;"	f
+handleCmd_OPTIONS	rtp_rtsp.c	/^void handleCmd_OPTIONS(char *fResponseBuffer)$/;"	f
+handleCmd_PLAY	rtp_rtsp.c	/^ void handleCmd_PLAY(char *fResponseBuffer)$/;"	f
+handleCmd_SETUP	rtp_rtsp.c	/^void handleCmd_SETUP(char *fResponseBuffer)$/;"	f
+handleCmd_bad	rtp_rtsp.c	/^void handleCmd_bad(char *fResponseBuffer)$/;"	f
+info2	rtp_rtsp.c	/^static int info2=0, info3=0;$/;"	v	file:
+info3	rtp_rtsp.c	/^static int info2=0, info3=0;$/;"	v	file:
+len	rtp_rtsp.c	/^  unsigned len;                 \/\/! Length of the NAL unit (Excluding the start code, which does not belong to the NALU)$/;"	m	struct:__anon5	file:
+lost_packets	rtp_rtsp.c	/^  unsigned short lost_packets;  \/\/! true, if packet loss is detected$/;"	m	struct:__anon5	file:
+main	client_test.c	/^int main(int argc, char **argv)$/;"	f
+main	rtp_rtsp.c	/^int main()$/;"	f
+marker	h264.h	/^    unsigned char marker:1;        \/**\/\/* expect 1 *\/$/;"	m	struct:__anon1
+max_size	rtp_rtsp.c	/^  unsigned max_size;            \/\/! Nal Unit Buffer size$/;"	m	struct:__anon5	file:
+nal_reference_idc	rtp_rtsp.c	/^  int nal_reference_idc;        \/\/! NALU_PRIORITY_xxxx$/;"	m	struct:__anon5	file:
+nal_unit_type	rtp_rtsp.c	/^  int nal_unit_type;            \/\/! NALU_TYPE_xxxx$/;"	m	struct:__anon5	file:
+nalu_hdr	rtp_rtsp.c	/^NALU_HEADER		*nalu_hdr;$/;"	v
+padding	h264.h	/^    unsigned char padding:1;        \/**\/\/* expect 0 *\/$/;"	m	struct:__anon1
+payload	h264.h	/^    unsigned char payload:7;        \/**\/\/* RTP_PAYLOAD_RTSP *\/$/;"	m	struct:__anon1
+rtp_hdr	rtp_rtsp.c	/^RTP_FIXED_HEADER        *rtp_hdr;$/;"	v
+rtp_send_file	rtp_rtsp.c	/^int rtp_send_file(int sockfd,struct sockaddr *addr)$/;"	f
+rtsp_yuan	rtp_rtsp.c	/^void rtsp_yuan(int sockfd,struct sockaddr *addr,char *fResponseBuffer,char *cmdName,int addrlen)$/;"	f
+seq_no	h264.h	/^    unsigned short seq_no;$/;"	m	struct:__anon1
+sock_recv	rtp_rtsp.c	/^char* sock_recv(int sockfd,struct sockaddr *addr_client,int *addrlen)$/;"	f
+ssrc	h264.h	/^    unsigned long ssrc;            \/**\/\/* stream number is used here. *\/$/;"	m	struct:__anon1
+startcodeprefix_len	rtp_rtsp.c	/^  int startcodeprefix_len;      \/\/! 4 for parameter sets and first slice in picture, 3 for everything else (suggested)$/;"	m	struct:__anon5	file:
+timestamp	h264.h	/^    unsigned  long timestamp;$/;"	m	struct:__anon1
+version	h264.h	/^    unsigned char version:2;        \/**\/\/* expect 2 *\/$/;"	m	struct:__anon1
