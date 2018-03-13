@@ -39,6 +39,13 @@ int main(int argc, char *argv[])
 
 	printf("7 bit reverse:%d\n", bit_reverse(7));
 	printf("nihao str_invert:%s\n", str_invert("nihao"));
+	{
+		int i = 3;
+	}
+
+	{
+		int j = 5;
+	}
 #if 0
 	//*d = 200;
 	printf("d=%p\n", d);
