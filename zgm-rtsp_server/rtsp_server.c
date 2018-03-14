@@ -22,16 +22,17 @@ static int s_SocketFd;
 #define MTU (1500)
 
 static char const* allowedCommandNames
-= "OPTIONS, DESCRIBE, SETUP, TEARDOWN, PLAY, PAUSE";
+	= "OPTIONS,DESCRIBE,SETUP,TEARDOWN,PLAY,PAUSE";
 static char *servName = "Gospell Rtsp SERVER";
 
 void handleCmd_OPTIONS(char *fResponseBuffer)
 {
 	snprintf((char*)fResponseBuffer, 256,
 			"RTSP/1.0 200 OK\r\n"
+			"Server:%s\r\n"
 			"CSeq: 2\r\n"
 			"Public: %s\r\n\r\n",
-			allowedCommandNames);
+			servName, allowedCommandNames);
 }
 
 void handleCmd_DESCRIBE(char *fResponseBuffer)
@@ -202,11 +203,22 @@ void rtsp_response(int sockfd, char *pbuf)
 void rtsp_process(int sockfd, struct sockaddr_in *psockaddr)
 {
 	char pbuf[MTU];
+	ssize_t ret;
 
-	while(recv(sockfd, pbuf, MTU, MSG_WAITALL)) {
-		printf("tcp recv: %s\n", pbuf);		
-		rtsp_response(sockfd, pbuf);
-	}	
+//	while (1) {
+		while (ret = recv(sockfd, pbuf, MTU, MSG_WAITALL)) {
+			printf("tcp recv: %s\n", pbuf);		
+			rtsp_response(sockfd, pbuf);
+		}	
+		printf("recv return: %d\n", ret);
+//	}
+}
+
+static void SigHandler(int SigNum)
+{
+	shutdown(s_SocketFd, SHUT_RDWR);
+	close(s_SocketFd);
+	exit(-1);
 }
 
 int main(int argc, char *argv[])
@@ -215,9 +227,9 @@ int main(int argc, char *argv[])
 	struct sockaddr_in lCliAddr;
 	int lReUse = 1; // 可重用地址
 
-	//signal(SIGINT, SigHandler);
-	//signal(SIGQUIT, SigHandler);
-	//signal(SIGABRT, SigHandler);
+	signal(SIGINT, SigHandler);
+	signal(SIGQUIT, SigHandler);
+	signal(SIGABRT, SigHandler);
 	//signal(SIGCLD, SigCldHandler);
 
 	if ((s_SocketFd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {

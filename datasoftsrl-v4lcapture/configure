@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# This is part of v4lcapture library.
+#
+# Copyright (C) 2015 DataSoft Srl
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+
+import os, sys, json
+from os import path
+from argparse import *
+
+import pkg_resources, setuptools
+
+DESCRIPTION = 'Configure build options for V4LCapture.'
+
+##### Error #####
+
+def error(message, exit=True, code=255):
+  cmd = path.basename(sys.argv[0])
+  if exit:
+    print('{}: error: {}'.format(cmd, message), file=sys.stderr)
+    sys.exit(code)
+  else:
+    print('{}: warning: {}'.format(cmd, message), file=sys.stderr)
+
+def warn(message):
+  error(message, False)
+
+def main():
+  parser = ArgumentParser(
+    description = DESCRIPTION
+  )
+  
+  parser.add_argument('-p', '--prefix', help='set install folder')
+  parser.add_argument('-d', '--debug', help='print debug encoding info',
+      action='store_true')
+  parser.add_argument('-i', '--install-log',
+      help='produce a log of all python installed files')
+  
+  args = parser.parse_args()
+  
+  if args.install_log:
+    install_log = args.install_log
+  else:
+    install_log = 'install.log'
+  
+  inst_icns = []
+  
+  with open('Makefile', 'w') as mf:
+    mf.write('# DEBUG: print debug encoding info\n')
+    mf.write('PREPROC :=')
+    if args.debug:
+      mf.write(' -DDEBUG')
+    mf.write('\n')
+    
+    mf.write('\n')
+    
+    mf.write('''\
+CC := gcc
+
+NOT_LINKED := -c
+SHARED := -shared
+CFLAGS := -g -Wall -fPIC
+LIBS := -lswscale -lavcodec -lavutil -lavformat
+INC := -Iinclude
+
+FILES := capture error encoding util
+
+LIB = lib
+BIN := bin
+SRC := src
+SCRIPTS := scripts
+OBJ := $(patsubst %, %.o, $(FILES))
+_OBJ := $(patsubst %, $(BIN)/%, $(OBJ))
+''')
+    
+    mf.write('\n')
+    
+    mf.write('PREFIX :=')
+    if args.prefix:
+      mf.write(' {}'.format(args.prefix))
+    else:
+      mf.write(' /usr/local')
+    mf.write('\n')
+    
+    mf.write('\n')
+    
+    mf.write('''\
+.PHONY: clean bin install route uninstall clean
+
+libv4lcapture: $(SRC)/libv4lcapture.c $(OBJ)
+\t$(CC) $(SHARED) -o $(LIB)/$@.so $< $(_OBJ) $(INC) \\
+    $(CFLAGS) $(LIBS)
+  
+test: $(SRC)/test.c $(OBJ)
+\t$(CC) -o $(BIN)/$@ $< $(_OBJ) $(INC) $(CFLAGS) $(LIBS) $(PREPROC)
+
+%.o: $(SRC)/%.c bin
+\t$(CC) -o $(BIN)/$@ $< $(INC) $(NOT_LINKED) $(CFLAGS) $(LIBS) $(PREPROC)
+
+bin:
+\t@mkdir -p bin
+
+# as root
+install:
+\t@mkdir -p $(PREFIX)/lib/pkgconfig
+\t@cp -f $(LIB)/libv4lcapture.so $(PREFIX)/lib/
+\t@cp -f $(LIB)/pkgconfig/libv4lcapture.pc $(PREFIX)/lib/pkgconfig/
+\t@ldconfig
+''')
+
+    mf.write('\t@python3 setup.py install --prefix=$(PREFIX)')
+    mf.write(' --record {}'.format(install_log))
+    mf.write(' >/dev/null 2>&1\n')
+    
+    # check icons folder
+    if not path.isdir('icons'):
+      error('icons directory not found')
+    
+    # copy png in icons folder into system folder
+    for file in os.listdir('icons'):
+      size = file[10:file.find('.')]
+      inst_icns.append('$(PREFIX)/share/icons/hicolor/'
+          '{}x{}/apps/v4lcapture.png'.format(size, size))
+      mf.write('\t@mkdir -p {}\n'.format(path.dirname(inst_icns[-1])))
+      mf.write('\t@cp -f icons/{} \\\n    {}\n'.format(file, inst_icns[-1]))
+    # copy .desktop file into system folder
+    mf.write('\t@mkdir -p $(PREFIX)/share/applications\n')
+    mf.write('\t@desktop-file-install --dir=$(PREFIX)/share/applications/ \\\n'
+        '    --rebuild-mime-info-cache $(SCRIPTS)/v4lcapture.desktop'
+        ' >/dev/null 2>&1\n')
+    mf.write('\t@update-desktop-database\n')
+
+    mf.write('\n')
+
+    mf.write('''\
+# as root
+route:
+\t@mkdir -p $(PREFIX)/bin
+\t@cp -f $(SCRIPTS)/add_route.sh $(PREFIX)/bin/add_route
+
+# as root
+uninstall:
+\t@-rm -rf $(PREFIX)/lib/libv4lcapture.so
+\t@-rm -rf $(PREFIX)/lib/pkgconfig/libv4lcapture.pc
+\t@ldconfig
+''')
+
+    mf.write('\t@-./scripts/uninstall.sh')
+    mf.write(' {}'.format(install_log))
+    mf.write(' $(PREFIX)\n')
+    
+    for file in inst_icns:
+      mf.write('\t@-rm -rf {}\n'.format(file))
+    mf.write('\t@-rm -rf $(PREFIX)/share/applications/v4lcapture.desktop\n')
+    
+    mf.write('''\
+\t@-rm -rf $(PREFIX)/bin/add_route
+
+clean:
+\t@-find bin -type f -executable -delete
+\t@-find bin -iname "*.o" -delete
+\t@-find lib -maxdepth 1 -iname "*.so" -delete
+''')
+    
+    mf.write('\t@-rm -rf build dist {} *.egg-info\n'.format(install_log))
+    mf.write('\t@-rm -rf Makefile')
+
+if __name__ == '__main__':
+  main()

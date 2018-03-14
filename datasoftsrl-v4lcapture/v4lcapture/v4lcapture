@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# This is part of v4lcapture library.
+#
+# Copyright (C) 2015 DataSoft Srl
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+
+import sys, os
+from os import path
+from argparse import *
+from datetime import datetime as dt
+
+import v4lcapture
+from v4lcapture import util, error
+from v4lcapture.ui import window
+from v4lcapture.capture import wrapper
+
+def main():
+  parser = ArgumentParser(
+    description = v4lcapture.DESCRIPTION
+  )
+  
+  parser.add_argument('-v', '--version', help='show program version',
+      action='store_true')
+  
+  args = parser.parse_args()
+  
+  if args.version:
+    year = dt.now().strftime('%Y')
+    print('V4LCapture {}'.format(v4lcapture.VERSION))
+    v4l = wrapper.V4LCapture()
+    print('libv4lcapture {}'.format(v4l.version()))
+    if year == '2015':
+      print('Copyright (c) 2015 DataSoft Srl')
+    else:
+      print('Copyright (c) 2015-{} DataSoft Srl'.format(year))
+    print('''\
+License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Riccardo Macoratti.
+''')
+    del v4l
+    sys.exit(0)
+  
+  # create config handler
+  conf = util.Config(path.dirname(sys.argv[0]))
+  
+  # check if some /dev/video* exists
+  util.check_devices()
+  
+  # check if some eth* exists
+  util.check_eths()
+  
+  # load v4lcapture library
+  v4l = wrapper.V4LCapture()
+  
+  # start main window
+  main_win = window.Window(conf, sys.argv, v4l)
+  
+  main_win.quit()
+
+if __name__ == '__main__':
+  main()

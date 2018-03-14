@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=V4LCapture
+GenericName=V4L2 Streamer
+Comment=View, capture and stream Video4Linux2 devices
+Exec=v4lcapture
+Icon=v4lcapture
+Terminal=false
+Categories=Qt;AudioVideo;Video;
