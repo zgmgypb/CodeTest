@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+void strdup_test(void)
+{
+	char *str="hello world!";
+
+	printf("strdup(\"hello\"):%s\n", strdup("hello"));
+}
+
 char *str_invert(char *str)
 {
 	char *p;
@@ -34,6 +41,8 @@ unsigned char bit_reverse(unsigned char c)
 
 int main(int argc, char *argv[])
 {
+	strdup_test();
+#if 0
 	int a = 5, b = 7, c;
 	const int *d = &b;
 
@@ -46,6 +55,7 @@ int main(int argc, char *argv[])
 	{
 		int j = 5;
 	}
+#endif
 #if 0
 	//*d = 200;
 	printf("d=%p\n", d);

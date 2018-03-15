@@ -1,6 +1,7 @@
 tags
 *.cmd.c
 *.o
+*.out
 *.ts
 *.out
 *.swp
