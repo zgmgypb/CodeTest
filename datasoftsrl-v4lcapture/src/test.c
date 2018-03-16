@@ -37,7 +37,7 @@ int main(void) {
   
   ctx *context = init_ctx();
   
-  strcpy(context->dev_name, "/dev/video1");
+  strcpy(context->dev_name, "/dev/video0");
   
   open_device(context);
   

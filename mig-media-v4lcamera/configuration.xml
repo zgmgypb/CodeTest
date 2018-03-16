@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Interface Domain="Media.CameraInput" AssemblyName="MIG-V4LCamera.dll" IsEnabled="false">
+  <Options />
+</Interface>
+
+
