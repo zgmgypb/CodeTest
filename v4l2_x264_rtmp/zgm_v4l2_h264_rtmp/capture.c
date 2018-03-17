@@ -1,11 +1,11 @@
 extern "C"{
 
 #ifdef __cplusplus
- #define __STDC_CONSTANT_MACROS
- #ifdef _STDINT_H
-  #undef _STDINT_H
- #endif
- # include <stdint.h>
+#define __STDC_CONSTANT_MACROS
+#ifdef _STDINT_H
+#undef _STDINT_H
+#endif
+# include <stdint.h>
 #endif
 
 }
@@ -44,22 +44,22 @@ struct Ctx
 	int bytesperrow; // 用于cp到 pic_src
 	AVPicture pic_src, pic_target;	// 用于 sws_scale
 	Buffer bufs[BUFFS_REQUEST];		// 用于 mmap
-        PixelFormat fmt;
+	PixelFormat fmt;
 };
 typedef struct Ctx Ctx;
 
 int capture_get_output_ptr (void *c, unsigned char***ptr, int **ls)
 {
-    Ctx *ctx = (Ctx*)c;
-    *ptr = ctx->pic_target.data;
-    *ls = ctx->pic_target.linesize;
-    return 1;
+	Ctx *ctx = (Ctx*)c;
+	*ptr = ctx->pic_target.data;
+	*ls = ctx->pic_target.linesize;
+	return 1;
 }
 
 /*
-	函数功能: 打开视频设备,并完成设置和内存映射
-	参考资料: http://www.embedu.org/Column/Column320.htm
-*/
+   函数功能: 打开视频设备,并完成设置和内存映射
+   参考资料: http://www.embedu.org/Column/Column320.htm
+   */
 void *capture_open (const char *dev_name, int t_width, int t_height, PixelFormat tarfmt)
 {
 	int id = open(dev_name, O_RDWR);//打开视频设备 /dev/videoX
@@ -91,7 +91,7 @@ void *capture_open (const char *dev_name, int t_width, int t_height, PixelFormat
 			bufs.count = BUFFS_REQUEST;//The number of buffers requested or granted. This field is only used when memory is set to V4L2_MEMORY_MMAP.
 			bufs.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;//Type of the stream or buffers, this is the same as the struct v4l2_format type field. See Table 3-2 for valid values.
 			bufs.memory = V4L2_MEMORY_MMAP;
-			
+
 			//向驱动申请帧缓存, 开启内存映射或用户指针I/O
 			if (ioctl(id, VIDIOC_REQBUFS, &bufs) < 0) 
 			{
@@ -120,7 +120,7 @@ void *capture_open (const char *dev_name, int t_width, int t_height, PixelFormat
 					return 0;
 				}
 
-				 //转换成相对地址
+				//转换成相对地址
 				ctx->bufs[i].length = buf.length;
 				ctx->bufs[i].start = mmap(0, buf.length, PROT_READ|PROT_WRITE,
 						MAP_SHARED, id, buf.m.offset);
@@ -148,7 +148,7 @@ void *capture_open (const char *dev_name, int t_width, int t_height, PixelFormat
 	v4l2_fmtdesc fmt_desc;
 	uint32_t index = 0;
 
-        // 看起来, 不支持 plane fmt, 直接使用 RGB 吧, 然后使用 libswscale 转换
+	// 看起来, 不支持 plane fmt, 直接使用 RGB 吧, 然后使用 libswscale 转换
 #if 1
 	do 
 	{
@@ -172,17 +172,17 @@ void *capture_open (const char *dev_name, int t_width, int t_height, PixelFormat
 		return 0;
 	}
 
-//	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
-//	fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
-//	rc = ioctl(id, VIDIOC_S_FMT, &fmt);
-//	if (rc < 0) {
-//		fprintf(stderr, "%s: can't support V4L2_PIX_FMT_MJPG\n", __func__);
-//		return 0;
-//	}
-//	if (fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_MJPEG) {
-//		fprintf(stderr, "%s: can't support V4L2_PIX_FMT_MJPG\n", __func__);
-//		return 0;
-//	}
+	//	fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
+	//	fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+	//	rc = ioctl(id, VIDIOC_S_FMT, &fmt);
+	//	if (rc < 0) {
+	//		fprintf(stderr, "%s: can't support V4L2_PIX_FMT_MJPG\n", __func__);
+	//		return 0;
+	//	}
+	//	if (fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_MJPEG) {
+	//		fprintf(stderr, "%s: can't support V4L2_PIX_FMT_MJPG\n", __func__);
+	//		return 0;
+	//	}
 
 	PixelFormat pixfmt = PIX_FMT_NONE;
 	switch (fmt.fmt.pix.pixelformat) 
@@ -194,7 +194,7 @@ void *capture_open (const char *dev_name, int t_width, int t_height, PixelFormat
 		case V4L2_PIX_FMT_MJPEG:
 			// pixfmt = PIX_FMT_YUVJ422P;
 			// 使用 mjpeg 应该能够满足 640x480x25, 但是需要解码 mjpeg
-		
+
 			break;
 	}
 
@@ -209,13 +209,13 @@ void *capture_open (const char *dev_name, int t_width, int t_height, PixelFormat
 	ctx->width = t_width;
 	ctx->height = t_height;
 	ctx->sws = sws_getContext(fmt.fmt.pix.width, fmt.fmt.pix.height, pixfmt,
-                        ctx->width, ctx->height, tarfmt, 	// PIX_FMT_YUV420P 对应 X264_CSP_I420
+			ctx->width, ctx->height, tarfmt, 	// PIX_FMT_YUV420P 对应 X264_CSP_I420
 			SWS_FAST_BILINEAR, 0, 0, 0);
 
 	ctx->rows = fmt.fmt.pix.height;
 	ctx->bytesperrow = fmt.fmt.pix.bytesperline;
 
-        avpicture_alloc(&ctx->pic_target, tarfmt, ctx->width, ctx->height);
+	avpicture_alloc(&ctx->pic_target, tarfmt, ctx->width, ctx->height);
 
 	// queue buf
 	fprintf(stderr, "%s: VIDIOC_QBUF, buf cnt=%d, %d\n", __func__, BUFFS_REQUEST, sizeof(ctx->bufs)/sizeof(Buffer));
@@ -238,7 +238,7 @@ void *capture_open (const char *dev_name, int t_width, int t_height, PixelFormat
 		exit(-1);
 	}
 
-        ctx->fmt = tarfmt;
+	ctx->fmt = tarfmt;
 
 	return ctx;
 }
@@ -264,8 +264,8 @@ int capture_get_picture (void *id, Picture *pic)
 		return -1;
 	}
 
-//	_save_pic(ctx->bufs[buf.index].start, buf.length);
-//	__asm("int $3");
+	//	_save_pic(ctx->bufs[buf.index].start, buf.length);
+	//	__asm("int $3");
 	ctx->pic_src.data[0] = (unsigned char*)ctx->bufs[buf.index].start;
 	ctx->pic_src.data[1] = ctx->pic_src.data[2] = ctx->pic_src.data[3] = 0;
 	ctx->pic_src.linesize[0] = ctx->bytesperrow;
